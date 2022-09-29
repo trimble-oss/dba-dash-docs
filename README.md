@@ -11,10 +11,13 @@ Based on [Doks](https://getdoks.org)
 
 ## Add docs page
 
-* npm run create docs/help/introduction/index.md
+* `npm run create docs/help/introduction/index.md`
 * Change draft to false
 * Set parent
 
+## Add blog post
+
+* `npm run create blog/blog-post-name/index.md`
 
 ## More help
 
