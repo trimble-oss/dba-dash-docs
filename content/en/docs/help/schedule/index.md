@@ -127,6 +127,8 @@ Add [your own](CustomChecks.md) checks to DBA Dash.
 
 ## Schedule Customization
 
+![Schedule](schedule.PNG)
+
 The application has a default schedule listed above which aims to provide a good balance for most instances. If you increase the frequency of data collection, you will increase the monitoring impact and it could also increase the size of your DBA Dash repository database.  Less frequent collection could mean that the data is stale or doesn't provide enough granularity for performance troubleshooting.
 If you need to adjust the default schedule to better meet your needs, this can be done using the DBA Dash Service Config tool.  In the Options tab click "Configure Schedule".
 
@@ -134,14 +136,19 @@ If you want to override the default schedule, uncheck "Default" and enter a stri
 
 There is also the option to configure the collection to run on service start.  Restarting the service is an option if you need to manually refresh data before the scheduled collection runs.
 
-![Schedule](schedule.PNG)
+{{< alert icon="💡" text="Collections that share the same schedule will be collected together.  For example, CPU, performance counters, waits etc might all share the same 1min collection schedule.  Every 1min, a job will be triggered to collect this data.  The collections are run serially rather than separate triggers firing at the same time for every collection.  A separate job is used for each monitored SQL instance and each schedule - collections for different instances will run in parallel.  Any collections that are not applicable for the instance type will be skipped.  For example, Azure DB collections are skipped for regular SQL Instances. Agent job collections are skipped for Azure DB. Availability group collections are skipped if HADR isn't enabled. " />}}
+
+The schedule data is saved in the ServiceConfig.json for any collections that you have overridden from the default values. The application defaults are configured in [this source file](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/CollectionSchedule.cs).
+
+## Bulk Edits
+
+![Schedule - Bulk changes](schedulebulk.PNG)
+
+To make it easier to apply updates to a group of schedules you can use the bulk edit features.  Use the row headers (highlighted above) to select the full row.  Select a single row to copy the schedule for that row.  Select the collections you want to update to have the same schedule and click paste.  There are also options to reset back to the default schedules or to disable the selected collections.
+
+## Per Instance customization
 
 If you configure the schedule in the options tab it will apply to all the monitored SQL instances for that agent.  If you want to adjust the schedule for a specific instance, click the "Source" tab.  In the "Existing Connections" grid, click the "Schedule" link to edit the schedule for a specific instance.  Any collections you don't override the schedule for will be inherited from the agent level configuration described earlier or from the built in application default values.  
-
-> **Note**
-> Collections that share the same schedule will be collected together.  For example, CPU, performance counters, waits etc might all share the same 1min collection schedule.  Every 1min, a job will be triggered to collect this data (serially) rather than separate triggers firing at the same time for each collection.  A separate job is used for each monitored SQL instance and each schedule.
-
-The schedule data is saved in the ServiceConfig.json for any collections that you have overridden from the default values. The application defaults are configured in [this source file](../DBADash/CollectionSchedule.cs).
 
 ## Cron Expressions
 
