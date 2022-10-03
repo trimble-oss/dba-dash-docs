@@ -39,11 +39,11 @@ To run the GUI, users only need access to the repository database.  No access is
 ![DBA Dash Connect](connect.png)
 
 {{< alert icon="⚠️" text="Use Windows authentication where possible." />}}
- [ServiceConfig.json](http://localhost:1313/docs/help/security/#config-file-security) is used to store the connection details.
+ [ServiceConfig.json](/docs/help/security/#config-file-security) is used to store the connection details.
 
  ## Upgrades
 
-Users will automatically be prompted to upgrade if the GUI version is different from the repository. [See here](http://localhost:1313/docs/setup/upgrades/#upgrading-gui-clients)
+Users will automatically be prompted to upgrade if the GUI version is different from the repository. [See here](/docs/setup/upgrades/#upgrading-gui-clients)
 
  ## Other deployment options
 

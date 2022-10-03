@@ -48,10 +48,10 @@ DBA Dash Service:
 
 {{< alert icon="💡" text="The destination connection is the SQL instance where your DBA Dash repository database is to be located" />}}
 {{< alert icon="⚠️" text="Use Windows authentication where possible." />}}
- [ServiceConfig.json](http://localhost:1313/docs/help/security/#config-file-security) is used to store the connection details.
+ [ServiceConfig.json](/docs/help/security/#config-file-security) is used to store the connection details.
 
-5. Click the "Source" tab
-6. Click the connect button to add a source connection (monitored instance)
+1. Click the "Source" tab
+2. Click the connect button to add a source connection (monitored instance)
 
 {{< alert icon="💡" text="Add multiple instances at the same time by entering a connection string or instance name on each line in the source textbox" />}}
 
