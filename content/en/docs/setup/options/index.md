@@ -28,6 +28,18 @@ There are various methods you can use to configure access to S3 buckets.  You co
 
 {{< alert icon="⚠️" text="Please avoid storing the credentials in the config if possible." />}}
 
+## Secondary Destinations
+
+A secondary destination can be used to write to multiple repository databases.  For example, you might want to have a local DBA Dash repository database and also push the data to a more central repository via a S3 bucket.  Secondary destinations can be configured by editing the **ServiceConfig.json file**.  You can use the "Json" tab in the service configuration tool or a text editor.  Here is an example writing to 3 secondary destinations (4 in total including the primary destination) - S3 bucket, folder, SQL Database.
+
+```json
+  "SecondaryDestinations": [
+    "https://mybucket.s3.amazonaws.com/DBADash",
+    "c:\\DBADashDestinationFolder",
+    "Data Source=LOCALHOST;Initial Catalog=DBADashDB;Integrated Security=True;Encrypt=True;Trust Server Certificate=True;Application Name=DBADash"
+  ],
+```
+
 ## Source Connection
 
 Similar to the destination connection, your source connection can also be a folder or S3 bucket.  This allows the DBA Dash service that has connectivity to your repository database to import the data collected via the remote DBA Dash agent.  Set the source connection the same as the destination connection used by the remote agent and click Add/Update.
