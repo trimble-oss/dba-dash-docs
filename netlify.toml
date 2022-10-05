@@ -50,3 +50,8 @@
   from = "/upgrades"
   to = "/docs/setup/upgrades/"
   status = 301
+
+  [[redirects]]
+  from = "/installation"
+  to = "/docs/setup/quick-start/"
+  status = 301
