@@ -86,7 +86,7 @@ Data collection runs on a schedule by the agent which is listed below. Collectio
 Add [your own](CustomChecks.md) checks to DBA Dash.
 - [DatabaseMirroring](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLDatabaseMirroring.sql)
 *Collect data from sys.database_mirroring*
-- [Jobs](../DBADash/SchemaSnapshotDB.cs)
+- [Jobs](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SchemaSnapshotDB.cs)
 *Collects metadata for SQL Agent jobs including a DDL snapshot using SMO. A lightweight check is run every hour to see if any jobs have been modified since the last collection. If any jobs have been modified, the collection will run.  The lightweight check won't detect some changes like changes to job schedules.  After 24hrs, the collection is run even if no modification to jobs is detected.*  
  
 #### Azure DB Only:
@@ -110,11 +110,11 @@ Add [your own](CustomChecks.md) checks to DBA Dash.
 *Collects data from sys.database_permissions for each database*
 - [VLF](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLVLF.sql)
 *Gets the Virtual Log File Count for each database.* 
-- [DriversWMI](../DBADash/DBCollector.cs)
+- [DriversWMI](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/DBCollector.cs)
 *Collects driver information from Win32_PnPSignedDriver via WMI.*  
 - [OSLoadedModules](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLOSLoadedModules.sql)
 *Collects data from sys.dm_os_loaded_modules - can be used to check if antivirus has loaded into SQL Server address space*
-- [ResourceGovernorConfiguration](../DBADash/SchemaSnapshotDB.cs)
+- [ResourceGovernorConfiguration](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SchemaSnapshotDB.cs)
 *Scripts resource governor configuration using SMO*
 - [DatabaseQueryStoreOptions](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLDatabaseQueryStoreOptions.sql)
 *Collects data from sys.database_query_store_options for each database*
@@ -122,7 +122,7 @@ Add [your own](CustomChecks.md) checks to DBA Dash.
 *Collects last identity value and row count for tables with identity values exceeding the capture threshold for % used*
 
 ### Daily @ 11pm
-- [Database Schema Snapshots](../DBADash/SchemaSnapshotDB.cs) (Not enabled by default)
+- [Database Schema Snapshots](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SchemaSnapshotDB.cs) (Not enabled by default)
 *Creates a schema snapshot of databases using SMO. This only runs for the databases listed in SchemaSnapshotDBs - schema snapshots won't run unless this option has been set.  See [here](SchemaSnapshots.md) for more info.*
 
 ## Schedule Customization
