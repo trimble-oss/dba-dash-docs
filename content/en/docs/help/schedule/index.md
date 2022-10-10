@@ -25,15 +25,15 @@ Data collection runs on a schedule by the agent which is listed below. Collectio
 *Captures object execution stats from sys.dm_exec_procedure_stats, sys.dm_exec_function_stats & sys.dm_exec_trigger_stats*
 - [CPU](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLCPU.sql)
 *Capture CPU utilization from sys.dm_os_ring_buffers or sys.dm_db_resource_stats (Azure).*
-- [RunningQueries](RunningQueries.md)
+- [RunningQueries](/docs/help/running-queries)
 *Captures a snapshot of queries currently executing. Captures blocking chains so replaces blocking snapshot. Also captures query text and optionally captures query plans*
 - [IOStats](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLIOStats.sql)
 *Collects data from sys.dm_io_virtual_file_stats*
 - [Waits](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLWaits.sql)
 *Collects data from sys.dm_os_wait_stats*
 - [PerformanceCounters](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLPerformanceCounters.sql)
-*Collects data from sys.dm_os_performance_counters.  Collection can be [customized](OSPerformanceCounters.md), adding additional performance counters or collecting your own metrics with custom SQL.*
-- [SlowQueries](SQLSlowQueries.md) (Not enabled by default)
+*Collects data from sys.dm_os_performance_counters.  Collection can be [customized](/docs/help/os-performance-counters), adding additional performance counters or collecting your own metrics with custom SQL.*
+- [SlowQueries](/docs/help/slow-queries) (Not enabled by default)
 *Captures queries that take longer than 1second (or custom) to run using extended events*
 - [JobHistory](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLJobHistory.sql)
 *Collects job execution data from msdb.dbo.sysjobhistory (just what's new since the last collection)*
@@ -83,7 +83,7 @@ Data collection runs on a schedule by the agent which is listed below. Collectio
 - [Alerts](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLAlerts.sql)
 *Collect data from msdb..sysalerts*
 - [CustomChecks](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLCustomChecks.sql)
-Add [your own](CustomChecks.md) checks to DBA Dash.
+Add [your own](/docs/help/custom-checks) checks to DBA Dash.
 - [DatabaseMirroring](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLDatabaseMirroring.sql)
 *Collect data from sys.database_mirroring*
 - [Jobs](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SchemaSnapshotDB.cs)
@@ -112,18 +112,18 @@ Add [your own](CustomChecks.md) checks to DBA Dash.
 *Gets the Virtual Log File Count for each database.* 
 - [DriversWMI](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/DBCollector.cs)
 *Collects driver information from Win32_PnPSignedDriver via WMI.*  
-- [OSLoadedModules](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLOSLoadedModules.sql)
+- [OSLoadedModules](/docs/help/os-loaded-modules)
 *Collects data from sys.dm_os_loaded_modules - can be used to check if antivirus has loaded into SQL Server address space*
 - [ResourceGovernorConfiguration](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SchemaSnapshotDB.cs)
 *Scripts resource governor configuration using SMO*
 - [DatabaseQueryStoreOptions](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLDatabaseQueryStoreOptions.sql)
 *Collects data from sys.database_query_store_options for each database*
-- [IdentityColumns](IdentityColumns.md)
+- [IdentityColumns](/docs/help/identity-columns)
 *Collects last identity value and row count for tables with identity values exceeding the capture threshold for % used*
 
 ### Daily @ 11pm
 - [Database Schema Snapshots](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SchemaSnapshotDB.cs) (Not enabled by default)
-*Creates a schema snapshot of databases using SMO. This only runs for the databases listed in SchemaSnapshotDBs - schema snapshots won't run unless this option has been set.  See [here](SchemaSnapshots.md) for more info.*
+*Creates a schema snapshot of databases using SMO. This only runs for the databases listed in SchemaSnapshotDBs - schema snapshots won't run unless this option has been set.  See [here](/docs/help/schema-snapshots) for more info.*
 
 ## Schedule Customization
 
