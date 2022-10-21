@@ -14,6 +14,17 @@ toc: true
 ## Prerequisites
 
 * Consider backing up your DBA Dash repository database and ServiceConfig.json file from the installation folder.
+* {{< details ".NET Framework 6 Runtime (desktop apps).  Version 6.0.2 or later" >}}
+[Download .NET 6 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/6.0/runtime)
+
+If the .NET 6 runtime is not installed, you will be prompted to install it when you try to run the application.  
+
+If you have an older version of the .NET framework installed (6.0.0 or 6.0.1), the **application will fail to start** (no errors).  This is due to a [breaking change in 6.0.2](https://github.com/trimble-oss/dba-dash/issues/42).  If you want to check the version of the .NET runtime you have installed you can run:
+
+`dotnet --list-runtimes`
+
+{{< /details >}}
+
 ## How to upgrade
 
 1. Open the DBA Dash service configuration tool
@@ -22,6 +33,7 @@ toc: true
 4. A powershell script will run that will perform the upgrade.  
 
 {{< alert icon="ℹ️" text="It might take a few minutes to shutdown the DBA Dash service as it waits for collections to complete.  Starting the service could also take a few minutes as it upgrades the DBA Dash repository database and starts up the collections" />}}
+{{< alert icon="⚠️" text="If the application fails to start, please ensure you have .NET Framework 6 Runtime (desktop apps) 6.0.2 or later installed.  See Prerequisites" />}}
 
 ## Upgrading GUI clients
 
@@ -44,6 +56,7 @@ There might be situations where you need to perform an upgrade manually.  e.g. T
 4. Extract the contents of the downloaded zip to replace the existing installation files.
 
 {{< alert icon="ℹ️" text="The ServiceConfig.json file is the only file you need to keep.  This contains all the settings for the service. If you created PerformanceCountersCustom.xml you should also keep this file." />}}
+{{< alert icon="⚠️" text="If the application fails to start, please ensure you have .NET Framework 6 Runtime (desktop apps) 6.0.2 or later installed.  See Prerequisites" />}}
 
 ## Command line Upgrade
 
