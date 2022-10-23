@@ -14,11 +14,86 @@ weight: 999
 toc: true
 ---
 ## Service Account
-The service account used for DBADash should be a member of the **sysadmin** role on the SQL instance and also be a member of  the **local "Administrators" group**.  It's possible to configure a user with a lower level of access but this might prevent DBA Dash from collecting certain information about your SQL instances.
+
+The DBA Dash service will work with a [minimal set of permissions](#running-with-minimal-permissions), but requires membership of the **sysadmin** role and **local "Administrators" group** for certain data collections (optional). 
+
+An Active Directory user account is recommended as it will allow you to use Windows authentication, avoiding the need to store passwords in the [config](#config-file-security).  Ideally a managed service account should be used which will automatically set and rotate passwords for you.  
+
+{{< details "How to create a Group Managed service account" >}}
+
+[See here](https://learn.microsoft.com/en-us/azure/active-directory/fundamentals/service-accounts-group-managed) for more info on Group Managed Service accounts. 
+
+The commands listed here use dbatools and RSAT-AD-PowerShell
+```powershell
+Install-Module dbatools
+Install-WindowsFeature RSAT-AD-PowerShell
+```
+
+* The first step is to ensure you have a [key distribution service](https://learn.microsoft.com/en-us/windows-server/security/group-managed-service-accounts/create-the-key-distribution-services-kds-root-key) root key deployed:
+
+```powershell
+Get-KdsRootKey
+<# Run if needed:
+# This command will take time to replicate.  See MS docs for more info.
+Add-KdsRootKey -EffectiveImmediately
+#>
+```
+
+* Create an Active Directory group.  Computers that are a member of this group will be able to use the service account.
+
+```powershell
+## Replace the path as required.  e.g. Domain is mydomain.com - Path =  CN=Users,DC=mydomain,DC=com or OU=MyOU,DC=mydomain,DC=com
+New-ADGroup -Name "DBADashGrp" -SamAccountName DBADashGrp -GroupCategory Security -GroupScope Global -DisplayName "DBADashGrp" -Path "CN=Users,DC=UPDATE_PATH_AS_REQUIRED,DC=local" -Description "Managed Service Account Group for DBA Dash"
+```
+
+* Add the computer where DBA Dash is to be installed as a member of the group
+
+```powershell
+Add-ADGroupMember -Identity "DBADashGrp" -Members "MACHINE_NAME_WHERE_DBADASH_RUNS$"
+```
+
+* A reboot of the machine specified in the previous step is required to pick up the change in group membership
+* Create the service account
+
+```powershell
+## Replace the DNSHostName as required.  e.g. Domain is mydomain.com - use DBADash.mydomain.com
+New-ADServiceAccount -name DBADash -DNSHostName DBADash.UPDATE_PATH_AS_REQUIRED.local -PrincipalsAllowedToRetrieveManagedPassword DBADashGrp
+```
+
+* Grant the appropriate permissions to the new account.
+
+```powershell
+## Option to add new service account to local admins to get WMI calls to work
+Invoke-Command -ComputerName SQL1,SQL2 -ScriptBlock {Add-LocalGroupMember -Group "Administrators" -Member "DBADash$" }
+
+## Create login for service account on monitored instances
+New-DbaLogin -SqlInstance SQL1,SQL2 -Login "YOURDOMAINNAME\DBADash$"
+
+## Add user to sysadmin group - or provision the minimum permissions as described in the security doc
+Add-DbaServerRoleMember -SqlInstance SQL1,SQL2 -ServerRole sysadmin -Login "YOURDOMAINNAME\DBADash$"
+
+```
+
+* Now install the service account machine specified earlier where you will run the DBA Dash service.
+
+```powershell
+Install-ADServiceAccount DBADash
+```
+
+* You can now use the service account in the service config tool. Specify DomainName\DBADash$ without a password.
+
+{{< /details >}}
+
+{{< details "Why local admin?" >}}
 
 ### Why local admin?  
-This is required to run WMI queries (optional).  These are used to collect drive space, driver info and o/s info.  If you don't want the tool to use WMI, select the "**Don't use WMI**" checkbox when adding an instance in the DBA Dash Service Config Tool. If you don't check this box, WMI collection will be attempted - resulting in a logged error if the user doesn't have access.  If drive space isn't collected via WMI it will be collected through SQL instead - but only for drives that contain SQL files. You could provision the required WMI access to your service account.  
+This provides the access required to run WMI queries (optional).  These are used to collect drive space, driver info and o/s info.  
 
+If you don't want the tool to use WMI, select the "**Don't use WMI**" checkbox when adding an instance in the DBA Dash Service Config Tool. If you don't check this box, WMI collection will be attempted - resulting in a logged error if the user doesn't have access.  If drive space isn't collected via WMI it will be collected through SQL instead - but only for drives that contain SQL files. You could provision the required WMI access to your service account.  
+
+{{< /details >}}
+
+{{< details "Why local SysAdmin?" >}}
 ### Why SysAdmin?
 
 If the tool doesn't run as sysadmin it won't be able to collect last good CHECKDB date as well as some other data from the registry like processor name, system manufacturer and model.  Sysadmin can be granted using:
@@ -26,6 +101,8 @@ If the tool doesn't run as sysadmin it won't be able to collect last good CHECKD
 ````SQL
 ALTER SERVER ROLE [sysadmin] ADD MEMBER [{LoginName}]
 ````
+
+{{< /details >}}
 
 ### Firewall
 
