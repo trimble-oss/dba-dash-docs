@@ -87,7 +87,7 @@ Install-ADServiceAccount DBADash
 {{< details "Why local admin?" >}}
 
 ### Why local admin?  
-This provides the access required to run WMI queries (optional).  These are used to collect drive space, driver info and o/s info.  
+This provides the access required to run [WMI queries](/docs/help/wmi) (optional).  These are used to collect drive space, driver info and o/s info.  
 
 If you don't want the tool to use WMI, select the "**Don't use WMI**" checkbox when adding an instance in the DBA Dash Service Config Tool. If you don't check this box, WMI collection will be attempted - resulting in a logged error if the user doesn't have access.  If drive space isn't collected via WMI it will be collected through SQL instead - but only for drives that contain SQL files. You could provision the required WMI access to your service account.  
 
@@ -108,27 +108,14 @@ ALTER SERVER ROLE [sysadmin] ADD MEMBER [{LoginName}]
 
 DBA Dash collects most of it's data via a SQL connection (Typically port 1433).  If you check the "No WMI" box when adding a connection then ALL data will be collected via the SQL connection and no additional firewall configuration would be required.  
 
-It can be useful to have WMI collection enabled though as this allows you to collect some extra data like drive capacity and free space for all drives.
+Starting with version 2.24.2, DBA Dash uses WSMan/WinRM protocol for WMI data collections which uses port 5985.  On servers WinRM should be enabled by default.  If you need to [enable it manually](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/enable-psremoting?view=powershell-7.2), run this on the monitored instance:
 
-These firewall rules can be used to allow WMI:
-
-* Windows Management Instrumentation (ASync-In)
-* Windows Management Instrumentation (DCOM-In)
-* Windows Management Instrumentation (WMI-In)
-
-If you want to check if WMI is working, you can run this powershell script to test:
-```Powershell
-Get-WmiObject -Class Win32_computerSystem -ComputerName "YOUR_COMPUTER_NAME"
+```powershell
+Enable-PSRemoting -SkipNetworkProfileCheck -Force
 ```
 
-As part of the DriversWMI collection DBA Dash will also attempt to get the AWS PV driver version by reading this registry key: SOFTWARE\Amazon\PVDriver. This requires a different firewall rule: 
-* File and Printer Sharing (SMB-In)
+This does a number of tasks including creating the firewall exception (port 5985).  [See here](/docs/help/wmi) for more information on WMI collections.
 
-This powerhell query provides a quick way to test if it's working (it should run without errors):
-```Powershell
-[Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey("LocalMachine", "YOUR_COMPUTER_NAME")
-```
-It's also possible to disable the "DriversWMI" collection in the service configuration tool if you are not interested in collecting driver versions for your SQL instances.
 
 ## Running with Minimal Permissions
 
