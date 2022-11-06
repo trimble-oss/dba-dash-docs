@@ -93,10 +93,15 @@ If you don't want the tool to use WMI, select the "**Don't use WMI**" checkbox w
 
 {{< /details >}}
 
-{{< details "Why local SysAdmin?" >}}
+{{< details "Why SysAdmin?" >}}
 ### Why SysAdmin?
 
-If the tool doesn't run as sysadmin it won't be able to collect last good CHECKDB date as well as some other data from the registry like processor name, system manufacturer and model.  Sysadmin can be granted using:
+If the tool doesn't run as sysadmin it won't be able to collect a small amount of data.  
+
+* [This collection](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLServerExtraProperties.sql) needs sysadmin permissions to read data from the registry like processor name, manufacturer and model.  These might be collected anyway if you have WMI enabled.  
+* SQL Server instances **older** than 2014 require sysadmin permissions to collect [last good check db time](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLLastGoodCheckDB.sql).  
+* The active power plan collection either requires sysadmin permissions or the user needs to be granted EXECUTE permissions on xp_cmdshell and a proxy account configured.  Regardless of sysadmin permissions, the query only collects this data via SQL if xp_cmdshell is already enabled. This data is also collected via WMI if enabled - so sysadmin access isn't required in this instance.  
+
 
 ````SQL
 ALTER SERVER ROLE [sysadmin] ADD MEMBER [{LoginName}]
