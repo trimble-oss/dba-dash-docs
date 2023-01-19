@@ -44,7 +44,7 @@ You can ask questions via the [discussions](https://github.com/trimble-oss/dba-d
 
 ## How do I create alert notifications with DBA Dash?
 
-DBA Dash doesn't have any built in alerting capabilities, but you can create your own custom alerts based on the data collected.  Some [examples here](/Alerts.md)
+DBA Dash doesn't have any built in alerting capabilities, but you can create your own custom alerts based on the data collected.  Some [examples here](/docs/help/alerts#examples)
 
 ## How many instances can I monitor with DBA Dash?
 
@@ -65,7 +65,7 @@ You will typically run into this issue when using elastic pools.  You might need
 
 ## The stored procedure names are not showing
 
-Object names might display as {object_id:1234567}.  This can occur if the DBA Dash service account doesn't have permissions to collect the object name.  [Review the permissions](/Security.md) assgined to the service account.
+Object names might display as {object_id:1234567}.  This can occur if the DBA Dash service account doesn't have permissions to collect the object name.  [Review the permissions](/docs/help/security) assgined to the service account.
 
 ## How do I get notifications of new releases?
 
