@@ -182,5 +182,9 @@ Cron expressions might seem cryptic but they provide a lot of flexibility for sc
 * [freeformatter.com](https://www.freeformatter.com/cron-expression-generator-quartz.html#crongenerator)
 * [crontab.cronhub.io](https://crontab.cronhub.io/)
 
+Also try [ChatGPT](https://chat.openai.com/chat):
 
+[![ChatGPT cron expression generation](chatGPT.png)](chatGPT.png)
+
+{{< alert icon="💡" text="Tip: Include 'Quartz format cron expression' as this should increase the chances of generating a compatible cron expression.  DBA Dash uses Quartz.NET for scheduling."/>}}
 
