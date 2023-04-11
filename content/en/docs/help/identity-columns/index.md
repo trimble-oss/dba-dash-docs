@@ -59,4 +59,8 @@ DBA Dash will run this query on your monitored instances to collect data for ide
 
 The collection threshold is configured in the Options tab on the service configuration tool (default 5% used).  This is used to reduce the amount of data collected while keeping the threshold low to allow tables to be monitored when there is potential for running out of identity values.
 
-The default warning threshold is configured at 50% and the critical threshold is configured at 80%.  These thresholds can be adjusted using the dbo.IdentityColumnThresholds table in the repository database.  The thresholds can't be adjusted in the GUI at this point in time.
+The default warning threshold is configured at 50% and the critical threshold is configured at 80%.  These thresholds can be adjusted by clicking the Edit button on the "Identity Columns" tab.
+
+![identity columns threshold configuration](identity-columns-threshold-configuration.png)
+
+Clicking the up arrow will allow you to set the threshold configuration at the database, instance then root level.  You can also click the gear menu icon to access the root and instance level configuration directly.  Note: The instance level menu option won't be available at root level.
