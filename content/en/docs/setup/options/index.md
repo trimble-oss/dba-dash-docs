@@ -95,3 +95,48 @@ It's possible to have multiple DBA Dash agents running on the same host.  To do 
 ## Service Threads
 
 The default value is -1 which is determined by the application.  The number of threads used is shown in the service log when the service starts up. If you have a large number of instances to monitor, you might need to increase the service threads to allow the collections to fire for each instance. It's also possible to distribute the monitored instances between multiple agents.  Multiple agents can point to the same DBA Dash repository database or you could also use multiple repository databases.
+
+## IO Collection Level
+
+![IO Collection Level](io_collection_level.png)
+
+By default IO metrics are captured at the file level using sys.dm_io_virtual_file_stats.  This level of granularity can be a problem if you have a very large number of database files. You can choose these options in the service configuration tool:
+
+* Full - the default option that will collect IO metrics at the file level. This option provides the most detail but also has the highest storage cost.
+* InstanceOnly - IO stats will be aggregated at the instance level.  You will see the big picture in terms of IO metrics and significantly reduce the amount of data stored.  You will lose the ability to identify which drive/database/file the IO activity is associated with.
+* Drive - This option should also significantly reduce the cost of storing IO metrics while still allowing you to see drive level IO stats.
+* Database - This option allows you to see database level IO stats.  It might not provide as much benefit in reducing the cost of storing IO metrics if you have a large number of databases.
+* DriveAndDatabase - This option will provide most of the benefits of Full with some small benefit in reducing IO storage costs. You lose file level IO metrics with this collection.
+
+*Note: If you have log shipping setup on an instance, the data won't be aggregated on collection for databases in a restoring or standby state.  The associated IO metrics can appear/disappear for these databases in the sys.dm_io_virtual_file_stats table - leading to some very misleading spikes in IO metrics.  The data will automatically be aggregated when importing into the DBA Dash repository database instead to avoid this bug with unusual IO spikes.*
+
+{{< details "Controlling IO collection at the repository level" >}}
+Instead of aggregating IO metrics at the collection level, it's also possible to aggregate on importing the collections into the DBA Dash repository. You can leave the collection level at FULL and aggregate the data on import instead. The BitMask used represents the aggregations that will be stored.  The value 31 is the default - this includes all the aggregations.  The script below can be used to adjust the setting.
+
+```sql
+DECLARE @InstanceName NVARCHAR(128)= 'ServerName'
+/*	
+	1 = Instance
+	2 = File level
+	4 = DB
+	8 = DB, Drive
+	16 = Drive
+	31 = Everything
+*/
+DECLARE @BitMask INT = 17 /* Instance + Drive */
+DECLARE @InstanceID INT = 6  /* Get InstanceID from dbo.Instances table */
+
+
+UPDATE dbo.InstanceSettings
+SET SettingValue = @BitMask
+WHERE InstanceID = @InstanceID
+AND SettingName = 'IOStorageBitMask'
+
+IF @@ROWCOUNT=0
+BEGIN
+	INSERT INTO dbo.InstanceSettings(InstanceID,SettingName,SettingValue)
+	VALUES(@InstanceID, 'IOStorageBitMask', @BitMask)
+END
+```
+
+{{< /details >}}

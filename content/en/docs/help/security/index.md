@@ -15,9 +15,11 @@ toc: true
 ---
 ## Service Account
 
-The DBA Dash service will work with a [minimal set of permissions](#running-with-minimal-permissions), but requires membership of the **sysadmin** role and **local "Administrators" group** for certain data collections (optional). 
+The recommended approach is to grant a [minimal set of permissions](#running-with-minimal-permissions) to the service account, but grant the service account membership of the **local administrators group** on the monitored instances (which allows the [WMI](/docs/wmi) collections to run).  You don't have to grant local admin access but this does allow the service to collect some useful information that we can't get from running a SQL query.  If you don't grant local admin access to the service account, click the option to disable WMI collections when adding the instance to avoid WMI related errors in the log.
 
-An Active Directory user account is recommended as it will allow you to use Windows authentication, avoiding the need to store passwords in the [config](#config-file-security).  Ideally a managed service account should be used which will automatically set and rotate passwords for you.  
+Alternatively, you can grant membership of the **sysadmin** role which will allow some additional information to be collected over the SQL connection. See the [why sysadmin](#why-sysadmin) section for more info.
+
+An Active Directory user account is recommended as it will allow you to use Windows authentication, avoiding the need to store passwords in the [config](#config-file-security).  Ideally a managed service account should be used which will automatically set and rotate passwords for the service account. 
 
 {{< details "How to create a Group Managed service account" >}}
 
@@ -96,7 +98,7 @@ If you don't want the tool to use WMI, select the "**Don't use WMI**" checkbox w
 {{< details "Why SysAdmin?" >}}
 ### Why SysAdmin?
 
-If the tool doesn't run as sysadmin it won't be able to collect a small amount of data.  
+Sysadmin permissions enabled the following data to be collected.
 
 * [This collection](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLServerExtraProperties.sql) needs sysadmin permissions to read data from the registry like processor name, manufacturer and model.  These might be collected anyway if you have WMI enabled.  
 * SQL Server instances **older** than 2014 require sysadmin permissions to collect [last good check db time](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLLastGoodCheckDB.sql).  
@@ -106,6 +108,8 @@ If the tool doesn't run as sysadmin it won't be able to collect a small amount o
 ````SQL
 ALTER SERVER ROLE [sysadmin] ADD MEMBER [{LoginName}]
 ````
+
+If you are on a modern version of SQL Server and you have granted local admin access to allow WMI collections to run there is little benefit in running with sysadmin over the more minimal permissions. 
 
 {{< /details >}}
 
@@ -203,6 +207,8 @@ EXEC sp_executesql @SQL
 The application configuration is stored in a "ServiceConfig.json" file.  You can edit this manually but it's recommended to use the "DBADashServiceConfigTool.exe" app to ensure a valid configuration.  Sensitive information like connection string passwords and AWS Secret key are encrypted automatically.  This is done to avoid storing the data in plain text but it should be considered as **obfuscation** rather than encryption (due to the storage of encryption keys).  Ideally you should use Windows authentication to connect to your SQL instances which avoids the need to store passwords in the config file.  
 
 If you are collecting data from remote SQL instances via a S3 bucket you could consider using IAM roles instead of specifying the credentials in the config file.  I would also recommend creating a new S3 bucket and configure minimal permissions that allow only read/write access to the new bucket.
+
+Starting with version 2.40.0, the **GUI** will initially use the connection defined in the ServiceConfig.json file if it's available.  The connection details will then be persisted on a per user basis in the AppData folder.  The connections are encrypted using the [DPAPI](https://en.wikipedia.org/wiki/Data_Protection_API) which provides better protection than the encryption used in the ServiceConfig.json file.  It's still better to use Windows authentication where possible which avoids the need to persist any sensitive data.
 
 ## DBA Dash GUI
 

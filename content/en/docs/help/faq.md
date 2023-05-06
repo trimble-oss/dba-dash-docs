@@ -54,6 +54,7 @@ There are no licensing restrictions or hard coded limits on the number of instan
 * Use multiple DBA Dash agents. 
 *Tip: Multiple agents can also be deployed to the same server.  Change the ServiceName in the ServiceConfig.json file to configure a unique name for each service.*
 * Split the instances between multiple DBA Dash repositories.
+*Starting with version 2.40.0, the DBA Dash GUI can fast switch between multiple repositories.*
 
 Automation also becomes important as the number of instances increase.  DBADashConfig.exe can be used for automation.  To get started run:
 
