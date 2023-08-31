@@ -50,6 +50,22 @@ Start-Process DBADashServiceConfigTool.exe
 DBADashConfig -c "Data Source=localhost;Integrated Security=SSPI;Initial Catalog=DBADashDB;Encrypt=True;TrustServerCertificate=True;" -a SetDestination
 ```
 
+## Add Destination connection
+
+Use the **SetDestination** instead to add/update the primary destination connection.  AddDestination can be used to add secondary destinations (less commonly used).  e.g. Write to a local DBA Dash repository database AND a S3 bucket.  If the primary destination doesn't exist, AddDestination will set the primary destination.  
+
+```cmd
+DBADashConfig -c "https://mybucket.s3.amazonaws.com/DBADash" -a AddDestination
+```
+
+## Remove Destination connection
+
+Use the RemoveDestination action to remove a secondary destination added with AddDestination.
+
+```cmd
+DBADashConfig -c "https://mybucket.s3.amazonaws.com/DBADash" -a RemoveDestination
+```
+
 ## Add Source connection
 
 ```cmd
