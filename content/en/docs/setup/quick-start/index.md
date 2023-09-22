@@ -56,7 +56,7 @@ If you have an older version of the .NET framework installed (6.0.0 or 6.0.1), t
 
 4. Set a destination connection
 
-{{< alert icon="💡" text="The destination connection is the SQL instance where your DBA Dash repository database is to be located" />}}
+{{< alert icon="💡" text="The destination connection is the SQL instance where your DBA Dash repository database is to be located. By default this is set to DBADashDB and the database will be created automatically when the service starts. If you select an existing database it will need to be completely blank with no existing objects created." />}}
 {{< alert icon="⚠️" text="Use Windows authentication where possible." />}}
  [ServiceConfig.json](/docs/help/security/#config-file-security) is used to store the connection details.
 
