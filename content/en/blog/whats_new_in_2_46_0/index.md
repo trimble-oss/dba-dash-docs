@@ -44,4 +44,4 @@ Application changes are required to fix problems caused by sleeping sessions wit
 
 ## Other
 
-See [2.46.0](https://github.com/trimble-oss/dba-dash/releases/tag/2.45.0) release notes for a full list of fixes.
+See [2.46.0](https://github.com/trimble-oss/dba-dash/releases/tag/2.46.0) release notes for a full list of fixes.
