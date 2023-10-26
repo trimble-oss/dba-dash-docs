@@ -103,7 +103,8 @@ CREATE OR ALTER PROC [UserReport].[SysAdminUsers](
 	@IsDisabled BIT=NULL,
 	@TypeDesc NVARCHAR(60)=NULL,
 	@Type CHAR(1) = NULL,
-	@FixedRole NVARCHAR(128)='sysadmin'
+	@FixedRole NVARCHAR(128)='sysadmin',
+	@IncludeHidden BIT =0
 )
 AS
 /* Base query into temp table */
@@ -136,6 +137,7 @@ AND EXISTS(SELECT 1
 AND (SP.is_disabled = @IsDisabled OR @IsDisabled IS NULL)
 AND (SP.type_desc = @TypeDesc OR @TypeDesc IS NULL)
 AND (SP.type = @Type OR @Type IS NULL)
+AND	(I.ShowInSummary=1 OR @IncludeHidden=1)
 
 /* Raw data */
 SELECT Instance,
