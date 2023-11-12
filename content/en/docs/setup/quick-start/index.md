@@ -50,7 +50,10 @@ If you have an older version of the .NET framework installed (6.0.0 or 6.0.1), t
 *(Select the one labelled DBADash_{version}.zip)*
 
 2. Extract the files to a folder of your choosing
-3. Run DBADashServiceConfigTool.exe
+
+⚠️ Please secure access to this folder.  See [security document](/docs/help/security) for more information.
+
+1. Run DBADashServiceConfigTool.exe
 
 {{< alert icon="⚠️" text="If the application fails to start, please ensure you have .NET Framework 6 Runtime (desktop apps) 6.0.2 or later installed.  See Requirements" />}}
 

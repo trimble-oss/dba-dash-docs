@@ -13,9 +13,30 @@ menu:
 weight: 999
 toc: true
 ---
+## DBA Dash service folder & Config file
+
+Please ensure that you secure access to the folder where the DBA Dash service runs.  Limit who can access the computer where the service account runs and also secure access to the folder using NTFS permissions.  
+
+Why?  If someone has permissions to the service folder it's possible they could elevate their permissions by replacing the service executable.  It also provides a layer of protection for the  **ServiceConfig.json** file.
+
+Note: The [service account](#service-account) should have read/write access to the folder.  
+
+### ServiceConfig.json
+
+The application configuration is stored in a **ServiceConfig.json** file.  This file *can* contain sensitive data such as passwords and you also don't want unauthorized users to be able to manipulate this file.  
+
+* Enable config file encryption (Starting 2.41.0).
+* Use a strong password to encrypt the config.
+* Avoid storing sensitive information in the config file if possible.
+
+*e.g. Use Windows authentication where possible.  Use IAM roles to provide access to S3 buckets instead of access keys*
+
+* Limit access to the config file.
+* Use the principal of least privilege.  
+  
 ## Service Account
 
-The recommended approach is to grant a [minimal set of permissions](#running-with-minimal-permissions) to the service account, but grant the service account membership of the **local administrators group** on the monitored instances (which allows the [WMI](/docs/wmi) collections to run).  You don't have to grant local admin access but this does allow the service to collect some useful information that we can't get from running a SQL query.  If you don't grant local admin access to the service account, click the option to disable WMI collections when adding the instance to avoid WMI related errors in the log.
+The recommended approach is to grant a [minimal set of permissions](#running-with-minimal-permissions) to the service account.  The optional [WMI collections](/docs/wmi) require membership of the **local administrators group** on the monitored instances. The only way this works without local admin access is to run a copy of the DBA Dash service locally on each monitored instance.  Please review what's provided through the [WMI collections](/docs/wmi) and decide if you want to use it in your environment.  If you don't want to use WMI, click the option to disable WMI collections when adding the instance to avoid WMI related errors in the log.
 
 Alternatively, you can grant membership of the **sysadmin** role which will allow some additional information to be collected over the SQL connection. See the [why sysadmin](#why-sysadmin) section for more info.
 
@@ -201,10 +222,6 @@ ALTER ROLE [db_owner] ADD MEMBER ' + QUOTENAME(@LoginName)
 PRINT @SQL
 EXEC sp_executesql @SQL
 ````
-
-## Config file Security
-
-The application configuration is stored in a **ServiceConfig.json** file.  This file can contain sensitive data such as passwords and access keys so it's important to protect this file.  [See here](/docs/help/config-file) for more information about protecting your config file.
 
 ## DBA Dash GUI
 
