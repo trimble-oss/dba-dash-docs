@@ -21,12 +21,12 @@ The configuration for the service is stored in JSON format in a file named **Ser
 
 To ensure your config file is protected:
 
+* [Enable config file encryption](#encryption) (Starting 2.41.0).
+* Use a strong password to encrypt the config.
 * Avoid storing sensitive information in the config file if possible.
 
 *e.g. Use Windows authentication where possible.  Use IAM roles to provide access to S3 buckets instead of access keys*
 
-* [Enable config file encryption](#encryption) (Starting 2.41.0).
-* Use a strong password to encrypt the config.
 * Limit access to the config file.
 * Review the [security](/docs/help/security) document and use the principal of least privilege.  
 
