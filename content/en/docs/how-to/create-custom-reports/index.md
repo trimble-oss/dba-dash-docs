@@ -232,7 +232,7 @@ The name of your report will be the name of the stored procedure.  Once you sele
 
 [![Configuration Options](menu-options.png)](menu-options.png)
 
-[![Column Options](column-options.png)](column-options.png)
+[![Column Options](column-options2.png)](column-options2.png)
 
 ### Report Title
 
@@ -253,6 +253,32 @@ Use drag & drop to re-order columns. If you want the changes to be persisted, cl
 ### Reset Layout
 
 Use **Reset Layout** from the **Configure** menu to undo any customizations to column order, size or visibility.
+
+### Add Link
+
+[![Add Link](add-link.png)](add-link.png)
+
+Links can be added to a column.  The options available are:
+
+* None
+  
+Remove link
+
+* URL
+  
+Navigate to a website.  A different Target Column can be selected to navigate to a URL in a different column.  
+
+* Text
+  
+Load text in a new window with formatting options for SQL, PowerShell or plain text.  A different target column can be selected to load the text in a different column.
+
+* Query Plan
+  
+Open Query plan in the default app for *.sqlplan files. A different target column can be selected to load the query plan from a different column.
+
+* Drill Down
+  
+Load a report and pass parameter values from the selected row.  Configure columns to map to parameters as needed.
 
 ### Column Alias
 
@@ -283,4 +309,6 @@ To run a custom report a user needs to have EXECUTE permissions on the stored pr
 
 ## Sharing Reports
 
-🤝It's easy to share your report creations with the community.  Just post the DDL for the stored procedure.  You can also script out the data in the dbo.UserReport table if you want to include any customizations made in the UI.  Post it on your blog and/or add a 🙌[Show and tell](https://github.com/trimble-oss/dba-dash/discussions) post.
+[![Script Report](script-report.png)](script-report.png)
+
+🤝It's easy to share your report creations with the community.  Click the **Script Report** option from the **Configure** menu (gear icon) of your custom report (Available in 2.50 and later).  This includes the stored procedure you created and any report customizations made in the GUI. Post it on your blog and/or add a 🙌[Show and tell](https://github.com/trimble-oss/dba-dash/discussions) post.
