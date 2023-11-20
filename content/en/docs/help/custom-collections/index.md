@@ -109,6 +109,8 @@ Capturing sp_Blitz for all your SQL instances is just a case of following the st
 
 For sp_Blitz you can setup initially using the steps above and replace the reports with the [customized versions from here](https://github.com/trimble-oss/dba-dash/discussions/768)
 
+🔒Note: sp_Blitz requires **sysadmin** permissions to run. See the [Security section in the discussion post](https://github.com/trimble-oss/dba-dash/discussions/768) for a workaround to run with minimal permissions.
+
 You can find more [custom report examples here](https://github.com/trimble-oss/dba-dash/discussions?discussions_q=label%3A%22Custom+Report%22) and also post your own custom collection and report examples.
 
 
