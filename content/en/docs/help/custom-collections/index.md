@@ -33,6 +33,8 @@ Do you want a custom check for the summary dashboard?  Use [this feature](/docs/
 
 This could be your own script or a community script.  You must be able to execute it without any parameters.  If you need to supply parameter values either create a new stored procedure that executes the script with the required values or set parameter default values for the stored procedure.
 
+ℹ️ DBA Dash will try to execute the stored procedure in whatever default database is specified on your monitored instances.  Typically this will be **master**, but you can adjust the default database in the Source tab of the service configuration tool if required.
+
 {{< details "Why a stored procedure?" >}}
 Custom collections are currently limited to running a stored procedure with no parameters.  This provides a degree of extra security as it prevents someone with access to edit your config file from running any adhoc SQL.  This only provides limited protection as someone with access to write to the service folder could potentially exploit that to elevate their permissions. 
 
