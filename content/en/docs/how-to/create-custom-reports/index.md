@@ -303,6 +303,60 @@ More options:
 
 Dates are assumed to be in UTC format and are converted automatically to the local/selected timezone. To prevent this automatic conversion, right-click the column header and uncheck **Convert to local timezone**.
 
+### Cell Highlighting Rules
+
+Apply conditional formatting to cells based on the cell value or the value of another cell in the row.  Right-click the column header of the column you want to format and select **Highlighting Rules**. 
+
+[![Cell Highlighting Rules](cell-highlighting-rules.png)](cell-highlighting-rules.png)
+
+* Set Target Column
+*The target column is what the rule will be evaluated against - typically this will be the same column as the one you want to format.  If you check **Is DBA Dash Status Column**, status formatting will be applied based on these values: 1 = Critical, 2 = Warning, 3 = NA, 4 = OK, 5 = Acknowledged, 6 = WarningLow, 7 = Information.  Leave this unchecked to apply your own formatting rules.*
+* Configure the Rule.  The following options are available.
+
+	* Equals =
+	* GreaterThan >
+	* GreaterThanOrEqual >=
+	* LessThan <
+	* LessThanOrEqual <=
+	* Between *>=value1 and <=value2*
+	* BeginsWith *matches start of string*
+	* EndsWith *matches end of string*
+    * Contains *value is somewhere in the string*
+    * NotContains *value is not contained somewhere in the string*
+    * Like *RegEx match*
+	* NotLike *RegEx does not match*
+    * IsNull *value is NULL*
+    * IsNotNull *value is NOT NULL*
+    * All *Matches everything*
+
+The rules are evaluated in order and the first rule that matches is applied.  If you have the **All** rule defined as your first rule, this would match everything and no other rules would be evaluated - so this should be the last rule you add as a catch all.  You can change the order of your rules in the grid by clicking the up/down arrows after they have been created.
+
+If you want to perform case sensitive string matches, click the **Case Sensitive** checkbox.
+
+* Set for formatting
+
+If you want to use a Red, Amber, Green status - select a status from the drop down.  This makes it easier to have formatting applied that fits with the rest of the application and it's quicker than configuring your own custom colors.  If you want more control, select the **Custom Formatting** tab.  Here you can set the ForeColor, BackColor and Font.  Click the Square box to pick your color or enter the hex value of the color in the textbox.  If you also want to configure separate colors for the DarkMode theme, click the **Configure Dark Mode** option.
+
+* Click Add
+
+Your rule will appear in the Grid.  The grid provides basic options to update colors and font for your rules.  You can also move your rule up and down or delete your rule.  The copy icon in the grid can be used if additional customization is required that is not supported in the grid.
+
+Repeat the steps above to define all your conditions.
+
+* Click Update.
+
+You cell formatting is now in effect.
+
+#### Copy/Paste Rules
+
+The copy button in the toolbar can be used to copy the entire set of rules.  You can then select a different column and use the paste button to copy the rules to the new column.  
+
+#### Gradient
+
+The Gradient button in the toolbar can be used to generate a set of rules that will create a gradient effect.  This might be useful for % columns for example.  Just set a start color, end color, number of steps and min/max values for the rule.  
+
+![Gradient Config](gradient.png)
+
 ## Security
 
 To run a custom report a user needs to have EXECUTE permissions on the stored procedure.  If a user doesn't have EXECUTE permissions, the report won't be visible and the user won't be able to run the report. You can add a user to the **RunUserReports** role to grant access to all custom reports.  
