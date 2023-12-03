@@ -23,6 +23,7 @@ toc: true
 - [The stored procedure names are not showing](#the-stored-procedure-names-are-not-showing)
 - [How do I get notifications of new releases?](#how-do-i-get-notifications-of-new-releases)
 - [How do I remove an Instance?](#how-do-i-remove-an-instance)
+- [How do I customize the tooltip length in the grid?](#how-do-i-customize-the-tooltip-length-in-the-grid)
 
 ## I Found a bug
 
@@ -102,4 +103,14 @@ AND NOT EXISTS(SELECT 1
 				WHERE CD.InstanceID = I.InstanceID 
 				AND CD.SnapshotDate> DATEADD(d,-1,GETUTCDATE())
 				)
+```
+
+## How do I customize the tooltip length in the grid?
+
+The tooltip length can be adjusted using the script below.  A value of 0 will disable tooltips.
+
+```sql
+DELETE dbo.Settings WHERE SettingName='GUICellToolTipMaxLength'
+INSERT INTO dbo.Settings(SettingName,SettingValue)
+VALUES('GUICellToolTipMaxLength',1000)
 ```
