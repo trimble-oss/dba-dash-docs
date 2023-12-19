@@ -19,7 +19,7 @@ The GUI is packaged along with the DBA Dash service for convenience, but you mig
 
 ## Requirements
 
-* Windows machine with [.NET Framework 6 Runtime (desktop apps)](https://dotnet.microsoft.com/en-us/download/dotnet/6.0/runtime)
+* Windows machine with [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0/runtime)
 * DBA Dash repository DB already [deployed](/docs/setup/quick-start). 
 
 ## Security
