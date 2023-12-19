@@ -24,12 +24,12 @@ Monitored Instances:
   
 DBA Dash Service:
 
-* {{< details ".NET Framework 6 Runtime (desktop apps).  Version 6.0.2 or later" >}}
-[Download .NET 6 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/6.0/runtime)
+* {{< details ".NET 8 Desktop Runtime.  Version 8.0.0 or later" >}}
+[Download .NET 8 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0/runtime)
 
-If the .NET 6 runtime is not installed, you will be prompted to install it when you try to run the application.  
+If the .NET 8 runtime is not installed, you will be prompted to install it when you try to run the application.  
 
-If you have an older version of the .NET framework installed (6.0.0 or 6.0.1), the **application will fail to start** (no errors).  This is due to a [breaking change in 6.0.2](https://github.com/trimble-oss/dba-dash/issues/42).  If you want to check the version of the .NET runtime you have installed you can run:
+*Note: Versions 2.x of DBA Dash used .NET 6. Version 3.0 and later use .NET 8*
 
 `dotnet --list-runtimes`
 
