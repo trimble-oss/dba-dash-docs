@@ -80,17 +80,45 @@ DBADashConfig -a "Remove" -c "Data Source=localhost;Integrated Security=SSPI;Enc
 
 ## Install Service
 
+Domain user
+```cmd
+DBADashService install --username "Domain\DBADash" -password "YourPassword"
+```
+
+Managed service user:
+```cmd
+DBADashService install --username "Domain\DBADash$"
+```
+
+Local system:
 ```cmd
 DBADashService install --localsystem
 ```
 
-See [Topshelf documentation](http://docs.topshelf-project.com/en/latest/overview/commandline.html) for more options.
+See `DBADashService install --help`
+
+## Uninstall Service
+
+```cmd
+DBADashService uninstall
+```
 
 ## Start Service
 
 ```cmd
-net start DBADashService
+DBADashService start
 ```
+
+`net start DBADashService` can also be used.
+
+
+## Stop Service
+
+```cmd
+DBADashService stop
+```
+
+`net stop DBADashService` can also be used.
 
 ## Set Service Name
 
