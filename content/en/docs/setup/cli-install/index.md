@@ -82,7 +82,7 @@ DBADashConfig -a "Remove" -c "Data Source=localhost;Integrated Security=SSPI;Enc
 
 Domain user
 ```cmd
-DBADashService install --username "Domain\DBADash" -password "YourPassword"
+DBADashService install --username "Domain\DBADash" --password "YourPassword"
 ```
 
 Managed service user:
