@@ -50,3 +50,21 @@ For any collections not specified, the application defaults for that specific co
 ## Monitoring collection times
 
 In the Options tab on the DBA Dash service config tool you can click the option to "Log Internal Performance Counters".  If this option is enabled, the collection duration will be available in the "Metrics" tab in the DBA Dash GUI.
+
+## Additional timeouts
+
+These additional timeouts can be configured in the **ServiceConfig.json** file.
+
+* ImportCommandTimeout - timeout for inserting data into the repository database.  60 seconds default.
+* PurgeDataCommandTimeout - timeout for managing data retention.  600 seconds default.
+* AddPartitionsCommandTimeout - timeout for creating new partitions. 300 seconds default.
+
+```json
+{
+  "ImportCommandTimeout": 60,
+  "PurgeDataCommandTimeout": 600,
+  "AddPartitionsCommandTimeout": 300,
+  
+}
+```
+
