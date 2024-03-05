@@ -68,3 +68,20 @@ These additional timeouts can be configured in the **ServiceConfig.json** file.
 }
 ```
 
+## GUI Timeouts
+
+The default timeout for the GUI can also be adjusted if needed.  Run this script in the repository database to change the default timeout to 120 seconds.
+
+```
+DELETE dbo.Settings WHERE SettingName='GUIDefaultCommandTimeout'
+INSERT INTO dbo.Settings
+(
+    SettingName,
+    SettingValue
+)
+VALUES
+(   
+    'GUIDefaultCommandTimeout',  
+    120
+)
+```
