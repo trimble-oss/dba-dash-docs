@@ -125,6 +125,11 @@ Add [your own](/docs/help/custom-checks) checks to DBA Dash.
 - [Database Schema Snapshots](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SchemaSnapshotDB.cs) (Not enabled by default)
 *Creates a schema snapshot of databases using SMO. This only runs for the databases listed in SchemaSnapshotDBs - schema snapshots won't run unless this option has been set.  See [here](/docs/help/schema-snapshots) for more info.*
 
+### Disabled by default
+
+* [TableSize](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLTableSize.sql)
+*Table row count and disk space usage*
+
 ## Schedule Customization
 
 ![Schedule](schedule.PNG)
