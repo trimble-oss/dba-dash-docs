@@ -225,6 +225,17 @@ EXEC sp_executesql @SQL
 
 ## DBA Dash GUI
 
-To use the DBA Dash GUI, users only need access to the DBA Dash repository database.  No access is required to the monitored instances.  To grant the minimum permissions to run the DBA Dash GUI, add the user the the **App** role in the DBA Dash database. This grants the user SELECT and EXECUTE permissions to the database.
+To use the DBA Dash GUI, users only need access to the DBA Dash repository database.  No access is required to the monitored instances.  To grant the minimum permissions to run the DBA Dash GUI, add the user the the **App** role in the DBA Dash database. This grants the user SELECT and EXECUTE permissions to the database.  An **AppReadOnly** role can also be used to allow access to the GUI without the ability to acknowledge alerts.
 
 The **ManageGlobalViews** role can be used to allow the user to save their customized metrics dashboards for all users. They will also have access to delete shared dashboards.  Users with db_owner will also have the same access.  Otherwise the user can still create their own dashboards.  
+
+## Messaging Security Considerations
+
+Without messaging enabled, the GUI communicates exclusively with the repository database. Enabling messaging establishes a communication channel between the GUI and the service, allowing users to initiate queries on monitored instances, even without direct access. These queries are executed within the context of the service account.
+
+Key points to note:
+
+* Messaging functionality is deactivated by default, posing no additional security risk if left disabled.
+* To send messages, users require EXECUTE permissions on the Messaging schema. This permission can be granted via the **Messaging** role, distinct from the App role. Granting access to the GUI does not automatically confer messaging privileges, ensuring controlled access.
+* Presently, messaging functionality is limited to triggering pre-existing collections.
+* Security risks can be mitigated by adhering to the principle of least privilege.  See the [security doc](/docs/help/security) for recommendations for the service account.
