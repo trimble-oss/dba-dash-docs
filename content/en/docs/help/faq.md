@@ -52,14 +52,24 @@ DBA Dash doesn't have any built in alerting capabilities, but you can create you
 There are no licensing restrictions or hard coded limits on the number of instances you can monitor with DBA Dash.  There are some practical limitations to consider which will impact how you deploy DBA Dash.  The DBA Dash GUI isn't designed for thousands of instances.  Collecting data from a large number of instances could also be a challenge. This will put additional pressure on the DBA Dash agent and the central repository database.  The size of the central repository database will also increase with the number of instances monitored. There are options if you have a large number of instances:
 
 * Increase the ServiceThreads value in the ServiceConfig.json file to allow the DBA Dash agent to work with a larger number of instances.
+  
+*Note: The default value of -1 (or any number less than 1) allows the system to decide the thread count. This is currently set to 10.  Set this value to a positive integer to override the thread count.  When the service starts, the thread count should be output in the log file:*
+
+`2024-07-21 12:48:48.738 +01:00 [INF] Threads 10 (default) <10>`
+  
 * Use multiple DBA Dash agents. 
 *Tip: Multiple agents can also be deployed to the same server.  Change the ServiceName in the ServiceConfig.json file to configure a unique name for each service.*
 * Split the instances between multiple DBA Dash repositories.
 *Starting with version 2.40.0, the DBA Dash GUI can fast switch between multiple repositories.*
+* Cleanup old instances in the service config file.  These can consume threads as they try to connect.
+* Adjust the collection schedules as required.  You could reduce the frequency of collection if appropriate or have offset schedules configured (easier to do with multiple DBA Dash services).  Remove any collections you are not interested in monitoring.
+* The repository database might grow large.  The data retention can be adjusted and/or collection schedule to keep the repository database size under control.  For many collections there is a *_60MIN* aggregate that can be used for longer term trends and requires less storage space.
 
 Automation also becomes important as the number of instances increase.  DBADashConfig.exe can be used for automation.  To get started run:
 
 `DBADashConfig --help`
+
+You can also add multiple connections at a time in the service config tool.
 
 ## I get a 'Operation will cause database event session memory to exceed allowed limit.' error on AzureDB
 
