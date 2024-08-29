@@ -3,8 +3,9 @@
   functions = "functions"
 
 [build.environment]
-  NODE_VERSION = "16.16.0"
-  NPM_VERSION = "8.11.0"
+  NODE_VERSION = "20.11.0"
+  NPM_VERSION = "10.2.4"
+  HUGO_VERSION = "0.125.1"
 
 [context.production]
   command = "npm run build"
@@ -21,37 +22,28 @@
 [context.next.environment]
   HUGO_ENV = "next"
 
-[[plugins]]
-  package = "netlify-plugin-submit-sitemap"
-
-	[plugins.inputs]
-    baseUrl = "https://doks-child-theme.netlify.app/"
-    sitemapPath = "/sitemap.xml"
-    ignorePeriod = 0
-    providers = [
-      "google",
-      "yandex"
-    ]
-
 [dev]
   framework = "#custom"
-  command = "npm run start"
+  command = "npm run dev"
   targetPort = 1313
   port = 8888
   publish = "public"
   autoLaunch = false
 
+# Redirects and rewrites — https://docs.netlify.com/routing/redirects/#syntax-for-the-netlify-configuration-file
+
+# Custom headers — https://docs.netlify.com/routing/headers/#syntax-for-the-netlify-configuration-file
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self';script-src 'sha256-z4p1qqGjrJKPFpSZ0YiVbcN00eTmyk/4rkp+1EYrla8=' 'sha256-ZnlJLdGwcatE/TgJH4KF3w6ZMYam2DZVgb/lkfz9M04=' 'sha256-mnOPnDygYx0R6f5FdUwj9OW2XIjzesqrtuEHVjeY+dg=' https://www.googletagmanager.com/gtag/js https://netlify-cdp-loader.netlify.app/netlify.js https://buttons.github.io/buttons.js 'report-sample' 'self' https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js;style-src 'report-sample' 'self' 'sha256-jjA4UPym75p6lEkndwvahIj3yhRf1otQ04rPukwwge4=';object-src 'none';base-uri 'self';connect-src https://api.github.com/repos/trimble-oss/ https://region1.google-analytics.com/ 'self';font-src 'self' data:;frame-src 'self' https://www.youtube.com/;img-src 'self' data: https://raw.githubusercontent.com/DavidWiseman/ https://raw.githubusercontent.com/trimble-oss/;manifest-src 'self';media-src 'self';report-uri https://6333f9faef389e2c71225b05.endpoint.csper.io/?v=0;worker-src 'none';"
-
-[[redirects]]
-  from = "/upgrades"
-  to = "/docs/setup/upgrades/"
-  status = 301
-
-  [[redirects]]
-  from = "/installation"
-  to = "/docs/setup/quick-start/"
-  status = 301
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Content-Security-Policy = "default-src 'self'; manifest-src 'self'; connect-src 'self'; font-src 'self'; img-src 'self' https://avatars.githubusercontent.com data:; script-src 'self' 'nonce-dXNlcj0iaGVsbG8iLGRvbWFpbj0iaGVua3ZlcmxpbmRlLmNvbSIsZG9jdW1lbnQud3JpdGUodXNlcisiQCIrZG9tYWluKTs=' 'sha256-aWZ3y/RxbBYKHXH0z8+8ljrHG1mSBvyzSfxSMjBSaXk='; style-src 'self'"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin"
+    Permissions-Policy = "geolocation=(self), microphone=(), camera=()"
+    Cache-Control= '''
+    public,
+    max-age=31536000'''
+    Access-Control-Allow-Origin = "*"
