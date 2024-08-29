@@ -84,7 +84,3 @@ copyRight = "Copyright (c) 2020-2024 Hyas"
   hint = "photo"
   quality = 85
   resampleFilter = "Lanczos"
-
-[services]
-  [services.googleAnalytics]
-    ID = 'G-RSKY09B29P'
