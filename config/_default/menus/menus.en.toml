@@ -29,6 +29,24 @@
   weight = 20
 
 [[main]]
+  name = "All"
+  url = "/blog/"
+  weight = 20
+  parent="Blog"
+
+[[main]]
+  name = "Releases"
+  url = "/categories/releases/"
+  weight = 20
+  parent="Blog"
+
+[[main]]
+  name = "Tips"
+  url = "/categories/tips/"
+  weight = 20
+  parent="Blog"
+
+[[main]]
   name = "Get Started"
   weight = 30
   identifier = "get-started"
