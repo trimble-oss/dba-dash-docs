@@ -378,6 +378,7 @@
       "disable-a-collection",
       "disable-wmi-collections",
       "disabled-by-default",
+      "does-dba-dash-collect-any-telemetry-or-usage-information",
       "doks-docs-nav",
       "download",
       "drilldown-example",

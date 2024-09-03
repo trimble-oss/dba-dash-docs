@@ -13,6 +13,7 @@ weight: 1000
 toc: true
 ---
 
+- [Does DBA Dash collect any telemetry or usage information?](#does-dba-dash-collect-any-telemetry-or-usage-information)
 - [I Found a bug](#i-found-a-bug)
 - [I have a feature suggestion](#i-have-a-feature-suggestion)
 - [How Do I Contribute?](#how-do-i-contribute)
@@ -25,9 +26,13 @@ toc: true
 - [How do I remove an Instance?](#how-do-i-remove-an-instance)
 - [How do I customize the tooltip length in the grid?](#how-do-i-customize-the-tooltip-length-in-the-grid)
 
+## Does DBA Dash collect any telemetry or usage information?
+
+**No**.  All the data that DBA Dash collects is stored in the repository database which is fully under your control.
+
 ## I Found a bug
 
-Please create an [Issue](https://github.com/trimble-oss/dba-dash/issues).  Before submitting an issue, please check if there is an existing issue for the bug.  Include as much information as possible about your environment and how to reproduce the bug, including full error messages.  Be careful not to include any security sensitive data in your issue.  
+Please create an [Issue](https://github.com/trimble-oss/dba-dash/issues).  Before submitting an issue, please check if there is an existing issue for the bug.  Include as much information as possible about your environment and how to reproduce the bug, including full error messages.  Be careful not to include any security sensitive data in your issue.
 
 Are you able to fix the bug yourself?  Please mention this in the issue.  We accept pull requests!
 
@@ -52,12 +57,12 @@ DBA Dash doesn't have any built in alerting capabilities, but you can create you
 There are no licensing restrictions or hard coded limits on the number of instances you can monitor with DBA Dash.  There are some practical limitations to consider which will impact how you deploy DBA Dash.  The DBA Dash GUI isn't designed for thousands of instances.  Collecting data from a large number of instances could also be a challenge. This will put additional pressure on the DBA Dash agent and the central repository database.  The size of the central repository database will also increase with the number of instances monitored. There are options if you have a large number of instances:
 
 * Increase the ServiceThreads value in the ServiceConfig.json file to allow the DBA Dash agent to work with a larger number of instances.
-  
+
 *Note: The default value of -1 (or any number less than 1) allows the system to decide the thread count. This is currently set to 10.  Set this value to a positive integer to override the thread count.  When the service starts, the thread count should be output in the log file:*
 
 `2024-07-21 12:48:48.738 +01:00 [INF] Threads 10 (default) <10>`
-  
-* Use multiple DBA Dash agents. 
+
+* Use multiple DBA Dash agents.
 *Tip: Multiple agents can also be deployed to the same server.  Change the ServiceName in the ServiceConfig.json file to configure a unique name for each service.*
 * Split the instances between multiple DBA Dash repositories.
 *Starting with version 2.40.0, the DBA Dash GUI can fast switch between multiple repositories.*
@@ -73,7 +78,7 @@ You can also add multiple connections at a time in the service config tool.
 
 ## I get a 'Operation will cause database event session memory to exceed allowed limit.' error on AzureDB
 
-You will typically run into this issue when using elastic pools.  You might need to be selective about which databases you enable slow query capture for.  [See here](https://github.com/trimble-oss/dba-dash/discussions/138) for more info.  
+You will typically run into this issue when using elastic pools.  You might need to be selective about which databases you enable slow query capture for.  [See here](https://github.com/trimble-oss/dba-dash/discussions/138) for more info.
 
 ## The stored procedure names are not showing
 
@@ -81,7 +86,7 @@ Object names might display as {object_id:1234567}.  This can occur if the DBA Da
 
 ## How do I get notifications of new releases?
 
-Click the GitHub "Watch" button at the top of this page.  A drop down will appear.  Select "Custom".  Check "Releases" and click apply - this will only notify you when releases are published.  
+Click the GitHub "Watch" button at the top of this page.  A drop down will appear.  Select "Custom".  Check "Releases" and click apply - this will only notify you when releases are published.
 
 ## How do I remove an Instance?
 
@@ -95,22 +100,22 @@ The mark deleted is a soft delete operation that will hide the instance from dis
 
 ```SQL
 /*  Find InstanceID:
-    SELECT InstanceID FROM dbo.Instances WHERE InstanceName ='' 
+    SELECT InstanceID FROM dbo.Instances WHERE InstanceName =''
 */
 EXEC dbo.Instance_Del @InstanceID = ???, @HardDelete = 1
 
-/* 
+/*
     This script will provide the command to hard delete each instance marked deleted
     This takes into account the 24hr waiting period since the last collection date.
 */
 SELECT	I.InstanceDisplayName,
-		I.Instance, 
+		I.Instance,
 		CONCAT('EXEC dbo.Instance_Del @InstanceID = ',InstanceID,', @HardDelete = 1') AS DeleteCommand
 FROM dbo.Instances I
 WHERE IsActive=0
-AND NOT EXISTS(SELECT 1 
-				FROM dbo.CollectionDates CD 
-				WHERE CD.InstanceID = I.InstanceID 
+AND NOT EXISTS(SELECT 1
+				FROM dbo.CollectionDates CD
+				WHERE CD.InstanceID = I.InstanceID
 				AND CD.SnapshotDate> DATEADD(d,-1,GETUTCDATE())
 				)
 ```
