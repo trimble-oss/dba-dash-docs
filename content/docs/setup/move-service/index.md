@@ -12,6 +12,7 @@ menu:
     identifier: "move-service-5933a1cd261bb215881a2f5e351c150b"
 weight: 1000
 toc: true
+slug: "move-service"
 ---
 
 ## Move the Repository Database

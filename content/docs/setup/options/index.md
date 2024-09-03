@@ -12,6 +12,7 @@ menu:
     identifier: "options-0200e506447a099d54cf3eaa71da9d8e"
 weight: 999
 toc: true
+slug: "options"
 ---
 ## Destination Connection
 
