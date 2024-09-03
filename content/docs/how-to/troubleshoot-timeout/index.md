@@ -12,6 +12,7 @@ menu:
     identifier: "troubleshoot-timeout-a88ad45005b0044e4ec424fb5c51f39f"
 weight: 999
 toc: true
+slug: "troubleshoot-timeout"
 ---
 Client applications can specify a query timeout when they query SQL Server.  If data isn't returned within the configured amount of time, the query is cancelled by the client application.  The default timeout in .NET is 30 seconds unless a developer specifically overrides this timeout.  
 

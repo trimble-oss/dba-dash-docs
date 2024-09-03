@@ -10,6 +10,7 @@ menu:
     parent: "setup"
 weight: 130
 toc: true
+slug: "cli-install"
 ---
 Use [quick start](../quick-start) to get up and running quickly, or continue on this page to learn how to automate DBA Dash deployments.
 
