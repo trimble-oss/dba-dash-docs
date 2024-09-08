@@ -33,7 +33,7 @@ The *PositiveIdentity* table started with identity value 1 and had 32K rows inse
 
 ### ReseedIdentity Table
 
-The *ReseedIdentity* table last identity value is -768 so based on this alone you would assume there is plenty of available identity values.  Unfortunately, this table was initially started at identity value 1 with 32K rows inserted.  The identity value was reseeded with -32,768 to allow more rows to be inserted by utilizing the negative address space.  An additional 32K rows were inserted so we have 64K rows total. This is 97.7% of the total number of rows and we will have issues with duplicate values once the identity value gets back to 1.  The used % is showing the percentage of rows used instead of the % of identity values used as the value is higher in this case. 
+The *ReseedIdentity* table last identity value is -768 so based on this alone you would assume there is plenty of available identity values.  Unfortunately, this table was initially started at identity value 1 with 32K rows inserted.  The identity value was reseeded with -32,768 to allow more rows to be inserted by utilizing the negative address space.  An additional 32K rows were inserted so we have 64K rows total. This is 97.7% of the total number of rows and we will have issues with duplicate values once the identity value gets back to 1.  The used % is showing the percentage of rows used instead of the % of identity values used as the value is higher in this case.
 
 ### NegativeIdentity Table
 
@@ -61,6 +61,8 @@ The collection threshold is configured in the Options tab on the service configu
 
 The default warning threshold is configured at 50% and the critical threshold is configured at 80%.  These thresholds can be adjusted by clicking the Edit button on the "Identity Columns" tab.
 
-![identity columns threshold configuration](identity-columns-threshold-configuration.png)
+![identity columns threshold configuration](identity-columns-threshold-configuration-2.png)
+
+*Starting with version [3.9](/content/blog/whats_new_in_3_9_0/), there is also threshold configuration for days remaining (Warning Threshold Days & Critical Threshold Days) in addition to % used.*
 
 Clicking the up arrow will allow you to set the threshold configuration at the database, instance then root level.  You can also click the gear menu icon to access the root and instance level configuration directly.  Note: The instance level menu option won't be available at root level.
