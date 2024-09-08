@@ -359,6 +359,18 @@ The Gradient button in the toolbar can be used to generate a set of rules that w
 
 ![Gradient Config](gradient.png)
 
+## Trigger Collections
+
+You can associate a collection with your custom report which allows you to trigger the collection to run on demand directly from the report.  The name of the available collections can be found on the *Collection Dates* tab.  A [custom collection](/content/docs/help/custom-collections/) will start *UserData.*
+
+![Trigger Collection](trigger-collection.png)
+
+{{< callout context="caution" >}}
+Triggering collections requires the [messaging](/content/docs/help/messaging/) feature to be enabled.
+
+Triggering collections currently only works at the instance level.
+{{< /callout >}}
+
 ## Security
 
 To run a custom report a user needs to have EXECUTE permissions on the stored procedure.  If a user doesn't have EXECUTE permissions, the report won't be visible and the user won't be able to run the report. You can add a user to the **RunUserReports** role to grant access to all custom reports.
