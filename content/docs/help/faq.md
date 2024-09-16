@@ -25,6 +25,7 @@ toc: true
 - [How do I get notifications of new releases?](#how-do-i-get-notifications-of-new-releases)
 - [How do I remove an Instance?](#how-do-i-remove-an-instance)
 - [How do I customize the tooltip length in the grid?](#how-do-i-customize-the-tooltip-length-in-the-grid)
+- [How do I monitor read replicas in Azure?]
 
 ## Does DBA Dash collect any telemetry or usage information?
 
@@ -129,3 +130,12 @@ DELETE dbo.Settings WHERE SettingName='GUICellToolTipMaxLength'
 INSERT INTO dbo.Settings(SettingName,SettingValue)
 VALUES('GUICellToolTipMaxLength',1000)
 ```
+
+# How do I monitor read replicas in Azure?
+
+In the service config tool add the `ApplicationIntent=ReadOnly` option to the connection string when adding the connection in the Source tab.
+
+This can be done from the connection builder by clicking the *{Other Options}* link or you can append this to the connection string in the Source text box.  When you click Add/Update, the Connection ID will be appended with "|ReadOnly" to ensure it's identified as a separate SQL instance from the primary replica.
+
+
+{{< callout context="caution" icon="outline/alert-triangle" >}}Ensure you are using version 3.10 or later.{{< /callout >}}
