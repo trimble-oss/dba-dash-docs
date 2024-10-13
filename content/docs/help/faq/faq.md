@@ -3,12 +3,8 @@ title: "FAQ"
 description: "Answers to frequently asked questions."
 lead: "Answers to frequently asked questions."
 date: 2020-10-06T08:49:31+00:00
-lastmod: 2020-10-06T08:49:31+00:00
+lastmod: 2024-10-13T21:44:31+00:00
 draft: false
-images: []
-menu:
-  docs:
-    parent: "help"
 weight: 1000
 toc: true
 ---
@@ -25,7 +21,7 @@ toc: true
 - [How do I get notifications of new releases?](#how-do-i-get-notifications-of-new-releases)
 - [How do I remove an Instance?](#how-do-i-remove-an-instance)
 - [How do I customize the tooltip length in the grid?](#how-do-i-customize-the-tooltip-length-in-the-grid)
-- [How do I monitor read replicas in Azure?]
+- [How do I monitor read replicas in Azure?](#how-do-i-monitor-read-replicas-in-azure)
 
 ## Does DBA Dash collect any telemetry or usage information?
 
@@ -83,7 +79,7 @@ You will typically run into this issue when using elastic pools.  You might need
 
 ## The stored procedure names are not showing
 
-Object names might display as {object_id:1234567}.  This can occur if the DBA Dash service account doesn't have permissions to collect the object name.  [Review the permissions](/docs/help/security) assgined to the service account.
+Object names might display as {object_id:1234567}.  This can occur if the DBA Dash service account doesn't have permissions to collect the object name.  [Review the permissions](/docs/help/security) assigned to the service account.
 
 ## How do I get notifications of new releases?
 
@@ -91,10 +87,13 @@ Click the GitHub "Watch" button at the top of this page.  A drop down will appea
 
 ## How do I remove an Instance?
 
-* First remove the instance from the service config tool to prevent data from been collected for the instance.
-* In the GUI, go to "Options\Manage Instances".  Find the instance and click "Mark Deleted".
+* First remove the instance from the service config tool to prevent data from been collected for the instance.  From version 3.12 you will be prompted to mark the instance deleted in the repository database, making this a one step process.
 
-The mark deleted is a soft delete operation that will hide the instance from display.  It's possible to click "Restore" to undo this operation.  If you want to remove the instance completely, this is a more resource intensive operation. You can complete this operation in SSMS:
+If you need to delete the instance in the GUI, right-click the instance.  Select delete from the Instance Actions context menu Available from 3.12. Or Options\Manage Instances for older versions.
+
+The mark deleted is a soft delete operation that will hide the instance from display.  The recycle bin folder Available from 3.12 allows you to restore an instance or remove it completely. In *Options\Repository* Settings, you can configure the application to automatically hard delete an instance after a specified period of time after the last collection.
+
+The **dbo.Instance_Del** stored procedure is used to perform both hard and soft delete operations.
 
 > **Note**
 >  You must wait at least 24hrs after stopping the collection for an instance before you can perform a hard delete.
@@ -131,7 +130,7 @@ INSERT INTO dbo.Settings(SettingName,SettingValue)
 VALUES('GUICellToolTipMaxLength',1000)
 ```
 
-# How do I monitor read replicas in Azure?
+## How do I monitor read replicas in Azure?
 
 In the service config tool add the `ApplicationIntent=ReadOnly` option to the connection string when adding the connection in the Source tab.
 
