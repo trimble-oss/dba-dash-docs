@@ -87,6 +87,20 @@ Invoke-DbaQuery -SqlInstance $SQLInstances -Query $LogHunter
 
 # sp_LogHunter permissions.  Commented out as it requires sysadmin.
 # Add-DbaServerRoleMember -SqlInstance $SQLInstances -ServerRole sysadmin -Login $DBADashServiceAccount
+
+## Kenneth Fisher's permission tools
+
+$sp_SrvPermissions = (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/sqlstudent144/SQL-Server-Scripts/refs/heads/main/sp_SrvPermissions.sql").Content
+Invoke-DbaQuery -SqlInstance $SQLInstances -Query $sp_SrvPermissions
+
+$sp_DBPermissions = (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/sqlstudent144/SQL-Server-Scripts/refs/heads/main/sp_DBPermissions.sql").Content
+Invoke-DbaQuery -SqlInstance $SQLInstances -Query $sp_DBPermissions
+
+$GrantSQL = "GRANT EXECUTE ON sp_SrvPermissions TO [" + $DBADashServiceAccount + "]
+GRANT EXECUTE ON sp_DBPermissions TO [" + $DBADashServiceAccount + "]"
+
+Invoke-DbaQuery -SqlInstance $SQLInstances -Query $GrantSQL
+
 ```
 
 * On the options tab in the service configuration tool, ensure ***Enable Communication*** is checked.
