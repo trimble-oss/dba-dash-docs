@@ -49,5 +49,5 @@ The GUI now only passes in a filtered list of instance IDs - making the @ShowHid
 
 * The Code Viewer now has a save button.
 
-See [3.14.0](https://github.com/trimble-oss/dba-dash/releases/tag/3.13.0) release notes for a full list of fixes.
+See [3.14.0](https://github.com/trimble-oss/dba-dash/releases/tag/3.14.0) release notes for a full list of fixes.
 

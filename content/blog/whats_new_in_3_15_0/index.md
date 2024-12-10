@@ -73,5 +73,5 @@ A *Copy Column* option has been added.  An example of where this might be useful
 CLI now has options for UseDualEventSession & PersistXESessions.
 Link Columns in custom reports now support folder paths.
 
-See [3.15.0](https://github.com/trimble-oss/dba-dash/releases/tag/3.13.0) release notes for a full list of fixes.
+See [3.15.0](https://github.com/trimble-oss/dba-dash/releases/tag/3.15.0) release notes for a full list of fixes.
 
