@@ -14,7 +14,7 @@ pinned: false
 homepage: false
 ---
 {{< callout context="caution" icon="outline/alert-triangle">}}
-3.17.0 is currently available for beta testing and will need to be deployed [manually](http://localhost:1313/docs/setup/upgrades/#manual-upgrade).  If you have any issues or feedback, please create an [issue](https://github.com/trimble-oss/dba-dash/issues).
+3.17.0 is currently available for beta testing and will need to be deployed [manually](/docs/setup/upgrades/#manual-upgrade).  If you have any issues or feedback, please create an [issue](https://github.com/trimble-oss/dba-dash/issues).
 {{< /callout >}}
 
 ## Alerts
