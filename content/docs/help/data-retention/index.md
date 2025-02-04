@@ -76,3 +76,7 @@ dbo.SlowQueriesStats_Del
 dbo.Waits_60MIN_Del
 dbo.Waits_Del
 ```
+
+## ClosedAlerts table
+
+Retention is configured in the same way as other tables.  A DELETE statement is used to remove data instead of truncating partitions.  By default, alerts that have notes associated with them are excluded from the DELETE as the notes might contain valuable information that is useful for troubleshooting future incidents.  This can be

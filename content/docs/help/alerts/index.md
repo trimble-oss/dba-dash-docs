@@ -2,8 +2,8 @@
 title: "Alerts"
 description: "How to create alerts with DBA Dash"
 lead: ""
-date: 2022-09-25T19:47:24+01:00
-lastmod: 2025-01-17T19:47:24+01:00
+date: 2025-01-16T08:00:00+00:00
+lastmod: 2025-02-04T00:00:24+01:00
 draft: false
 images: []
 menu:
@@ -110,7 +110,7 @@ If you want to disable alerts for the next hour, click *Add Blackout* on the Ale
 ### Blackout configuration
 
 * Start Date - when the blackout period starts.  Defaults to current date/time
-* End Date - when the blackout period ends.  Defaults to the next hour.  For scheduled alerts, adjust this to a day in the distant future.
+* End Date - when the blackout period ends.  Defaults to the next hour.  For scheduled alerts, set to empty/null or a date in the distant future.
 * Alert Key - By default the blackout period will apply to all alerts. To filter for a specific alert, enter the alert key to filter on (LIKE syntax is supported.).  Alternatively, create the blackout using the *Add Blackout* link in the alert rules grid.
 * Apply To (Instance) - option to filter the blackout period to a specific instance
 * Apply To (Tag) - option to apply the blackout period to a specific tag.  e.g. Role:DEV
