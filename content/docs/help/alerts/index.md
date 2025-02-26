@@ -3,7 +3,7 @@ title: "Alerts"
 description: "How to create alerts with DBA Dash"
 lead: ""
 date: 2025-01-16T08:00:00+00:00
-lastmod: 2025-02-04T00:00:24+01:00
+lastmod: 2025-02-26T00:00:24+01:00
 draft: false
 images: []
 menu:
@@ -44,6 +44,14 @@ An alert rule defines a condition that you want to be notified about. To create 
         * RESOURCE_SEMAPHORE_QUERY_COMPILE - queries queued waiting to compile
         * THREADPOOL - queries waiting for an available worker thread
         * LCK% - queries blocked
+    * Agent Job.
+
+  *Receive a notification when a job fails.  The rule can be filtered by job name or category (with LIKE syntax support)*
+
+  {{< callout context="tip">}}
+  The agent job rule can be used for custom notifications by creating a job that will fail based on your condition
+  {{< /callout >}}
+
 * Configure the rule
   * Apply To (Instance) - enter the name of the instance you want the alert to apply to OR leave blank to apply to all instances.
   * Apply To (Tag) - Select a tag to apply the alert to a group of instances.
@@ -74,7 +82,9 @@ A notification channel defines where to send the alert notification. To create a
   * Webhook - For Google chat and generic webhooks.  Google chat supports threaded conversations.
   * Slack - Slack can also be configured as a webhook, but this option uses the API and supports threaded conversations.
   * Email
+  * PagerDuty. *Select the service in PagerDuty.  Click Integrations.  Click to add an Events API V2 integration.  This provides the integration key required when setting up the notification channel in DBA Dash*
 * Configure the channel.
+  * Alert Message Consolidation Threshold - *The number of notifications that will trigger a single consolidated alert notification to reduce noise.  Default 5.*
   * Channel name - How you want to identify the channel
   * Disable From/To - option to disable a notification channel.  e.g. Holidays.
   * Schedules - By default, a notification channel is available 24x7 for alerts of Medium priority and higher.  You can edit the schedule and add additional schedules as required.  For example, you can have a schedule for medium priority alerts that send notifications Mon-Fri, 9am-5pm.  An additional schedule can be added for high priority alerts that will send notifications 24x7.  If you have teams in different timezones you can configure notification channels and schedules to align with when the teams are available.
