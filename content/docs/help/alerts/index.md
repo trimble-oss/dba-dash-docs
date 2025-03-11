@@ -45,6 +45,8 @@ An alert rule defines a condition that you want to be notified about. To create 
         * THREADPOOL - queries waiting for an available worker thread
         * LCK% - queries blocked
     * Agent Job.
+    * Offline - connection to the instance has failed.
+    * Restart - instance has recently come back online following a restart.
 
   *Receive a notification when a job fails.  The rule can be filtered by job name or category (with LIKE syntax support)*
 
