@@ -3,7 +3,7 @@ title: "What's new in 3.20?"
 description: "Availability Group monitoring & alert improvements"
 summary: "Availability Group monitoring & alert improvements"
 date: 2025-04-07T08:00:00+00:00
-lastmod: 2025-04-07T08:00:00+00:00
+lastmod: 2025-04-09T08:00:00+00:00
 draft: false
 weight: 50
 categories: [Releases]
