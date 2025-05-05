@@ -86,5 +86,7 @@ Chart date/time format is now more consistent.  It's also configurable in the op
 
 ## Other
 
+Thanks to [Vincenzo Marchese](https://github.com/VincenzoMarchese) for a [bug fix](https://github.com/trimble-oss/dba-dash/pull/1302) contribution!
+
 See [3.21.0](https://github.com/trimble-oss/dba-dash/releases/tag/3.21.0) release notes for a full list of fixes.
 
