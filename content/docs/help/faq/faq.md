@@ -47,7 +47,7 @@ You can ask questions via the [discussions](https://github.com/trimble-oss/dba-d
 
 ## How do I create alert notifications with DBA Dash?
 
-DBA Dash doesn't have any built in alerting capabilities, but you can create your own custom alerts based on the data collected.  Some [examples here](/docs/help/alerts#examples)
+Alerts are now available in DBA Dash starting from 3.17.0.  [See here](docs/help/alerts/) for more info.
 
 ## How many instances can I monitor with DBA Dash?
 
@@ -84,6 +84,8 @@ Object names might display as {object_id:1234567}.  This can occur if the DBA Da
 ## How do I get notifications of new releases?
 
 Click the GitHub "Watch" button at the top of this page.  A drop down will appear.  Select "Custom".  Check "Releases" and click apply - this will only notify you when releases are published.
+
+If you prefer a RSS feed, you can use [this link](https://dbadash.com/blog/index.xml) for all blog content or [this link](https://dbadash.com/categories/releases/index.xml) just for release information.  Blog posts are not created for minor bug fix releases.
 
 ## How do I remove an Instance?
 
