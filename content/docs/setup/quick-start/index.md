@@ -14,15 +14,17 @@ toc: true
 ---
 ## Requirements
 
-Repository DB:
+### Repository DB:
 
-* SQL 2016 SP1 or later, including Azure DB and RDS (SQL Server)
+* SQL 2016 SP1 **or later**, including Azure DB⁽¹⁾, Managed Instance and RDS (SQL Server)
 
-Monitored Instances:
+  *⁽¹⁾The [Messaging](/docs/help/messaging) feature requires service broker which isn't supported on Azure DB.*
 
-* SQL 2005-2022, including Azure DB and RDS (SQL Server)
+### Monitored Instances:
 
-DBA Dash Service:
+* SQL 2005-2025, including Azure DB, Managed Instance and RDS (SQL Server)
+
+### DBA Dash Service:
 
 * {{< details ".NET 8 Desktop Runtime.  Version 8.0.0 or later" >}}
 [Download .NET 8 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0/runtime)
