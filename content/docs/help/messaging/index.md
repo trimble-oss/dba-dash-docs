@@ -49,13 +49,36 @@ To enable communication to the remote service in this scenario, we need to confi
 
 ## Security
 
-{{< callout context="caution" icon="outline/alert-triangle" >}}The messaging feature enables users with repository database access to interact in a **limited** capacity with monitored instances, even if they do not have direct access to those instances.{{< /callout >}}
+{{< callout context="caution" icon="outline/alert-triangle" >}}
+The messaging feature enables users with repository database access to interact in a **limited** capacity with monitored instances, even if they do not have direct access to those instances.
+{{< /callout >}}
 
-To use messaging users need to have:
+To use **any** messaging functionality users need to have:
 * Access to the repository database with EXECUTE permission on the Messaging schema.  This can be granted through the **Messaging role**.
-* Messaging needs to be enabled in the service configuration tool.
+* Messaging needs to be enabled in the service configuration tool.  Enabled by default.
 
-At the moment, the messaging feature can only be used to trigger collections to run ahead of their schedule time.  The functionality will be extended in future while prioritizing security.
+Query Plan Forcing requires:
+* Allow Plan Forcing in config tool checked.  *Disabled by default*.
+* Membership of the *AllowPlanForcing* or *db_owner* roles in the repository database. (*Application Level constraint*)
+
+Community script execution requires:
+* Script listed in *Allowed Community Scripts* in the config tool (Or all scripts allowed).  *Disabled by default.*
+* Membership of the *CommunityScripts* or *db_owner* roles in the repository database. (*Application Level constraint*)
+* Community script deployed to the SQL instance & DBA Dash service account needs to have permissions to execute the stored procedure.
+
+Agent Job execution requires:
+* Allowed Job Execution configured in the service configuration tool.  This is a comma separated list of allowed job names, categories and IDs. A hyphen (-) prefix can be used to deny.  Use * or % as wildcard characters. *Disabled by default*
+e.g.
+`*` = Allow All
+`*,-%backup%` = Allow all except jobs with "backup" in their name or category.
+`%backup%` = Only allow jobs with "backup" in their name or category.
+* Membership of the *AllowJobExecution* or *db_owner* roles in the repository database. (*Application Level constraint*)
+
+{{< callout context="caution" icon="outline/alert-triangle" >}}
+Some of the role membership checks are *application level* constraints and could potentially be circumvented by users that have EXECUTE permission on the Messaging schema.
+{{< /callout >}}
+
+The DBA Dash service account needs permissions to execute SQL agent jobs, which can be granted through the **SQLAgentOperatorRole** role.
 
 ## How it works
 
