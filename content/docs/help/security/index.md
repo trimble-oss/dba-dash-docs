@@ -160,7 +160,7 @@ If you **don't** want to grant sysadmin access, you can assign the permissions l
 
 **MSDB Database:**
 * Add user to the *db_datareader* role.
-* Add user to the *SQLAgentReaderRole* role
+* Add user to the *SQLAgentReaderRole* role or *SQLAgentOperatorRole* (If you want to allow job execution via the messaging feature)
 
 This script can be used to provision the required permissions:
 ````SQL
@@ -189,7 +189,8 @@ BEGIN
 	CREATE USER ' + QUOTENAME(@LoginName) + ' FOR LOGIN ' + QUOTENAME(@LoginName) + '
 END
 ALTER ROLE [db_datareader] ADD MEMBER ' + QUOTENAME(@LoginName) + '
-ALTER ROLE [SQLAgentReaderRole] ADD MEMBER ' + QUOTENAME(@LoginName) + '
+--ALTER ROLE [SQLAgentReaderRole] ADD MEMBER ' + QUOTENAME(@LoginName) + '
+ALTER ROLE [SQLAgentOperatorRole] ADD MEMBER ' + QUOTENAME(@LoginName) + '
 '
 PRINT @SQL
 EXEC sp_executesql @SQL
