@@ -39,7 +39,8 @@ To run the GUI, users only need access to the repository database.  No access is
 ![DBA Dash Connect](connect.png)
 
 {{< callout context="caution" icon="outline/alert-triangle">}}Use Windows authentication where possible.{{< /callout >}}
- [ServiceConfig.json](/docs/help/security/#config-file-security) is used to store the connection details.
+
+The connection details are persisted on a per user basis in the AppData folder, encrypted using the DPAPI. The GUI will initially use the connection defined in the ServiceConfig.json file if it’s available (where the service is deployed). 
 
  ## Upgrades
 
