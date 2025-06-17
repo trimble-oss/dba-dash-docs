@@ -36,7 +36,11 @@ If the .NET 8 runtime is not installed, you will be prompted to install it when 
 `dotnet --list-runtimes`
 
 {{< /details >}}
-* Account to run the service with [appropriate permissions](/docs/help/security/) to connect to the monitored instances and repository database instance
+* Account to run the service with [appropriate permissions](/docs/help/security/) to connect to the monitored instances and repository database instance.
+
+{{< callout context="note" icon="outline/info-circle" >}}
+DBA Dash now includes a [Permissions Helper](/docs/help/permissions-helper) as part of the config tool to help you assign the appropriate permissions.  Configure the destination & source connections and install the service.  Use the Permissions Helper to assign permissions to the service account.
+{{< /callout >}}
 
 {{< callout context="note" icon="outline/info-circle" >}}
 You can run the DBADashService.exe console app as your own user account without installing as a service for testing purposes
@@ -56,13 +60,13 @@ You can run the DBADashService.exe console app as your own user account without 
 Please secure access to this folder.  See [security document](/docs/help/security) for more information.
 {{< /callout >}}
 
-1. Run DBADashServiceConfigTool.exe
+3. Run DBADashServiceConfigTool.exe
 
 {{< callout context="caution" icon="outline/alert-triangle" >}}
 If the application fails to start, please ensure you have .NET Framework 8 Runtime (desktop apps) installed.  See Requirements
 {{< /callout >}}
 
-1. Set a destination connection
+4. Set a destination connection
 
 {{< callout context="note" icon="outline/info-circle" >}}
 The destination connection is the SQL instance where your DBA Dash repository database is to be located. By default this is set to DBADashDB and the database will be created automatically when the service starts. If you select an existing database it will need to be completely blank with no existing objects created.
@@ -72,30 +76,37 @@ Use Windows authentication where possible.
 {{< /callout >}}
  [ServiceConfig.json](/docs/help/security/#config-file-security) is used to store the connection details.
 
-1. Click the "Source" tab
-2. Click the connect button to add a source connection (monitored instance)
+5. Click the "Source" tab
+6. Click the connect button to add a source connection (monitored instance)
 
 {{< callout context="note" icon="outline/info-circle" >}}
 Add multiple instances at the same time by entering a connection string or instance name on each line in the source textbox
 {{< /callout >}}
 
-1. Review the options available on the "Extended Events" and "Other" tab.
-2. Click "Add/Update" to add the source connection(s)
-3. Repeat the process of adding source connections as necessary
-4.  Click "Save".
+7. Review the options available on the "Extended Events" and "Other" tab.
+8. Click "Add/Update" to add the source connection(s)
+9. Repeat the process of adding source connections as necessary
+10.  Click "Save".
 
 {{< callout context="note" icon="outline/info-circle" >}}
 Your settings are stored in a file called ServiceConfig.json
 {{< /callout >}}
 
-1.  Click the "Destination" tab
-2.  Click the "Install as service button"
-3.  Click Install and enter credentials for the service.
-4.  Click Start
+11.  Click the "Destination" tab
+12.  Click the "Install as service link"
+13.  Click Install and enter credentials for the service.
+
+{{< callout context="note" icon="info" >}}
+You can use the script in the "Script to create service account" link to help create a managed service account.
+{{< /callout >}}
+
+14. If you haven't already done so, use the Permissions Helper button to assign permissions to the service account and/or review the [security document](/docs/help/security) and configure the permissions manually.
+
+15.  Click Start
 
 {{< callout context="note" icon="outline/info-circle" >}}
 Click View Service Log button to see what the service is doing.  It will take a few moments to create the repository database and start collecting data.
 {{< /callout >}}
 
-1.  All done! Run DBADash.exe to see the data collected 🎉
+16.  All done! Run DBADash.exe to see the data collected 🎉
 

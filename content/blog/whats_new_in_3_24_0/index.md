@@ -35,5 +35,5 @@ As the job is executed by the DBA Dash service account, that account will need p
 
 Thank you [Evan Stewart](https://github.com/evanstewart207) for [a bug fix](https://github.com/trimble-oss/dba-dash/pull/1398) relating to identity columns and [Mark Cilia Vincenti](https://github.com/MarkCiliaVincenti) for a [code refactoring/performance improvement](https://github.com/trimble-oss/dba-dash/pull/1397).
 
-See [3.24.0](https://github.com/trimble-oss/dba-dash/releases/tag/3.23.0) release notes for a full list of fixes.
+See [3.24.0](https://github.com/trimble-oss/dba-dash/releases/tag/3.24.0) release notes for a full list of fixes.
 
