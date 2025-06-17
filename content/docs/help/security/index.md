@@ -25,7 +25,7 @@ Note: The [service account](#service-account) should have read/write access to t
 
 The application configuration is stored in a **ServiceConfig.json** file.  This file *can* contain sensitive data such as passwords and you also don't want unauthorized users to be able to manipulate this file.
 
-* Enable config file encryption (Starting 2.41.0).
+* Enable config file encryption.
 * Use a strong password to encrypt the config.
 * Avoid storing sensitive information in the config file if possible.
 
@@ -36,95 +36,30 @@ The application configuration is stored in a **ServiceConfig.json** file.  This 
 
 ## Service Account
 
-The recommended approach is to grant a [minimal set of permissions](#running-with-minimal-permissions) to the service account.  The optional [WMI collections](/docs/wmi) require membership of the **local administrators group** on the monitored instances. The only way this works without local admin access is to run a copy of the DBA Dash service locally on each monitored instance.  Please review what's provided through the [WMI collections](/docs/wmi) and decide if you want to use it in your environment.  If you don't want to use WMI, click the option to disable WMI collections when adding the instance to avoid WMI related errors in the log.
+Using a domain user account as the service account is recommended as it allows you to use Windows authentication to connect to your monitored instances.  A [managed service account](https://learn.microsoft.com/en-us/azure/active-directory/fundamentals/service-accounts-group-managed) is the best type of domain user account as it avoids the need to configure and rotate passwords.  [This script](https://github.com/trimble-oss/dba-dash/blob/main/DBADashServiceConfig/CreateMSA.ps1) can be used to create a managed service account for DBA Dash.  If you prefer to use a regular domain user account, that will also work.  A local account will also work, but you will need to use SQL authentication to connect to your monitored instances.
 
-Alternatively, you can grant membership of the **sysadmin** role which will allow some additional information to be collected over the SQL connection. See the [why sysadmin](#why-sysadmin) section for more info.
+To assign permissions to the service account, the [Permissions Helper](/docs/help/permissions-helper) can be used.
 
-An Active Directory user account is recommended as it will allow you to use Windows authentication, avoiding the need to store passwords in the [config](#config-file-security).  Ideally a managed service account should be used which will automatically set and rotate passwords for the service account.
+#### Local Admin for WMI
 
-{{< details "How to create a Group Managed service account" >}}
+If you want to use [WMI](/docs/wmi) collections (optional), the service account will need to be a local admin on the monitored instances.  The main benefit of WMI is it allows you to collect drive space for ALL drives on your monitored instance - otherwise only the drives that contain SQL files are collected.  See the [WMI](/docs/wmi) doc for more info.  The [Permissions Helper](/docs/help/permissions-helper) has a button that will grant local admin access.  Or you can use PowerShell.
 
-[See here](https://learn.microsoft.com/en-us/azure/active-directory/fundamentals/service-accounts-group-managed) for more info on Group Managed Service accounts.
-
-The commands listed here use dbatools and RSAT-AD-PowerShell
-```powershell
-Install-Module dbatools
-Install-WindowsFeature RSAT-AD-PowerShell
-```
-
-* The first step is to ensure you have a [key distribution service](https://learn.microsoft.com/en-us/windows-server/security/group-managed-service-accounts/create-the-key-distribution-services-kds-root-key) root key deployed:
-
-```powershell
-Get-KdsRootKey
-<# Run if needed:
-# This command will take time to replicate.  See MS docs for more info.
-Add-KdsRootKey -EffectiveImmediately
-#>
-```
-
-* Create an Active Directory group.  Computers that are a member of this group will be able to use the service account.
-
-```powershell
-## Replace the path as required.  e.g. Domain is mydomain.com - Path =  CN=Users,DC=mydomain,DC=com or OU=MyOU,DC=mydomain,DC=com
-New-ADGroup -Name "DBADashGrp" -SamAccountName DBADashGrp -GroupCategory Security -GroupScope Global -DisplayName "DBADashGrp" -Path "CN=Users,DC=UPDATE_PATH_AS_REQUIRED,DC=local" -Description "Managed Service Account Group for DBA Dash"
-```
-
-* Add the computer where DBA Dash is to be installed as a member of the group
-
-```powershell
-Add-ADGroupMember -Identity "DBADashGrp" -Members "MACHINE_NAME_WHERE_DBADASH_RUNS$"
-```
-
-* A reboot of the machine specified in the previous step is required to pick up the change in group membership
-* Create the service account
-
-```powershell
-## Replace the DNSHostName as required.  e.g. Domain is mydomain.com - use DBADash.mydomain.com
-New-ADServiceAccount -name DBADash -DNSHostName DBADash.UPDATE_PATH_AS_REQUIRED.local -PrincipalsAllowedToRetrieveManagedPassword DBADashGrp
-```
-
-* Grant the appropriate permissions to the new account.
-
-```powershell
+```pwsh
 ## Option to add new service account to local admins to get WMI calls to work
 Invoke-Command -ComputerName SQL1,SQL2 -ScriptBlock {Add-LocalGroupMember -Group "Administrators" -Member "DBADash$" }
-
-## Create login for service account on monitored instances
-New-DbaLogin -SqlInstance SQL1,SQL2 -Login "YOURDOMAINNAME\DBADash$"
-
-## Add user to sysadmin group - or provision the minimum permissions as described in the security doc
-Add-DbaServerRoleMember -SqlInstance SQL1,SQL2 -ServerRole sysadmin -Login "YOURDOMAINNAME\DBADash$"
-
 ```
 
-* Now install the service account machine specified earlier where you will run the DBA Dash service.
+#### SysAdmin
 
-```powershell
-Install-ADServiceAccount DBADash
-```
+The service account *doesn't* require sysadmin access, but the sysadmin role allows a small amount of additional information to be collected.  The [Permissions Helper](/docs/help/permissions-helper) doesn't assign *sysadmin* by default, but it's available for selection if required.
 
-* You can now use the service account in the service config tool. Specify DomainName\DBADash$ without a password.
+{{< details "What does sysadmin provide?" >}}
 
-{{< /details >}}
-
-{{< details "Why local admin?" >}}
-
-### Why local admin?
-This provides the access required to run [WMI queries](/docs/help/wmi) (optional).  These are used to collect drive space, driver info and o/s info.
-
-If you don't want the tool to use WMI, select the "**Don't use WMI**" checkbox when adding an instance in the DBA Dash Service Config Tool. If you don't check this box, WMI collection will be attempted - resulting in a logged error if the user doesn't have access.  If drive space isn't collected via WMI it will be collected through SQL instead - but only for drives that contain SQL files. You could provision the required WMI access to your service account.
-
-{{< /details >}}
-
-{{< details "Why SysAdmin?" >}}
-### Why SysAdmin?
-
-Sysadmin permissions enabled the following data to be collected.
+Sysadmin permissions enable the following data to be collected.
 
 * [This collection](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLServerExtraProperties.sql) needs sysadmin permissions to read data from the registry like processor name, manufacturer and model.  These might be collected anyway if you have WMI enabled.
 * SQL Server instances **older** than 2014 require sysadmin permissions to collect [last good check db time](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLLastGoodCheckDB.sql).
 * The active power plan collection either requires sysadmin permissions or the user needs to be granted EXECUTE permissions on xp_cmdshell and a proxy account configured.  Regardless of sysadmin permissions, the query only collects this data via SQL if xp_cmdshell is already enabled. This data is also collected via WMI if enabled - so sysadmin access isn't required in this instance.
-
 
 ````SQL
 ALTER SERVER ROLE [sysadmin] ADD MEMBER [{LoginName}]
@@ -134,22 +69,9 @@ If you are on a modern version of SQL Server and you have granted local admin ac
 
 {{< /details >}}
 
-### Firewall
+### Recommended permissions for monitored instances
 
-DBA Dash collects most of it's data via a SQL connection (Typically port 1433).  If you check the "No WMI" box when adding a connection then ALL data will be collected via the SQL connection and no additional firewall configuration would be required.
-
-Starting with version 2.24.2, DBA Dash uses WSMan/WinRM protocol for WMI data collections which uses port 5985.  On servers WinRM should be enabled by default.  If you need to [enable it manually](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/enable-psremoting?view=powershell-7.2), run this on the monitored instance:
-
-```powershell
-Enable-PSRemoting -SkipNetworkProfileCheck -Force
-```
-
-This does a number of tasks including creating the firewall exception (port 5985).  [See here](/docs/help/wmi) for more information on WMI collections.
-
-
-## Running with Minimal Permissions
-
-If you **don't** want to grant sysadmin access, you can assign the permissions listed below instead
+The [Permissions Helper](/docs/help/permissions-helper) can be used to assign permissions.
 
 **Server Level Permissions:**
 * View Server State
@@ -166,7 +88,7 @@ This script can be used to provision the required permissions:
 ````SQL
 /*
 	Use this script to configure permissions for the DBA Dash service account if you don't want to use the sysadmin server role.
-	DBA Dash can collect more data when running as sysadmin but most features and functionallity will work with a more limited account
+	DBA Dash can collect more data when running as sysadmin but most features and functionality will work with a more limited account
 	See here for details: https://github.com/trimble-oss/dba-dash/edit/main/Docs/Security.md
 
 	On the destination connection the service will need to be a member of db_owner role on the repository database
@@ -196,7 +118,16 @@ PRINT @SQL
 EXEC sp_executesql @SQL
 ````
 
-### Azure DB
+If you want to allow slow query capture, grant the following permissions in the user databases.
+
+```sql
+GRANT CREATE ANY DATABASE EVENT SESSION TO DBADashService;
+GRANT ALTER ANY DATABASE EVENT SESSION TO DBADashService;
+```
+
+Additional permissions might be required for custom collections, custom checks, custom performance counters & community script execution.
+
+#### Azure DB
 
 For Azure DB, add the service account to the **##MS_ServerStateReader##** role in the master database.
 
@@ -204,13 +135,6 @@ e.g.
 ```sql
 ALTER SERVER ROLE ##MS_ServerStateReader##
 ADD MEMBER DBADashService
-```
-
-If you want to allow slow query capture, grant the following permissions in the user databases.
-
-```sql
-GRANT CREATE ANY DATABASE EVENT SESSION TO DBADashService;
-GRANT ALTER ANY DATABASE EVENT SESSION TO DBADashService;
 ```
 
 ### Repository Database Permissions
@@ -241,6 +165,19 @@ PRINT @SQL
 EXEC sp_executesql @SQL
 ````
 
+### Firewall
+
+DBA Dash collects most of it's data via a SQL connection (Typically port 1433).  If you check the "No WMI" box when adding a connection then ALL data will be collected via the SQL connection and no additional firewall configuration would be required.
+
+Starting with version 2.24.2, DBA Dash uses WSMan/WinRM protocol for WMI data collections which uses port 5985.  On servers WinRM should be enabled by default.  If you need to [enable it manually](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/enable-psremoting?view=powershell-7.2), run this on the monitored instance:
+
+```powershell
+Enable-PSRemoting -SkipNetworkProfileCheck -Force
+```
+
+This does a number of tasks including creating the firewall exception (port 5985).  [See here](/docs/help/wmi) for more information on WMI collections.
+
+
 ## DBA Dash GUI
 
 To use the DBA Dash GUI, users only need access to the DBA Dash repository database.  No access is required to the monitored instances.  To grant the minimum permissions to run the DBA Dash GUI, add the user the the **App** role in the DBA Dash database. This grants the user SELECT and EXECUTE permissions to the database.  An **AppReadOnly** role can also be used to allow access to the GUI without the ability to acknowledge alerts.
@@ -249,11 +186,12 @@ The **ManageGlobalViews** role can be used to allow the user to save their custo
 
 ## Messaging Security Considerations
 
-Without messaging enabled, the GUI communicates exclusively with the repository database. Enabling messaging establishes a communication channel between the GUI and the service, allowing users to initiate queries on monitored instances, even without direct access. These queries are executed within the context of the service account.
+Without messaging enabled, the GUI communicates exclusively with the repository database. Enabling messaging establishes a communication channel between the GUI and the service, allowing users to trigger actions against monitored instances, even without direct access. These queries are executed within the context of the service account.
 
 Key points to note:
 
 * Messaging functionality is deactivated by default, posing no additional security risk if left disabled.
 * To send messages, users require EXECUTE permissions on the Messaging schema. This permission can be granted via the **Messaging** role, distinct from the App role. Granting access to the GUI does not automatically confer messaging privileges, ensuring controlled access.
-* Presently, messaging functionality is limited to triggering pre-existing collections.
+* Additional role membership might be required for certain messaging actions.  These are application level restrictions which could potentially be bypassed *if* a user already has access to send messages.  See [Messaging doc](/docs/help/messaging) for more info.
+* [Messaging](/docs/help/messaging) is now used for a variety of things, but you can limit what actions are available.
 * Security risks can be mitigated by adhering to the principle of least privilege.  See the [security doc](/docs/help/security) for recommendations for the service account.
