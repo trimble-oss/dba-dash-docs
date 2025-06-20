@@ -36,7 +36,23 @@ If the .NET 8 runtime is not installed, you will be prompted to install it when 
 `dotnet --list-runtimes`
 
 {{< /details >}}
-* Account to run the service with [appropriate permissions](/docs/help/security/) to connect to the monitored instances and repository database instance.
+* A user account to run the service with [appropriate permissions](/docs/help/security/) to connect to the monitored instances and repository database instance.  This account requires **Log on as a service**.
+
+{{< details "Grant Log on as a service" >}}
+
+To run as a Windows service, accounts need the **Logon as a service** right.  This should be granted by default if you are LocalSystem, LocalService, NetworkService or a managed service account.  A managed service account is recommended.
+
+* Start, run.  gpedit.msc
+* Navigate to [*Computer Configuration\Windows Settings\Security Settings\Local Policies\User Rights Assignment*](logon-as-a-service.png)
+* Double click *Log on as a service*
+* Click *Add User or Group...*
+* Add the user account & click OK.
+
+{{< /details >}}
+
+{{< callout context="note" icon="outline/info-circle" >}}
+A [managed service account](https://github.com/trimble-oss/dba-dash/blob/main/DBADashServiceConfig/CreateMSA.ps1) is the best option as it allows you to use Windows authentication and the password of the account is automatically rotated for you. It should also have the logon as a service right automatically.  A regular domain account can be used, but you will need to grant **Log on as a service**.  You will also need to manage the rotation of the password (set it to never expire to avoid issues with password expiry and rotate manually).  A local account can also be used, but you will need to use SQL authentication to connect to your monitored instances.
+{{< /callout >}}
 
 {{< callout context="note" icon="outline/info-circle" >}}
 DBA Dash now includes a [Permissions Helper](/docs/help/permissions-helper) as part of the config tool to help you assign the appropriate permissions.  Configure the destination & source connections and install the service.  Use the Permissions Helper to assign permissions to the service account.
@@ -74,7 +90,6 @@ The destination connection is the SQL instance where your DBA Dash repository da
 {{< callout context="note" icon="outline/info-circle" >}}
 Use Windows authentication where possible.
 {{< /callout >}}
- [ServiceConfig.json](/docs/help/security/#config-file-security) is used to store the connection details.
 
 5. Click the "Source" tab
 6. Click the connect button to add a source connection (monitored instance)
@@ -89,7 +104,7 @@ Add multiple instances at the same time by entering a connection string or insta
 10.  Click "Save".
 
 {{< callout context="note" icon="outline/info-circle" >}}
-Your settings are stored in a file called ServiceConfig.json
+Your settings are stored in a file called [ServiceConfig.json](/docs/help/security/#config-file-security).  You can protect this by clicking *Configure Encryption* on the *Options* tab.
 {{< /callout >}}
 
 11.  Click the "Destination" tab

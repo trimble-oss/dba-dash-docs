@@ -43,6 +43,34 @@ The last place to look is the Windows event log (Start\Run\eventvwr).  DBA Dash 
 
 ## Common Issues
 
+### The service won't start
+
+* Ensure the service account user has *logon as a service*
+
+{{< details "Grant Log on as a service" >}}
+
+To run as a Windows service, accounts need the **Logon as a service** right.  This should be granted by default if you are LocalSystem, LocalService, NetworkService or a managed service account.  A managed service account is recommended.
+
+* Start, run.  gpedit.msc
+* Navigate to [*Computer Configuration\Windows Settings\Security Settings\Local Policies\User Rights Assignment*](logon-as-a-service.png)
+* Double click *Log on as a service*
+* Click *Add User or Group...*
+* Add the user account & click OK.
+
+{{< /details >}}
+
+* Ensure the service account has permissions to connect to the repository database.  Use the *Permissions Helper* button on the service config tool and click *Grant Access to repository database*.  The account should be db_owner.
+
+#### Issues after changing service account or moving DBA Dash to a new instance
+
+* If you encrypted the config file, the service account will need access to decrypt the file.  Open the service config tool & click the *Configure Encryption* button on the *Options* tab.  Click the *Update* button to create a temporary key. (Note: You should now be prompted to create a temporary key when starting the service using the config tool)
+* The new service account user will need [permissions](/docs/help/security) to the repository database and monitored instance.
+
+See:
+* [Change Service Account](/docs/setup/change-service-account/)
+* [Move Service](/docs/setup/move-service/)
+
+
 ### Instance is not visible in the tree / no data
 
 * Check that the instance exists in the config.
@@ -66,14 +94,6 @@ If there is a permissions issue connecting to the monitored instance, the error 
 * Ensure the service account has the required [permissions](/docs/help/security).
 * If there is a bug, please log an [issue](https://github.com/trimble-oss/dba-dash/issues)
 
-### Issues after changing service account or moving DBA Dash to a new instance
-
-* If you encrypted the config file, the service account will need access to decrypt the file.  Open the service config tool & click the *Configure Encryption* button on the *Options* tab.  Click the *Update* button to create a temporary key.
-* The new service account user will need [permissions](/docs/help/security) to the repository database and monitored instance.
-
-See:
-* [Change Service Account](/docs/setup/change-service-account/)
-* [Move Service](/docs/setup/move-service/)
 
 ### WMI related errors
 
