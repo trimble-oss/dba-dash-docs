@@ -19,7 +19,26 @@ For example, you might experience query timeouts with the IdentityColumns collec
 
 {{< callout tip >}}Note: The service loops through the databases rather than processing them in parallel to minimize the impact on the monitored instance.{{< /callout >}}
 
-To specify custom query timeouts, create or edit the **commandTimeouts.json" file**.  If the file doesn't exist, you should find a file called "commandTimeouts.json.example" in the application folder that can be used as a starting point.  The example looks like this:
+## Configuring collection timeouts
+
+Collection timeouts can be configured using the *Custom Timeouts* link on the *Options* tab of the service configuration tool.
+
+![Custom Timeout](custom-timeout.png)
+
+* Select a collection from the *Collection* drop down.
+* The default timeout will be shown in the textbox to the right.  Edit this to the value required.
+* Click *Add*
+* Click *Save* to save the timeouts.
+
+### Default timeout
+
+The default timeout applies to any collection without an explicitly defined timeout.  This can be changed by checking the *Custom Default Timeout* checkbox and editing the timeout value.  An explicitly defined user timeout will take priority, then a built-in timeout if configured for the collection.  If no timeout is defined for the collection, the user default timeout is used or the system default timeout if a user default is not specified.
+
+To see what timeout values will actually be used, click the *Preview Effective Timeouts* button.
+
+### Json
+
+Custom timeouts are stored in the **commandTimeouts.json" file**.  If the file doesn't exist, the application default timeouts will be used.  You can now use the service config tool to edit timeouts or you can create/edit the json file manually if you prefer.
 
 ```json
 {
@@ -68,18 +87,6 @@ These additional timeouts can be configured in the **ServiceConfig.json** file.
 
 ## GUI Timeouts
 
-The default timeout for the GUI can also be adjusted if needed.  Run this script in the repository database to change the default timeout to 120 seconds.
+The default timeout for the GUI can also be adjusted if needed. Select *Repository Settings* from the *Options* menu and adjust the *Default command timeout in seconds* as required.
 
-```
-DELETE dbo.Settings WHERE SettingName='GUIDefaultCommandTimeout'
-INSERT INTO dbo.Settings
-(
-    SettingName,
-    SettingValue
-)
-VALUES
-(
-    'GUIDefaultCommandTimeout',
-    120
-)
-```
+![GUI default timeout](gui-default-timeout.png)
