@@ -13,11 +13,41 @@ menu:
 weight: 999
 toc: true
 ---
-# Summary
+## Summary
+
 DBA Dash will automatically capture key performance metrics from the sys.dm_os_performance_counters DMV.  e.g. Page reads/sec, Memory Grants Pending, SQL Compilations/sec and more. The performance counters collected can easily be customized - adding additional counters or removing counters that you are not interested in.  It's also possible to add your own application performance metrics by creating a stored procedure that will return this data in a specified format.
 
-# OS Performance Counters
-To customize what is collected, edit the "PerformanceCounters.xml" file or create a copy of the file called "PerformanceCountersCustom.xml".  It's recommended to create a "PerformanceCountersCustom.xml" file which will completely override the existing "PerformanceCounters.xml" file.  This will simplify application upgrades - otherwise you would need to take care not to overwrite your custom version of "PerformanceCounters.xml".
+## OS Performance Counters
+
+Performance Counters can be customized by clicking the *Performance Counters* button on the *Options* tab of the service configuration tool.
+
+[![Custom performance counters](custom-performance-counters.png)](custom-performance-counters.png)
+
+#### Adding a counter
+
+* The available performance counters are automatically loaded from the first source connection.  Click *Change Connection* to select a different instance if required.
+* Select a performance counter from the *Available Counters* grid.
+* The selected counter is loaded to the right of the grid.
+* Select an instance of the counter or click the *All Instances* checkbox to collect all instances of the counter.
+* Click *Add* to add the counter.
+* Repeat as needed and click *Save*
+* The changes will apply after a service restart
+
+#### Removing a counter
+
+* Click the Remove link.  Alternatively, select the rows in the grid and click the delete button on the keyboard.
+* Click *Save*
+* The changes will apply after a service restart
+
+#### Application defaults
+
+Once customized, the application defaults will be overridden with your own preferences.  Over time, performance counters might be added/removed from the application defaults.  You won't receive any updates automatically.  If you want to add all application defaults, click the *Load Defaults* button to append all the default counters.  If you want to remove all your customizations, click the *Reset to defaults*.  Alternatively, delete the *PerformanceCountersCustom.xml* file.
+
+The *Is Default* column will indicate which counters are application defaults.
+
+#### XML file
+
+Custom performance counters are saved in "PerformanceCountersCustom.xml".  You can create/edit this file manually if you prefer, but it's easier to use the service config tool starting with DBA Dash 3.26.
 
 A short version of the XML file is listed below:
 
@@ -35,16 +65,16 @@ If the counter is of type "537003264" or "1073874176" you will need to include t
 
 If the instance_name is specified in the XML (including a blank string) the counter will filter for that specific counter instance.  If you want to collect all instances of a counter you can omit the instance_name attribute from the XML.
 
-# Custom SQL Counters
+## Custom SQL Counters
 
 You are not limited to the counters available in os performance counters DMV - It's possible to create a stored procedure to return any custom metric.  The stored procedure needs to return the data in a specific format - the same format as the data collected for os performance counters.  This allows your custom metrics to be collected and treated in the same way as os performance counters.
- 
+
 Example stored procedure:
- 
-```SQL 
+
+```SQL
 CREATE PROC [dbo].[DBADash_CustomPerformanceCounters]
 AS
--- Table variable isn't needed but it ensures the data is returned in the required format.  
+-- Table variable isn't needed but it ensures the data is returned in the required format.
 DECLARE @Return AS TABLE(
 	SnapshotDate DATETIME2(7) NOT NULL DEFAULT(SYSUTCDATETIME()),
 	object_name NVARCHAR(128) NOT NULL,
@@ -63,7 +93,7 @@ INSERT INTO @Return
     cntr_value
 )
 SELECT
-    N'User Counters', 
+    N'User Counters',
     N'Random Counter',
     N'_Total',
     CAST(RAND()*100 AS DECIMAL(28,9))
@@ -76,8 +106,9 @@ SELECT SnapshotDate, -- Time in UTC
        counter_name, -- Name of the counter.  e.g. "App Response Time (ms)"
        instance_name, -- Name of the instance.  e.g. "", "_Total", "DATABASE_NAME" etc
        cntr_value, -- The value of the couner (decimal)
-       cntr_type -- follows the types ued in sys.dm_os_performanance_counters.  Use 65792 in most cases to use the value as is without further calculation.  Valid values: 65792,272696576,537003264,1073874176 
+       cntr_type -- follows the types ued in sys.dm_os_performanance_counters.  Use 65792 in most cases to use the value as is without further calculation.  Valid values: 65792,272696576,537003264,1073874176
 FROM @Return
 
  ```
- 
+
+The stored procedure needs to be created on your monitored instances in the database that DBA Dash is configured to connect to (master by default).  If you want to use a different database, ensure that it's specified as the initial catalog in the connection string on the *Source* tab of the service configuration tool.  Also ensure that the service account has permissions to EXECUTE the stored procedure.  The permissions helper can be used to grant EXECUTE.  Additional permissions might be required depending on the content of your stored procedure.
