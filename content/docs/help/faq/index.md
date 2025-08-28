@@ -3,12 +3,14 @@ title: "FAQ"
 description: "Answers to frequently asked questions."
 lead: "Answers to frequently asked questions."
 date: 2020-10-06T08:49:31+00:00
-lastmod: 2024-10-13T21:44:31+00:00
+lastmod: 2025-08-28T00:00:00+00:00
 draft: false
 weight: 1000
 toc: true
+menu:
+  docs:
+    parent: "help"
 ---
-
 - [Does DBA Dash collect any telemetry or usage information?](#does-dba-dash-collect-any-telemetry-or-usage-information)
 - [I Found a bug](#i-found-a-bug)
 - [I have a feature suggestion](#i-have-a-feature-suggestion)
@@ -136,7 +138,22 @@ VALUES('GUICellToolTipMaxLength',1000)
 
 In the service config tool add the `ApplicationIntent=ReadOnly` option to the connection string when adding the connection in the Source tab.
 
-This can be done from the connection builder by clicking the *{Other Options}* link or you can append this to the connection string in the Source text box.  When you click Add/Update, the Connection ID will be appended with "|ReadOnly" to ensure it's identified as a separate SQL instance from the primary replica.
+The Application Intent option is available to configure by clicking the *Advanced* button on the connection dialog. (Available from 3.27.3)
 
+[![Connect Dialog - Advanced](connect-dialog-advanced.png)](connect-dialog-advanced.png)
+
+This can also be done by clicking the *{Other Options}* link or you can append this to the connection string in the Source text box.  When you click Add/Update, the Connection ID will be appended with "|ReadOnly" to ensure it's identified as a separate SQL instance from the primary replica.
 
 {{< callout context="caution" icon="outline/alert-triangle" >}}Ensure you are using version 3.10 or later.{{< /callout >}}
+
+## How can I update the Build Reference without an internet connection?
+
+If you have an internet connection on any computer running the GUI application, click the *Update Build Reference* button on the *SQL Patching* tab.  The build reference is provided by dbatools from this URL: [https://dataplat.github.io/assets/dbatools-buildref-index.json](https://dataplat.github.io/assets/dbatools-buildref-index.json).
+
+Alternatively, you can download the build reference on another computer and copy it to the location where the DBA Dash service is installed.  The file should be renamed to `BuildReference.json`.  The build reference is updated when the service is restarted.
+
+This PowerShell command can be used to download the build reference from dbatools, on a computer with internet access.
+
+`Invoke-WebRequest -Uri 'https://dataplat.github.io/assets/dbatools-buildref-index.json' -OutFile 'BuildReference.json'`
+
+An updated build reference is included with each new version of DBA Dash.
