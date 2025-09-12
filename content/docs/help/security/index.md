@@ -129,11 +129,18 @@ Additional permissions might be required for custom collections, custom checks, 
 
 #### Azure DB
 
-For Azure DB, add the service account to the **##MS_ServerStateReader##** role in the master database.
+For Azure DB, add the service account to the **##MS_ServerStateReader##** & **##MS_DatabaseConnector##** [fixed roles](https://learn.microsoft.com/en-us/azure/azure-sql/database/security-server-roles?view=azuresql#fixed-server-level-roles) in the master database.
 
 e.g.
 ```sql
+--CREATE LOGIN DBADashService WITH PASSWORD = '???'
+
+-- Allows querying of DMVs.  e.g. VIEW SERVER STATE & VIEW DATABASE STATE on any database the user can access
 ALTER SERVER ROLE ##MS_ServerStateReader##
+ADD MEMBER DBADashService
+
+-- Alow the user to connect to each database without an explicit login
+ALTER SERVER ROLE ##MS_DatabaseConnector##
 ADD MEMBER DBADashService
 ```
 
