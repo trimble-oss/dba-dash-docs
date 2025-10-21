@@ -130,6 +130,9 @@ Add [your own](/docs/help/custom-checks) checks to DBA Dash.
 * [TableSize](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLTableSize.sql)
 *Table row count and disk space usage*
 
+* [FailedLogins](/docs//help/failed-logins)
+*Collects failed login information from the SQL Server error log*
+
 ## Schedule Customization
 
 ![Schedule](schedule.PNG)
