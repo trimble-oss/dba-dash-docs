@@ -42,7 +42,7 @@ To assign permissions to the service account, the [Permissions Helper](/docs/hel
 
 #### Local Admin for WMI
 
-If you want to use [WMI](/docs/wmi) collections (optional), the service account will need to be a local admin on the monitored instances.  The main benefit of WMI is it allows you to collect drive space for ALL drives on your monitored instance - otherwise only the drives that contain SQL files are collected.  See the [WMI](/docs/wmi) doc for more info.  The [Permissions Helper](/docs/help/permissions-helper) has a button that will grant local admin access.  Or you can use PowerShell.
+If you want to use [WMI](/docs/help/wmi) collections (optional), the service account will need to be a local admin on the monitored instances.  The main benefit of WMI is it allows you to collect drive space for ALL drives on your monitored instance - otherwise only the drives that contain SQL files are collected.  See the [WMI](/docs/wmi) doc for more info.  The [Permissions Helper](/docs/help/permissions-helper) has a button that will grant local admin access.  Or you can use PowerShell.
 
 ```pwsh
 ## Option to add new service account to local admins to get WMI calls to work
