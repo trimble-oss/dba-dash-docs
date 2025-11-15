@@ -94,7 +94,6 @@ If there is a permissions issue connecting to the monitored instance, the error 
 * Ensure the service account has the required [permissions](/docs/help/security).
 * If there is a bug, please log an [issue](https://github.com/trimble-oss/dba-dash/issues)
 
-
 ### WMI related errors
 
 * Check the [WMI](/docs/help/wmi) doc.
@@ -114,6 +113,15 @@ Object names might display as {object_id:1234567}.  This can occur if the DBA Da
 * Ensure this collection is enabled in the config for the monitored instance. (*Slow Query Threshold* is greater than 0. Typically 1000 or higher. *)
 * Ensure the service account [has permissions](/docs/help/security) to create extended events.
 * Try running a query that will be over the set threshold.  e.g. `WAITFOR DELAY '00:00:30'`
+
+
+### I get a 'Operation will cause database event session memory to exceed allowed limit.' error on AzureDB
+
+You will typically run into this issue when using elastic pools.  You might need to be selective about which databases you enable slow query capture for.  [See here](https://github.com/trimble-oss/dba-dash/discussions/138) for more info.
+
+### The stored procedure names are not showing
+
+Object names might display as {object_id:1234567}.  This can occur if the DBA Dash service account doesn't have permissions to collect the object name.  [Review the permissions](/docs/help/security) assigned to the service account.
 
 ## Where to get help
 
