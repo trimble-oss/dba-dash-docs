@@ -130,7 +130,7 @@ DBA Dash is open-source and you are free to create your own web dashboards using
 
 ### Who created DBA Dash?
 
-DBA Dash was created by [David Wiseman](https://github.com/DavidWiseman), an employee of [Trimble](https://www.trimble.com/) working in the UK.  It's provided under [Trimble's open-source](https://github.com/trimble-oss) GitHub organization.  A number of [other people](https://github.com/trimble-oss/dba-dash/graphs/contributors) have now [contributed](#how-do-i-contribute) DBA Dash.  [Contributions](#how-do-i-contribute) from the SQL Server community are welcome.
+DBA Dash was created by [David Wiseman](https://github.com/DavidWiseman), an employee of [Trimble](https://www.trimble.com/) working in the UK.  It's provided under [Trimble's open-source](https://github.com/trimble-oss) GitHub organization.  A number of [other people](https://github.com/trimble-oss/dba-dash/graphs/contributors) have now [contributed](#how-do-i-contribute) to DBA Dash.  [Contributions](#how-do-i-contribute) from the SQL Server community are welcome.
 
 ---
 
@@ -369,6 +369,6 @@ Please create an [Issue](https://github.com/trimble-oss/dba-dash/issues).  Befor
 
 There are some [guidelines here](https://trimble-oss.github.io/contribute/) for Trimble employees.  We also accept external contributions and anyone is free to contribute. Start by creating an [issue](https://github.com/trimble-oss/dba-dash/issues) of what you plan to do, indicating that you are willing to work on the new feature or bug fix.  If you create and issue first, feedback can be provided before you invest time working on it.  It also lets the project maintainers and other people know what you are working on, avoiding duplication.
 
-Contributions are subject to review.  All good open-source projects need a careful review process to maintain quality, ensuring contributions are safe and a good fit for the project.  Keeping the the monitoring overhead as low as possible is a key design consideration.
+Contributions are subject to review.  All good open-source projects need a careful review process to maintain quality, ensuring contributions are safe and a good fit for the project.  Keeping the monitoring overhead as low as possible is a key design consideration.
 
 We hope people decide to contribute back to the main repository, but you are also welcome to maintain your own fork of DBA Dash.  You might want to do this if you need to make very bespoke changes or your pull request was rejected for some reason.  You might also have propriety code that you are unable to share with the community.
