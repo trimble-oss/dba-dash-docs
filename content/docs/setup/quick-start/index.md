@@ -26,16 +26,21 @@ toc: true
 
 ### DBA Dash Service:
 
-* {{< details ".NET 8 Desktop Runtime.  Version 8.0.0 or later" >}}
-[Download .NET 8 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0/runtime)
+* {{< details ".NET 8/10 Desktop Runtime.  Version 10.0.0 or later" >}}
+[Download .NET 10 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0/runtime)
 
-If the .NET 8 runtime is not installed, you will be prompted to install it when you try to run the application.
-
-*Note: Versions 2.x of DBA Dash used .NET 6. Version 3.0 and later use .NET 8*
+*Note:*
+* Versions 4.x use [.NET 10.](https://dotnet.microsoft.com/en-us/download/dotnet/10.0/runtime)
+* Versions 3.x use [.NET 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0/runtime).
+* Versions 2.x of DBA Dash use [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0/runtime).
 
 `dotnet --list-runtimes`
 
 {{< /details >}}
+{{< callout context="caution" >}}
+DBA Dash is in a [transition period](/blog/whats-new-in-4.0/) between .NET 8 and .NET 10.  [.NET 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0/runtime) is the current runtime for the latest 3.x release.  [.NET 10.](https://dotnet.microsoft.com/en-us/download/dotnet/10.0/runtime) is the runtime for the 4.x prerelease.
+{{< /callout >}}
+
 * A user account to run the service with [appropriate permissions](/docs/help/security/) to connect to the monitored instances and repository database instance.  This account requires **Log on as a service**.
 
 {{< details "Grant Log on as a service" >}}
