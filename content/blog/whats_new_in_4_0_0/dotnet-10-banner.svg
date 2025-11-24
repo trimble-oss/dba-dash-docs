@@ -1,0 +1,72 @@
+<svg viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#512BD4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#A78BFA;stop-opacity:0.3" />
+      <stop offset="50%" style="stop-color:#C4B5FD;stop-opacity:0.5" />
+      <stop offset="100%" style="stop-color:#A78BFA;stop-opacity:0.3" />
+    </linearGradient>
+
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="400" fill="url(#bgGradient)"/>
+  
+  <!-- Decorative circles -->
+  <circle cx="100" cy="80" r="120" fill="url(#accentGradient)" opacity="0.2"/>
+  <circle cx="1100" cy="320" r="150" fill="url(#accentGradient)" opacity="0.2"/>
+  <circle cx="950" cy="100" r="80" fill="url(#accentGradient)" opacity="0.15"/>
+  
+  <!-- Grid pattern overlay -->
+  <g opacity="0.1">
+    <line x1="0" y1="100" x2="1200" y2="100" stroke="white" stroke-width="1"/>
+    <line x1="0" y1="200" x2="1200" y2="200" stroke="white" stroke-width="1"/>
+    <line x1="0" y1="300" x2="1200" y2="300" stroke="white" stroke-width="1"/>
+    <line x1="300" y1="0" x2="300" y2="400" stroke="white" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="400" stroke="white" stroke-width="1"/>
+    <line x1="900" y1="0" x2="900" y2="400" stroke="white" stroke-width="1"/>
+  </g>
+  
+  <!-- .NET Logo inspired hexagon -->
+  <g transform="translate(180, 200)">
+    <polygon points="0,-60 52,-30 52,30 0,60 -52,30 -52,-30" 
+             fill="none" stroke="white" stroke-width="4" opacity="0.9"/>
+    <polygon points="0,-50 43,-25 43,25 0,50 -43,25 -43,-25" 
+             fill="white" opacity="0.1"/>
+    <circle cx="0" cy="0" r="15" fill="white" opacity="0.9"/>
+  </g>
+  
+  <!-- Main text: DBA Dash -->
+  <text x="320" y="160" font-family="Segoe UI, Arial, sans-serif" font-size="64" font-weight="700" fill="white" opacity="0.95">
+    DBA Dash
+  </text>
+  
+  <!-- Subtitle: Now Using -->
+  <text x="320" y="200" font-family="Segoe UI, Arial, sans-serif" font-size="32" font-weight="400" fill="white" opacity="0.85">
+    Now Using
+  </text>
+  
+  <!-- Main text: .NET 10 -->
+  <text x="320" y="270" font-family="Segoe UI, Arial, sans-serif" font-size="90" font-weight="700" fill="white" filter="url(#glow)">
+    .NET 10
+  </text>
+  
+  <!-- LTS Badge in corner -->
+  <g transform="translate(1050, 60)">
+    <rect x="-60" y="-25" width="120" height="50" rx="25" fill="white" opacity="0.25"/>
+    <text x="0" y="8" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="white" text-anchor="middle">
+      LTS
+    </text>
+  </g>
+</svg>

@@ -19,7 +19,22 @@ The GUI is packaged along with the DBA Dash service for convenience, but you mig
 
 ## Requirements
 
-* Windows machine with [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0/runtime)
+* {{< details ".NET 8/10 Desktop Runtime.  Version 10.0.0 or later" >}}
+[Download .NET 10 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0/runtime)
+
+*Note:*
+* Versions 4.x use [.NET 10.](https://dotnet.microsoft.com/en-us/download/dotnet/10.0/runtime)
+* Versions 3.x use [.NET 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0/runtime).
+* Versions 2.x of DBA Dash use [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0/runtime).
+
+`dotnet --list-runtimes`
+
+{{< /details >}}
+
+{{< callout context="caution" >}}
+DBA Dash is in a [transition period](/blog/whats-new-in-4.0/) between .NET 8 and .NET 10.  [.NET 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0/runtime) is the current runtime for the latest 3.x release.  [.NET 10.](https://dotnet.microsoft.com/en-us/download/dotnet/10.0/runtime) is the runtime for the 4.x prerelease.
+{{< /callout >}}
+
 * DBA Dash repository DB already [deployed](/docs/setup/quick-start).
 
 ## Security
@@ -40,7 +55,7 @@ To run the GUI, users only need access to the repository database.  No access is
 
 {{< callout context="caution" icon="outline/alert-triangle">}}Use Windows authentication where possible.{{< /callout >}}
 
-The connection details are persisted on a per user basis in the AppData folder, encrypted using the DPAPI. The GUI will initially use the connection defined in the ServiceConfig.json file if it’s available (where the service is deployed). 
+The connection details are persisted on a per user basis in the AppData folder, encrypted using the DPAPI. The GUI will initially use the connection defined in the ServiceConfig.json file if it’s available (where the service is deployed).
 
  ## Upgrades
 
