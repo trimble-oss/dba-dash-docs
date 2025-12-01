@@ -3,7 +3,7 @@ title: "What's new in 4.0?"
 description: "DBA Dash 4.0 upgrades to .NET 10 LTS, ensuring long-term support and improved performance. Major version upgrade with runtime requirement changes."
 summary: "DBA Dash 4.0 upgrades to .NET 10 LTS, ensuring long-term support and improved performance. Major version upgrade with runtime requirement changes."
 date: 2025-11-24T08:00:00+00:00
-lastmod: 2025-11-24T08:00:00+00:00
+lastmod: 2025-12-01T08:00:00+00:00
 draft: false
 weight: 50
 categories: [Releases]
@@ -12,12 +12,6 @@ contributors: [David Wiseman]
 pinned: false
 homepage: false
 ---
-
-{{< callout context="caution" >}}
-**Version 4.0 Prerelease Notice**
-Version 4.0 is currently marked as pre-release. Please follow the [manual upgrade instructions](/docs/setup/upgrades/#manual-upgrade) to update manually or wait until the prerelease flag is removed.
-{{< /callout >}}
-
 ## Upgrading to .NET 10 LTS
 
 Version 4.0.0 moves DBA Dash from .NET 8 to .NET 10, the latest Long Term Support (LTS) version of Microsoft's .NET platform. This upgrade provides several key benefits:
@@ -51,11 +45,9 @@ Before upgrading to DBA Dash 4.0:
 2. **Verify installation** by running `dotnet --list-runtimes` in PowerShell/Command Prompt
 3. **Upgrade DBA Dash** by following the upgrade instructions [here](/docs/setup/upgrades/).
 
-{{< callout context="caution" >}}
-**Version 4.0 Prerelease Notice**
-Version 4.0 is currently marked as pre-release. Please follow the [manual upgrade instructions](/docs/setup/upgrades/#manual-upgrade) to update manually or wait until the prerelease flag is removed.
-{{< /callout >}}
 
 ## Additional Changes
 
 See the [4.0.0 release notes](https://github.com/trimble-oss/dba-dash/releases/tag/4.0.0) for a complete list of fixes and improvements.
+
+Version [4.0.1](https://github.com/trimble-oss/dba-dash/releases/tag/4.0.1) is now marked as the latest release.  It fixes a query store bug and ensures the service user has logon as a service rights for a smoother installation experience.
