@@ -3,7 +3,7 @@ title: "Quick Start"
 description: "One page summary of how to setup DBA Dash"
 lead: ""
 date: 2020-11-16T13:59:39+01:00
-lastmod: 2020-11-16T13:59:39+01:00
+lastmod: 2025-12-01T08:00:00+00:00
 draft: false
 images: []
 menu:
@@ -26,7 +26,7 @@ toc: true
 
 ### DBA Dash Service:
 
-* {{< details ".NET 8/10 Desktop Runtime.  Version 10.0.0 or later" >}}
+* {{< details ".NET 10 Desktop Runtime.  Version 10.0.0 or later (New for version 4)" >}}
 [Download .NET 10 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0/runtime)
 
 *Note:*
@@ -37,9 +37,6 @@ toc: true
 `dotnet --list-runtimes`
 
 {{< /details >}}
-{{< callout context="caution" >}}
-DBA Dash is in a [transition period](/blog/whats-new-in-4.0/) between .NET 8 and .NET 10.  [.NET 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0/runtime) is the current runtime for the latest 3.x release.  [.NET 10.](https://dotnet.microsoft.com/en-us/download/dotnet/10.0/runtime) is the runtime for the 4.x prerelease.
-{{< /callout >}}
 
 * A user account to run the service with [appropriate permissions](/docs/help/security/) to connect to the monitored instances and repository database instance.  This account requires **Log on as a service**.
 
