@@ -253,13 +253,13 @@ VALUES('GUICellToolTipMaxLength',1000)
 
 ### How can I update the Build Reference without an internet connection?
 
-If you have an internet connection on any computer running the GUI application, click the *Update Build Reference* button on the *SQL Patching* tab.  The build reference is provided by dbatools from this URL: [https://dataplat.github.io/assets/dbatools-buildref-index.json](https://dataplat.github.io/assets/dbatools-buildref-index.json).
+If you have an internet connection on any computer running the GUI application, click the *Update Build Reference* button on the *SQL Patching* tab.  The build reference is provided by dbatools from this URL: [https://dataplat.dbatools.io/assets/dbatools-buildref-index.json](https://dataplat.dbatools.io/assets/dbatools-buildref-index.json).
 
 Alternatively, you can download the build reference on another computer and copy it to the location where the DBA Dash service is installed.  The file should be renamed to `BuildReference.json`.  The build reference is updated when the service is restarted.
 
 This PowerShell command can be used to download the build reference from dbatools, on a computer with internet access.
 
-`Invoke-WebRequest -Uri 'https://dataplat.github.io/assets/dbatools-buildref-index.json' -OutFile 'BuildReference.json'`
+`Invoke-WebRequest -Uri 'https://dataplat.dbatools.io/assets/dbatools-buildref-index.json' -OutFile 'BuildReference.json'`
 
 An updated build reference is included with each new version of DBA Dash.
 

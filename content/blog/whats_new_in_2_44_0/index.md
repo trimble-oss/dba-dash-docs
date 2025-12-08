@@ -22,7 +22,7 @@ The SQL Patching tab previously tracked your current patch level and a history o
 
 [![SQL Patching](sql-patching.png)](sql-patching.png)
 
-*The build reference data is provided by [dbatools](https://dbatools.io) in an easy to consume [json](https://dataplat.github.io/assets/dbatools-buildref-index.json) format.  The build reference is maintained by contributors of the dbatools project and supports their [Get-DbaBuild](https://docs.dbatools.io/Get-DbaBuild) & [Test-DbaBuild](https://docs.dbatools.io/Test-DbaBuild) powershell functions as well as their [online build reference viewer](https://dataplat.github.io/builds).*
+*The build reference data is provided by [dbatools](https://dbatools.io) in an easy to consume [json](https://dataplat.dbatools.io/assets/dbatools-buildref-index.json) format.  The build reference is maintained by contributors of the dbatools project and supports their [Get-DbaBuild](https://docs.dbatools.io/Get-DbaBuild) & [Test-DbaBuild](https://docs.dbatools.io/Test-DbaBuild) powershell functions as well as their [online build reference viewer](https://dataplat.github.io/builds).*
 
 ## Build Reference Viewer
 
@@ -44,7 +44,7 @@ Some columns have been removed from the SQL Patching report but are still availa
 
 ### Updating the build reference
 
-Click the **Update Build Reference** button on the **SQL Patching** tab to update the build reference at any time.  The build reference will also be updated whenever you upgrade to a new version of DBA Dash which is useful if you can't reach out to the internet.  You can also download the build reference directly from [here](https://dataplat.github.io/assets/dbatools-buildref-index.json) and save it as a file called **BuildReference.json** in the DBA Dash service installation folder.  The build reference will then be updated on service restart.
+Click the **Update Build Reference** button on the **SQL Patching** tab to update the build reference at any time.  The build reference will also be updated whenever you upgrade to a new version of DBA Dash which is useful if you can't reach out to the internet.  You can also download the build reference directly from [here](https://dataplat.dbatools.io/assets/dbatools-buildref-index.json) and save it as a file called **BuildReference.json** in the DBA Dash service installation folder.  The build reference will then be updated on service restart.
 
 ## Other
 
