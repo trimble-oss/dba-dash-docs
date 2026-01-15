@@ -3,7 +3,7 @@ title: "Troubleshooting"
 description: "What to do when things go wrong."
 lead: ""
 date: 2025-05-17T13:00:00Z
-lastmod: 2025-05-17T13:00:00Z
+lastmod: 2026-01-15T13:00:00Z
 draft: false
 images: []
 weight: 1001
@@ -45,6 +45,8 @@ The last place to look is the Windows event log (Start\Run\eventvwr).  DBA Dash 
 
 ### The service won't start
 
+* Check the [logs folder](#logs-folder) for errors.
+* Critical errors might be reported in the Application Event Log. (Start+R to open run dialog.  Type `eventvwr` and click enter.)
 * Ensure the service account user has *logon as a service*
 
 {{< details "Grant Log on as a service" >}}
@@ -122,6 +124,36 @@ You will typically run into this issue when using elastic pools.  You might need
 ### The stored procedure names are not showing
 
 Object names might display as {object_id:1234567}.  This can occur if the DBA Dash service account doesn't have permissions to collect the object name.  [Review the permissions](/docs/help/security) assigned to the service account.
+
+### Upgrade failed - Incomplete upgrade of DBA Dash detected
+
+You might get this error during an upgrade:
+
+`System.Exception: Incomplete upgrade of DBA Dash detected.  File 'DBADash.Upgrade' found in directory. Upgrade might have failed due to locked files.`
+
+The upgrade script creates a file called `DBADash.Upgrade` in the application directory before expanding the zip file and deletes it upon successful completion. If this file is present when starting the service or GUI, it indicates the upgrade failed or was interrupted during the file extraction process. The application files might be in an inconsistent state with some files from the new version and others from the previous version.
+
+**Common causes:**
+* Locked files preventing file replacement
+* Corrupted upgrade zip file
+* Insufficient file system permissions for the user running the upgrade
+
+**Resolution steps:**
+
+1. **First attempt**: Try re-running the upgrade process.
+
+2. **If the problem persists**:
+   * Stop the DBA Dash service
+   * Close all instances of the config tool and GUI (check all user sessions)
+   * A reboot might help clear locked files.
+   * Verify the user account has write permissions to the DBA Dash application folder
+   * Use [Process Explorer](https://learn.microsoft.com/en-gb/sysinternals/downloads/process-explorer) if required to identify processes that might be locking files
+
+3. **Retry the upgrade process**
+
+4. **Manual upgrade** (if automatic upgrade continues to fail):
+   * Delete the `DBADash.Upgrade` file from the application directory
+   * Follow the [manual upgrade steps](/docs/setup/upgrades/#manual-upgrade)
 
 ## Where to get help
 
