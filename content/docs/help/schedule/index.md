@@ -45,6 +45,10 @@ Data collection runs on a schedule by the agent which is listed below. Collectio
 *Collects data from sys.availability_groups*
 - [MemoryUsage](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLMemoryUsage.sql)
 *Collects data from sys.dm_os_memory_clerks*
+- [ResourceGovernorWorkloadGroups](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLResourceGovernorWorkloadGroups.sql)
+*Collects data from sys.dm_resource_governor_workload_groups, only if workload groups have been configured.*
+- [ResourceGovernorResourcePools](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLResourceGovernorResourcePools.sql)
+*Collects data from sys.dm_resource_governor_resource_pools, only if workload groups have been configured.*
 
 #### Azure DB Only:
 - [AzureDBElasticPoolResourceStats](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLAzureDBElasticPoolResourceStats.sql)
