@@ -38,7 +38,7 @@ In the IO Summary dialog, the drive label is now shown when you group by drive.
 
 ## Agent Job/Job Step collection performance improvement
 
-{{< callout tip >}}The performance of the Jobs collection is not an issue under normal circumstances.{{< /callout >}}
+{{< callout context="tip" >}}The performance of the Jobs collection is not an issue under normal circumstances.{{< /callout >}}
 
 If you are monitoring instances with large numbers of jobs over high latency network connections using SMO can be very slow. Performance has been improved by replacing SMO with queries to the system tables:
 
@@ -52,7 +52,7 @@ SMO is still used to script the agent job, but this can be disabled if required.
 DBA Dash processes collections in batches based on their schedule.  The collections in a batch are processed serially to reduce the load on the monitored instance, but this can mean a slow collection like Jobs/JobSteps can slow down the whole batch.  The processing has been changed for Jobs/JobSteps so that it runs after the other collections.
 
 
-{{< callout tip >}}The Jobs collection is scheduled to run every 1hr but only executes if changes have been detected or it's been 24hrs since the last collection.{{< /callout >}}
+{{< callout context="tip" >}}The Jobs collection is scheduled to run every 1hr but only executes if changes have been detected or it's been 24hrs since the last collection.{{< /callout >}}
 
 ## Other changes
 

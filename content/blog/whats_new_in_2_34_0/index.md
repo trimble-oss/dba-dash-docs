@@ -32,7 +32,7 @@ DBA Dash already does some deciphering of the wait resource for you in the Runni
 
 The output of the script will vary depending on the type of wait resource.
 
-{{< callout tip>}}Note: The script uses the undocumented DBCC PAGE command.{{< /callout >}}
+{{< callout context="tip" >}}Note: The script uses the undocumented DBCC PAGE command.{{< /callout >}}
 
 ## Slow Queries - Pivot by CPU
 

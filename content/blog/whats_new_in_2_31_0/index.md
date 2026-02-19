@@ -24,7 +24,7 @@ A timeline (gantt chart) view of your SQL Server agent jobs is now included.  Th
 
 This feature was initially discussed in the #dbadash channel on the [SQL Server Community Slack](https://www.brentozar.com/archive/2017/04/chatting-slack-watch-groupby/).  Thanks to *Tuan* for the feature suggestion and *WSUHoey* for the suggestion to use Google charts similar to what [dbatools](https://dbatools.io/) uses for [ConvertTo-DbaTimeline](https://dbatools.io/timeline/).  DBA Dash uses it's own approach but takes inspiration from dbatools.
 
-{{< callout tip >}}dbatools is an amazing powershell module for SQL Server that has had a huge impact on the way people do database administration.{{< /callout >}}
+{{< callout context="tip" >}}dbatools is an amazing powershell module for SQL Server that has had a huge impact on the way people do database administration.{{< /callout >}}
 
 ### DBA Dash vs dbatools job timeline
 
@@ -45,7 +45,7 @@ The DBA Dash timeline is based on the data from the DBA Dash repository database
 In the example above, the data from the *Random* and *Multiple Steps* jobs is missing from dbatools due to the msdb retention settings.  This isn't an issue with dbatools and is easily fixed by adjusting the retention.  The lack of per job retention in DBA Dash can be beneficial for producing consistent timeline views though - it won't vary per job.
 
 
-{{< callout tip>}}Note: DBA Dash also keeps job execution history for 2 years (by default) in aggregated format, but this is not currently used for timelines.{{< /callout >}}
+{{< callout context="tip" >}}Note: DBA Dash also keeps job execution history for 2 years (by default) in aggregated format, but this is not currently used for timelines.{{< /callout >}}
 
 #### Filtering
 
@@ -53,7 +53,7 @@ The "Demo Blocking Demo" job execution started at 11:10 so it isn't included in 
 
 There is an extra LOG backup job at 12:30 in dbatools as this started at exactly 12:30 (DBA Dash filters for < end date).
 
-{{< callout tip >}}A very long running job that started more than 24hrs before the start of the selected time period won't be included.  Jobs still executing are not included. DBA Dash will also have some additional latency as job history is collected every 1min by default.{{< /callout >}}
+{{< callout context="tip" >}}A very long running job that started more than 24hrs before the start of the selected time period won't be included.  Jobs still executing are not included. DBA Dash will also have some additional latency as job history is collected every 1min by default.{{< /callout >}}
 
 #### Grouping
 
