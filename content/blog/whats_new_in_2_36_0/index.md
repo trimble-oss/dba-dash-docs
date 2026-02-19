@@ -20,7 +20,7 @@ DBA Dash will highlight detected corruption on the Summary tab (Checking msdb.db
 
 When corruption is detected you should investigate and fix the root cause of the corruption.  Validate that your databases are free of corruption by running DBCC CHECKDB and take manual action to repair the corruption if needed.  There are various options to recover from corruption such as [page level restores](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/restore-pages-sql-server?view=sql-server-ver16) and the DBCC CHECKDB REPAIR_REBUILD and REPAIR_ALLOW_DATA_LOSS options.  If corruption is on a non-clustered index dropping and re-creating the index is an option.  Recovering from corruption is outside the scope of this blog post.
 
-{{< callout tip >}} REPAIR_ALLOW_DATA_LOSS should only be used as a last resort.  As it's name implies, this command is likely to result in data loss.{{< /callout >}}
+{{< callout context="tip" >}} REPAIR_ALLOW_DATA_LOSS should only be used as a last resort.  As it's name implies, this command is likely to result in data loss.{{< /callout >}}
 
 The "Corruption Info" dialog gives you an option to "Acknowledge" the corruption once it's been investigated and fixed.  The alert will remain cleared until there is a new incident of corruption been detected - allowing you to keep focused on the things that require your attention.
 

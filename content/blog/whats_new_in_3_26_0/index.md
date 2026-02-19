@@ -28,7 +28,7 @@ You can now run *your own* custom stored procedures on demand directly from the 
 
 This opens up a lot of possibilities from running your own diagnostic scripts to returning the contents of a queue or log table used by your application.
 
-{{< callout note >}}
+{{< callout context="note" >}}
 **Quick Start**
 
 * Create a stored procedure in the database that DBA Dash connects to (usually master unless you have specified an initial catalog when adding the connection in the config tool)

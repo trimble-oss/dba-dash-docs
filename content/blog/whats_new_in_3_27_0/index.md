@@ -26,7 +26,7 @@ To enable this collection, check the options you want to use in the Metadata pro
 
 The *Hardware* tab also includes a VM Size column which has a link to the instance metadata.  In AWS the instance size was reported in the model column, but we didn't have this information for Azure.
 
-{{< callout tip >}}
+{{< callout context="tip" >}}
 Tags in DBA Dash can be created from the collected IMDS data.  In Options\Repository settings, set `Tags to create from Instance Metadata.  Use * for ALL.` to `*` to create all associated tags.  These will be created as system tags next time tags are updated (every 1hr by default).
 
 Note: To capture AWS Tags from IMDS, ensure the 'Allow Tags in instance metadata` is enabled for the instance.

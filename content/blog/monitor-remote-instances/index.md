@@ -22,7 +22,7 @@ You might have some isolated environments where there is no direct connectivity 
 
 DBA Dash allows you to collect data from these remote environments via a [S3 bucket](https://aws.amazon.com/s3/) accessible to both locations.  This requires two DBA Dash services.  One will run in the remote environment.  It's destination connection is a S3 bucket instead of a SQL connection to the repository database. The second DBA Dash service will run somewhere with connectivity to the repository database.  It's destination connection is the repository database and the source connection is the S3 bucket path you configured as the destination connection for the other service.
 
-{{< callout tip >}}The source and destination connection can also be a folder instead of a S3 bucket.  You would need to provide your own method to sync the files between your environments.{{< /callout >}}
+{{< callout context="tip" >}}The source and destination connection can also be a folder instead of a S3 bucket.  You would need to provide your own method to sync the files between your environments.{{< /callout >}}
 
 [![DBA Dash diagram](dba-dash-diagram.png)](dba-dash-diagram.png)
 *The diagram above shows a local DBA Dash service collecting data from the DR1 and DR2 instances and pushing this data to a central repository database.  We also have another DBA Dash service collecting data from PROD1,PROD2,PROD3 & PROD4 - pushing this data to a S3 bucket.  The bucket is a source connection for the local DBA Dash service which pushes the collected data from the bucket to the repository database (along with the data collected from DR1 and DR2).*
@@ -73,7 +73,7 @@ Here we will configure the DBA Dash service to collect data from monitored insta
 
 * Configure credentials for bucket access (Optional)
 
-{{< callout tip >}}Ideally it's best to use an IAM role for bucket access.  This avoids the need to store the credentials in the config and manage the rotation of the credentials.  This is possible if the DBA Dash service is running on an EC2 instance.  You can also specify a profile to use instead of using an access/secret key combination.{{< /callout >}}
+{{< callout context="tip" >}}Ideally it's best to use an IAM role for bucket access.  This avoids the need to store the credentials in the config and manage the rotation of the credentials.  This is possible if the DBA Dash service is running on an EC2 instance.  You can also specify a profile to use instead of using an access/secret key combination.{{< /callout >}}
 
 Credentials are configured on the Options tab if required:
 ![AWS Credential configuration](aws-cred.png)

@@ -28,7 +28,7 @@ These metrics are available on the Metrics tab once configured:
 
 [![Database Metrics](database-metrics.png)](database-metrics.png)
 
-{{< callout tip >}}
+{{< callout context="tip" >}}
 You can even alert on these metrics.  e.g. Receive a notification when a database is added or removed.
 {{< /callout >}}
 
@@ -44,7 +44,7 @@ As well as tracking the number of databases created and dropped over time, you m
 
 *The deleted databases report shows databases recently removed.  Note: The deleted date is approximate and shows the time the collection ran where the database was no longer present.  If the database was re-created it would show in the New Databases report instead.*
 
-{{< callout tip >}}
+{{< callout context="tip" >}}
 You don't need to configure database metrics for these reports to work
 {{< /callout >}}
 
