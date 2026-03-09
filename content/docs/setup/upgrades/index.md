@@ -58,7 +58,7 @@ There might be situations where you need to perform an upgrade manually.  e.g. T
 4. Extract the contents of the downloaded zip to replace the existing installation files.
 
 {{< callout context="note" icon="outline/info-circle" >}}The ServiceConfig.json file is the only file you need to keep.  This contains all the settings for the service. If you created PerformanceCountersCustom.xml you should also keep this file.{{< /callout >}}
-{{< callout context="caution" icon="outline/alert-triangle" >}}If the application fails to start, please ensure you have .NET Framework 8 Desktop Runtime 8.0.0 or later installed.  See Prerequisites{{< /callout >}}
+{{< callout context="caution" icon="outline/alert-triangle" >}}If the application fails to start, please ensure you have .NET Framework 10 Desktop Runtime 10.0.0 or later installed.  See Prerequisites{{< /callout >}}
 
 ## Command line Upgrade
 
