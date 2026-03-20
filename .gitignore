@@ -4,3 +4,6 @@ resources
 .netlify
 .hugo_build.lock
 hugo_stats.json
+
+# Local build artifacts
+/.hugo_build
