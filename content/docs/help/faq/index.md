@@ -34,6 +34,10 @@ menu:
 - [Where should I deploy the repository database?](#where-should-i-deploy-the-repository-database)
 - [How do people get access to the front-end?](#how-do-people-get-access-to-the-front-end)
 
+## Security
+
+- [How do I restrict users access to certain instances?](#how-do-i-restrict-users-access-to-certain-instances)
+
 ## Configuration & Management
 
 - [How many instances can I monitor with DBA Dash?](#how-many-instances-can-i-monitor-with-dba-dash)
@@ -161,6 +165,20 @@ If your production SQL instances are under stress, it's better for the monitorin
 ### How do people get access to the front-end?
 
 The front-end GUI is a .NET WinForms application.  You can [deploy](/docs/setup/deploy-gui/) this separately to client machines.  End users only need to be granted access to the repository database using the *App* or *AppReadOnly* roles.
+
+---
+
+## Security
+
+### How do I restrict users access to certain instances?
+
+Users are granted access to the repository database and are able to view performance data for ALL instances in the repository database.  If there is a security requirement for certain users to be able to access a subset of instances, separate repository databases must be used.  If you deploy multiple repository databases (with separate DBA Dash services), you can secure access to each individually.  The GUI can switch easily between repository databases.  If you want to retain a central repository with all instances, the service can be configured to write to [multiple destinations](/docs/help/setup/options/#secondary-destinations).
+
+If you requirements are not security focused and you simply want to hide instances that are not relevant, it's possible to supply command line options to limit users to a certain tag.  e.g.
+
+`dbadash --Tags Role:Dev --NoTagMenu`
+
+This is weak as a security measure as users can simply run the exe without the command line options or they could use a different app (e.g. SSMS) to access the data.
 
 ---
 
