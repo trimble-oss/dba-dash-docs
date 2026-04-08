@@ -172,13 +172,13 @@ The front-end GUI is a .NET WinForms application.  You can [deploy](/docs/setup/
 
 ### How do I restrict users access to certain instances?
 
-Users are granted access to the repository database and are able to view performance data for ALL instances in the repository database.  If there is a security requirement for certain users to be able to access a subset of instances, separate repository databases must be used.  If you deploy multiple repository databases (with separate DBA Dash services), you can secure access to each individually.  The GUI can switch easily between repository databases.  If you want to retain a central repository with all instances, the service can be configured to write to [multiple destinations](/docs/help/setup/options/#secondary-destinations).
+Users access the repository database and, by default, can view performance data for all instances contained there. For true access control, deploy separate repository databases (and separate DBA Dash services) for each access group and secure each database with SQL Server permissions so users can only access the repositories they are permitted to see. The GUI can switch between repositories, and the service can write to [multiple destinations](/docs/setup/options/#secondary-destinations) if you need both a central copy and restricted copies.
 
-If you requirements are not security focused and you simply want to hide instances that are not relevant, it's possible to supply command line options to limit users to a certain tag.  e.g.
+If your goal is only to hide instances that are not relevant (not to enforce security), you can start the GUI with a tag filter, for example:
 
 `dbadash --Tags Role:Dev --NoTagMenu`
 
-This is weak as a security measure as users can simply run the exe without the command line options or they could use a different app (e.g. SSMS) to access the data.
+⚠️This is not a security control — users could run the executable without those options or query the database directly.
 
 ---
 
