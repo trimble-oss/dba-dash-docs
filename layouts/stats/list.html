@@ -1,0 +1,1400 @@
+{{ define "main" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script language="javascript" type="text/javascript">
+let downloadsChart = null;
+let starHistoryChart = null;
+let statsData = null;
+let releasesData = [];
+let currentPage = 1;
+let itemsPerPage = 20;
+let viewMode = 'simple'; // 'simple' or 'detailed'
+
+// Wait for DOM to be ready before loading stats
+document.addEventListener('DOMContentLoaded', function() {
+    // Load stats from build-time generated JSON
+    fetch('/data/github-stats.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            statsData = data;
+            displayStats(data);
+
+            // Listen for color scheme changes to recreate charts
+            if (window.matchMedia) {
+                const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                colorSchemeQuery.addEventListener('change', () => recreateCharts());
+            }
+
+            // Listen for manual theme toggle
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.attributeName === 'data-bs-theme' || mutation.attributeName === 'data-dark-mode') {
+                        recreateCharts();
+                    }
+                });
+            });
+
+            observer.observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ['data-bs-theme', 'data-dark-mode']
+            });
+        })
+        .catch(error => {
+            console.error('Error loading GitHub stats:', error);
+            const statsOverview = document.getElementById('stats-overview');
+            if (statsOverview) {
+                statsOverview.innerHTML = '<p class="text-danger">Failed to load statistics. Check console for details.</p>';
+            }
+        });
+});
+
+function displayStats(data) {
+    // Display repository stats
+    document.getElementById('stars-count').textContent = data.repository.stars.toLocaleString();
+    document.getElementById('forks-count').textContent = data.repository.forks.toLocaleString();
+    document.getElementById('watchers-count').textContent = data.repository.watchers.toLocaleString();
+    document.getElementById('open-issues').textContent = data.repository.openIssues.toLocaleString();
+    document.getElementById('total-downloads').textContent = data.totalDownloads.toLocaleString();
+
+    // Display issue stats
+    if (data.issues) {
+        document.getElementById('closed-issues').textContent = data.issues.closed.toLocaleString();
+    }
+
+    // Display pull request stats
+    if (data.pullRequests) {
+        document.getElementById('open-prs').textContent = data.pullRequests.open.toLocaleString();
+        // Closed PRs = Total - Open (includes both merged and closed-without-merge)
+        const closedPRs = data.pullRequests.total - data.pullRequests.open;
+        document.getElementById('closed-prs').textContent = closedPRs.toLocaleString();
+    }
+
+    // Display commit and discussion counts
+    if (data.totalCommits !== undefined) {
+        document.getElementById('total-commits').textContent = data.totalCommits.toLocaleString();
+    }
+    if (data.totalDiscussions !== undefined) {
+        document.getElementById('total-discussions').textContent = data.totalDiscussions.toLocaleString();
+    }
+
+    // Display last updated time
+    const generatedDate = new Date(data.generatedAt);
+    const timeAgo = getTimeAgo(generatedDate);
+    document.querySelector('.footer-note p').innerHTML =
+        `Updated ${timeAgo} from the <a href="https://github.com/trimble-oss/dba-dash" target="_blank">GitHub repository</a>.`;
+
+    // Create charts
+    createStarHistoryChart(data.starHistory.labels, data.starHistory.data);
+    createDownloadsChart(data.downloadChart.labels, data.downloadChart.data);
+
+    // Display releases table
+    displayReleasesTable(data.releases);
+
+    // Display contributors
+    if (data.contributors) {
+        displayContributors(data.contributors);
+    }
+}
+
+function getTimeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+
+    if (seconds < 60) return 'just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
+    return `${Math.floor(seconds / 86400)} days ago`;
+}
+
+function displayReleasesTable(releases) {
+    releasesData = releases;
+    currentPage = 1;
+    renderReleasesPage();
+}
+
+function renderReleasesPage() {
+    const totalPages = Math.ceil(releasesData.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageReleases = releasesData.slice(startIndex, endIndex);
+
+    let tableHtml = '';
+
+    // View toggle buttons
+    tableHtml += '<div class="view-toggle">';
+    tableHtml += `<button class="btn-view ${viewMode === 'simple' ? 'active' : ''}" onclick="changeView('simple')">☰ Simple View</button>`;
+    tableHtml += `<button class="btn-view ${viewMode === 'detailed' ? 'active' : ''}" onclick="changeView('detailed')">📦 Asset Details</button>`;
+    tableHtml += '</div>';
+
+    if (viewMode === 'simple') {
+        tableHtml += renderSimpleView(pageReleases);
+    } else {
+        tableHtml += renderDetailedView(pageReleases);
+    }
+
+    // Add pagination controls
+    tableHtml += '<div class="pagination-controls">';
+
+    // Page size selector
+    tableHtml += '<div class="page-size-selector">';
+    tableHtml += '<label for="pageSize">Show:</label>';
+    tableHtml += '<select id="pageSize" onchange="changePageSize(this.value)" class="page-size-select">';
+    const pageSizes = [10, 20, 50, 100];
+    pageSizes.forEach(size => {
+        tableHtml += `<option value="${size}" ${size === itemsPerPage ? 'selected' : ''}>${size}</option>`;
+    });
+    tableHtml += '</select>';
+    tableHtml += '<span>per page</span>';
+    tableHtml += '</div>';
+
+    if (totalPages > 1) {
+        tableHtml += `<button class="btn-pagination" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>← Previous</button>`;
+        tableHtml += '<span class="pagination-info">';
+
+        // Page numbers
+        const maxPageButtons = 7;
+        let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+        let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+        if (endPage - startPage + 1 < maxPageButtons) {
+            startPage = Math.max(1, endPage - maxPageButtons + 1);
+        }
+
+        if (startPage > 1) {
+            tableHtml += `<button class="btn-page" onclick="changePage(1)">1</button>`;
+            if (startPage > 2) tableHtml += '<span class="pagination-ellipsis">...</span>';
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            tableHtml += `<button class="btn-page ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) tableHtml += '<span class="pagination-ellipsis">...</span>';
+            tableHtml += `<button class="btn-page" onclick="changePage(${totalPages})">${totalPages}</button>`;
+        }
+
+        tableHtml += '</span>';
+        tableHtml += `<button class="btn-pagination" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>`;
+    }
+
+    tableHtml += `<div class="pagination-summary">Showing ${startIndex + 1}-${Math.min(endIndex, releasesData.length)} of ${releasesData.length} releases</div>`;
+    tableHtml += '</div>';
+
+    document.getElementById('release-stats').innerHTML = tableHtml;
+}
+
+function changePage(page) {
+    const totalPages = Math.ceil(releasesData.length / itemsPerPage);
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    renderReleasesPage();
+    // Scroll to top of table
+    document.getElementById('release-stats').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function changePageSize(newSize) {
+    itemsPerPage = parseInt(newSize);
+    currentPage = 1; // Reset to first page when changing page size
+    renderReleasesPage();
+}
+
+function changeView(mode) {
+    viewMode = mode;
+    renderReleasesPage();
+}
+
+function renderSimpleView(pageReleases) {
+    let html = '<table class="table table-hover"><thead><tr><th>Release</th><th>Date</th><th>Downloads</th></tr></thead><tbody>';
+
+    pageReleases.forEach(release => {
+        const publishedDate = new Date(release.publishedAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+        html += `<tr>
+            <td><a href="${release.url}" target="_blank">${release.name}</a></td>
+            <td>${publishedDate}</td>
+            <td><strong>${release.downloads.toLocaleString()}</strong></td>
+        </tr>`;
+    });
+
+    html += '</tbody></table>';
+    return html;
+}
+
+function renderDetailedView(pageReleases) {
+    let html = '<div class="releases-detailed">';
+
+    pageReleases.forEach(release => {
+        const publishedDate = new Date(release.publishedAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+
+        html += '<div class="release-card">';
+        html += '<div class="release-header">';
+        html += `<h3 class="release-title"><a href="${release.url}" target="_blank">${release.name}</a></h3>`;
+        html += `<span class="release-date">${publishedDate}</span>`;
+        html += '</div>';
+
+        if (release.assets && release.assets.length > 0) {
+            html += '<table class="assets-table">';
+            html += '<thead><tr><th>Asset</th><th>Downloads</th></tr></thead>';
+            html += '<tbody>';
+
+            release.assets.forEach(asset => {
+                html += '<tr>';
+                html += `<td><a href="${asset.url}" target="_blank" class="asset-link">${asset.name}</a></td>`;
+                html += `<td class="asset-downloads">${asset.downloads.toLocaleString()}</td>`;
+                html += '</tr>';
+            });
+
+            html += '</tbody>';
+            html += '<tfoot>';
+            html += '<tr class="total-row">';
+            html += '<td><strong>Total</strong></td>';
+            html += `<td class="asset-downloads"><strong>= ${release.downloads.toLocaleString()}</strong></td>`;
+            html += '</tr>';
+            html += '</tfoot>';
+            html += '</table>';
+        }
+
+        html += '</div>';
+    });
+
+    html += '</div>';
+    return html;
+}
+
+function displayContributors(contributors) {
+    let html = '<div class="contributors-grid">';
+
+    contributors.forEach(contributor => {
+        html += '<div class="contributor-card">';
+        html += `<a href="${contributor.profile}" target="_blank" class="contributor-link">`;
+        html += `<img src="${contributor.avatar}" alt="${contributor.username}" class="contributor-avatar">`;
+        html += `<div class="contributor-info">`;
+        html += `<div class="contributor-name">${contributor.username}</div>`;
+        html += `<div class="contributor-contributions">${contributor.contributions.toLocaleString()} contribution${contributor.contributions !== 1 ? 's' : ''}</div>`;
+        html += '</div>';
+        html += '</a>';
+        html += '</div>';
+    });
+
+    html += '</div>';
+    document.getElementById('contributors-list').innerHTML = html;
+}
+
+function createStarHistoryChart(labels, data) {
+    const ctx = document.getElementById('starHistoryChart');
+    if (!ctx) return;
+
+    if (starHistoryChart) {
+        starHistoryChart.destroy();
+    }
+
+    // Get colors from CSS custom properties
+    const styles = getComputedStyle(document.documentElement);
+    const accentColor = styles.getPropertyValue('--accent-color').trim();
+    const accentBg = styles.getPropertyValue('--chart-bg').trim();
+    const textColor = styles.getPropertyValue('--chart-text').trim();
+    const gridColor = styles.getPropertyValue('--chart-grid').trim();
+
+    starHistoryChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Stars Over Time',
+                data: data,
+                borderColor: accentColor,
+                backgroundColor: accentBg,
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: accentColor
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: styles.getPropertyValue('--card-bg').trim(),
+                    titleColor: textColor,
+                    bodyColor: textColor,
+                    borderColor: gridColor,
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            return 'Stars: ' + context.parsed.y.toLocaleString();
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: gridColor
+                    },
+                    ticks: {
+                        color: textColor,
+                        callback: function(value) {
+                            return value.toLocaleString();
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        color: gridColor
+                    },
+                    ticks: {
+                        color: textColor,
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createDownloadsChart(labels, data) {
+    const ctx = document.getElementById('downloadsChart');
+    if (!ctx) return;
+
+    if (downloadsChart) {
+        downloadsChart.destroy();
+    }
+
+    // Get colors from CSS custom properties
+    const styles = getComputedStyle(document.documentElement);
+    const trimbleBlue = styles.getPropertyValue('--chart-color').trim();
+    const trimbleBluePale = styles.getPropertyValue('--chart-bg').trim();
+    const textColor = styles.getPropertyValue('--chart-text').trim();
+    const gridColor = styles.getPropertyValue('--chart-grid').trim();
+
+    downloadsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Cumulative Downloads',
+                data: data,
+                borderColor: trimbleBlue,
+                backgroundColor: trimbleBluePale,
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: trimbleBlue
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: styles.getPropertyValue('--card-bg').trim(),
+                    titleColor: textColor,
+                    bodyColor: textColor,
+                    borderColor: gridColor,
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            return 'Total: ' + context.parsed.y.toLocaleString() + ' downloads';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: gridColor
+                    },
+                    ticks: {
+                        color: textColor,
+                        callback: function(value) {
+                            return value.toLocaleString();
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        color: gridColor
+                    },
+                    ticks: {
+                        color: textColor,
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Recreate charts when theme changes
+function recreateCharts() {
+    if (statsData) {
+        if (statsData.starHistory) {
+            createStarHistoryChart(statsData.starHistory.labels, statsData.starHistory.data);
+        }
+        if (statsData.downloadChart) {
+            createDownloadsChart(statsData.downloadChart.labels, statsData.downloadChart.data);
+        }
+    }
+}
+</script>
+
+<style>
+:root {
+    /* Trimble Color Palette - Fixed Values */
+    --trimble-blue: #0063a3;
+    --trimble-blue-dark: #0e416c;
+    --trimble-blue-light: #217cbb;
+    --trimble-blue-pale: #dcedf9;
+    --trimble-yellow: #fbad26;
+    --trimble-gray: #252a2e;
+    --gray-9: #353a40;
+    --gray-8: #464b52;
+    --gray-6: #6a6e79;
+    --gray-3: #a3a6b1;
+    --gray-1: #cbcdd6;
+    --gray-0: #e0e1e9;
+    --gray-light: #f1f1f6;
+    --green: #1e8a44;
+    --red: #da212c;
+    --highlight-blue: #019aeb;
+}
+
+/* Default Light Mode Theme */
+:root,
+[data-bs-theme="light"],
+[data-dark-mode="false"] {
+    --stats-bg: linear-gradient(135deg, #0e416c 0%, #0063a3 100%);
+    --stats-text: #ffffff;
+    --card-bg: #ffffff;
+    --card-text: #252a2e;
+    --border-color: #e0e1e9;
+    --accent-color: #0063a3;
+    --hover-bg: rgba(0, 99, 163, 0.05);
+    --table-border: #0063a3;
+    --chart-color: #0063a3;
+    --chart-bg: rgba(0, 99, 163, 0.1);
+    --chart-text: #0063a3;
+    --chart-grid: #e0e1e9;
+}
+
+/* Dark Mode - System Preference (lower priority) */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-bs-theme="light"]):not([data-dark-mode="false"]) {
+        --stats-bg: linear-gradient(135deg, #0063a3 0%, #019aeb 100%);
+        --card-bg: #353a40;
+        --card-text: #f1f1f6;
+        --border-color: #464b52;
+        --accent-color: #019aeb;
+        --hover-bg: rgba(1, 154, 235, 0.1);
+        --table-border: #019aeb;
+        --chart-color: #019aeb;
+        --chart-bg: rgba(1, 154, 235, 0.15);
+        --chart-text: #f1f1f6;
+        --chart-grid: #464b52;
+    }
+}
+
+/* Dark Mode - Manual Toggle (higher priority - overrides media query) */
+[data-bs-theme="dark"],
+[data-dark-mode="true"],
+html.dark,
+body.dark {
+    --stats-bg: linear-gradient(135deg, #0063a3 0%, #019aeb 100%) !important;
+    --card-bg: #353a40 !important;
+    --card-text: #f1f1f6 !important;
+    --border-color: #464b52 !important;
+    --accent-color: #019aeb !important;
+    --hover-bg: rgba(1, 154, 235, 0.1) !important;
+    --table-border: #019aeb !important;
+    --chart-color: #019aeb !important;
+    --chart-bg: rgba(1, 154, 235, 0.15) !important;
+    --chart-text: #f1f1f6 !important;
+    --chart-grid: #464b52 !important;
+}
+
+/* Light Mode Text Overrides - Use Trimble Blue for table section text */
+:root .table thead th,
+:root .table tbody td,
+:root .table tbody td strong,
+:root .page-size-selector,
+:root .page-size-select,
+:root .btn-view:not(.active),
+:root .btn-pagination,
+:root .btn-page:not(.active),
+:root .release-title,
+:root .assets-table thead th,
+:root .assets-table td,
+:root .contributor-name,
+:root .contributor-contributions,
+[data-bs-theme="light"] .table thead th,
+[data-bs-theme="light"] .table tbody td,
+[data-bs-theme="light"] .table tbody td strong,
+[data-bs-theme="light"] .page-size-selector,
+[data-bs-theme="light"] .page-size-select,
+[data-bs-theme="light"] .btn-view:not(.active),
+[data-bs-theme="light"] .btn-pagination,
+[data-bs-theme="light"] .btn-page:not(.active),
+[data-bs-theme="light"] .release-title,
+[data-bs-theme="light"] .assets-table thead th,
+[data-bs-theme="light"] .assets-table td,
+[data-bs-theme="light"] .contributor-name,
+[data-bs-theme="light"] .contributor-contributions,
+[data-dark-mode="false"] .table thead th,
+[data-dark-mode="false"] .table tbody td,
+[data-dark-mode="false"] .table tbody td strong,
+[data-dark-mode="false"] .page-size-selector,
+[data-dark-mode="false"] .page-size-select,
+[data-dark-mode="false"] .btn-view:not(.active),
+[data-dark-mode="false"] .btn-pagination,
+[data-dark-mode="false"] .btn-page:not(.active),
+[data-dark-mode="false"] .release-title,
+[data-dark-mode="false"] .assets-table thead th,
+[data-dark-mode="false"] .assets-table td,
+[data-dark-mode="false"] .contributor-name,
+[data-dark-mode="false"] .contributor-contributions {
+    color: #0063a3 !important;
+}
+
+/* Dark Mode Text Overrides - Use Light/White text for better visibility */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-bs-theme="light"]) .table thead th,
+    :root:not([data-bs-theme="light"]) .table tbody td,
+    :root:not([data-bs-theme="light"]) .table tbody td strong,
+    :root:not([data-bs-theme="light"]) .page-size-selector,
+    :root:not([data-bs-theme="light"]) .page-size-select,
+    :root:not([data-bs-theme="light"]) .btn-view:not(.active),
+    :root:not([data-bs-theme="light"]) .btn-pagination,
+    :root:not([data-bs-theme="light"]) .btn-page:not(.active),
+    :root:not([data-bs-theme="light"]) .release-title,
+    :root:not([data-bs-theme="light"]) .assets-table thead th,
+    :root:not([data-bs-theme="light"]) .assets-table td,
+    :root:not([data-bs-theme="light"]) .contributor-name,
+    :root:not([data-bs-theme="light"]) .contributor-contributions {
+        color: #f1f1f6 !important;
+    }
+}
+
+[data-bs-theme="dark"] .table thead th,
+[data-bs-theme="dark"] .table tbody td,
+[data-bs-theme="dark"] .table tbody td strong,
+[data-bs-theme="dark"] .page-size-selector,
+[data-bs-theme="dark"] .page-size-select,
+[data-bs-theme="dark"] .btn-view:not(.active),
+[data-bs-theme="dark"] .btn-pagination,
+[data-bs-theme="dark"] .btn-page:not(.active),
+[data-bs-theme="dark"] .release-title,
+[data-bs-theme="dark"] .assets-table thead th,
+[data-bs-theme="dark"] .assets-table td,
+[data-bs-theme="dark"] .contributor-name,
+[data-bs-theme="dark"] .contributor-contributions,
+[data-dark-mode="true"] .table thead th,
+[data-dark-mode="true"] .table tbody td,
+[data-dark-mode="true"] .table tbody td strong,
+[data-dark-mode="true"] .page-size-selector,
+[data-dark-mode="true"] .page-size-select,
+[data-dark-mode="true"] .btn-view:not(.active),
+[data-dark-mode="true"] .btn-pagination,
+[data-dark-mode="true"] .btn-page:not(.active),
+[data-dark-mode="true"] .release-title,
+[data-dark-mode="true"] .assets-table thead th,
+[data-dark-mode="true"] .assets-table td,
+[data-dark-mode="true"] .contributor-name,
+[data-dark-mode="true"] .contributor-contributions,
+html.dark .table thead th,
+html.dark .table tbody td,
+html.dark .table tbody td strong,
+html.dark .page-size-selector,
+html.dark .page-size-select,
+html.dark .btn-view:not(.active),
+html.dark .btn-pagination,
+html.dark .btn-page:not(.active),
+html.dark .release-title,
+html.dark .assets-table thead th,
+html.dark .assets-table td,
+html.dark .contributor-name,
+html.dark .contributor-contributions,
+body.dark .table thead th,
+body.dark .table tbody td,
+body.dark .table tbody td strong,
+body.dark .page-size-selector,
+body.dark .page-size-select,
+body.dark .btn-view:not(.active),
+body.dark .btn-pagination,
+body.dark .btn-page:not(.active),
+body.dark .release-title,
+body.dark .assets-table thead th,
+body.dark .assets-table td,
+body.dark .contributor-name,
+body.dark .contributor-contributions {
+    color: #f1f1f6 !important;
+}
+
+/* Shadows - Dark Mode */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-bs-theme="light"]) .chart-container,
+    :root:not([data-bs-theme="light"]) .table-container {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+    }
+}
+
+[data-bs-theme="dark"] .chart-container,
+[data-bs-theme="dark"] .table-container,
+[data-dark-mode="true"] .chart-container,
+[data-dark-mode="true"] .table-container,
+html.dark .chart-container,
+html.dark .table-container,
+body.dark .chart-container,
+body.dark .table-container {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+}
+
+.stats-header {
+    background: var(--stats-bg);
+    color: var(--stats-text);
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    transition: transform 0.2s, background 0.2s;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.stat-link {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+}
+
+.stat-link:hover {
+    color: inherit;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+    color: var(--stats-text);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    opacity: 0.95;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--stats-text);
+}
+
+.chart-container {
+    background-color: var(--card-bg) !important;
+    background: var(--card-bg) !important;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    border: 1px solid var(--border-color);
+}
+
+.chart-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--chart-color) !important;
+}
+
+.table-container {
+    background-color: var(--card-bg) !important;
+    background: var(--card-bg) !important;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    border: 1px solid var(--border-color);
+}
+
+.table {
+    margin-bottom: 0;
+    color: var(--card-text) !important;
+    width: 100%;
+}
+
+.table thead th {
+    border-bottom: 2px solid var(--table-border);
+    color: var(--card-text) !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+    background: transparent;
+    padding: 12px 8px;
+}
+
+.table tbody tr {
+    transition: background-color 0.2s;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table tbody td {
+    color: var(--card-text) !important;
+    padding: 12px 8px;
+    vertical-align: middle;
+}
+
+.table tbody td strong {
+    color: var(--card-text) !important;
+}
+
+.table tbody td a {
+    color: var(--accent-color) !important;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.table tbody td a:hover {
+    text-decoration: underline;
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--hover-bg) !important;
+}
+
+.footer-note {
+    text-align: center;
+    color: var(--gray-6);
+    font-size: 0.875rem;
+    margin-top: 40px;
+}
+
+.footer-note a {
+    color: var(--accent-color) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    .footer-note {
+        color: var(--gray-3) !important;
+    }
+}
+
+[data-bs-theme="dark"] .footer-note,
+[data-dark-mode="true"] .footer-note,
+html.dark .footer-note,
+body.dark .footer-note {
+    color: var(--gray-3) !important;
+}
+
+.contributors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    padding: 10px 0;
+}
+
+.contributor-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.contributor-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: var(--accent-color);
+}
+
+.contributor-link {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.contributor-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid var(--border-color);
+    transition: border-color 0.2s;
+}
+
+.contributor-card:hover .contributor-avatar {
+    border-color: var(--accent-color);
+}
+
+.contributor-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.contributor-name {
+    font-weight: 600;
+    color: var(--card-text);
+    font-size: 0.9375rem;
+}
+
+.contributor-contributions {
+    font-size: 0.8125rem;
+    color: var(--gray-6);
+}
+
+@media (prefers-color-scheme: dark) {
+    .contributor-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .contributor-contributions {
+        color: var(--gray-3) !important;
+    }
+}
+
+[data-bs-theme="dark"] .contributor-card:hover,
+[data-dark-mode="true"] .contributor-card:hover,
+html.dark .contributor-card:hover,
+body.dark .contributor-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .contributor-contributions,
+[data-dark-mode="true"] .contributor-contributions,
+html.dark .contributor-contributions,
+body.dark .contributor-contributions {
+    color: var(--gray-3) !important;
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .chart-container,
+    .table-container {
+        padding: 15px;
+    }
+
+    .page-size-selector {
+        width: 100%;
+        justify-content: center;
+        margin-right: 0;
+    }
+
+    .pagination-controls {
+        gap: 8px;
+    }
+
+    .btn-pagination {
+        padding: 6px 12px;
+        font-size: 0.8125rem;
+    }
+
+    .btn-page {
+        min-width: 36px;
+        padding: 5px 10px;
+        font-size: 0.8125rem;
+    }
+
+    .contributors-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+    }
+
+    .contributor-avatar {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+.cache-indicator {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    background: var(--trimble-yellow);
+    color: #252a2e;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    flex-wrap: wrap;
+}
+
+.page-size-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    color: var(--card-text);
+    margin-right: auto;
+}
+
+.page-size-select {
+    padding: 6px 12px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--card-text);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.page-size-select:hover {
+    border-color: var(--accent-color);
+}
+
+.page-size-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(0, 99, 163, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+    .page-size-select:focus {
+        box-shadow: 0 0 0 3px rgba(1, 154, 235, 0.2);
+    }
+}
+
+[data-bs-theme="dark"] .page-size-select:focus,
+[data-dark-mode="true"] .page-size-select:focus,
+html.dark .page-size-select:focus,
+body.dark .page-size-select:focus {
+    box-shadow: 0 0 0 3px rgba(1, 154, 235, 0.2) !important;
+}
+
+.btn-pagination, .btn-page {
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--card-text);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-pagination:hover:not(:disabled), .btn-page:hover:not(.active) {
+    background: var(--hover-bg);
+    border-color: var(--accent-color);
+}
+
+.btn-pagination:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.btn-page {
+    min-width: 40px;
+    padding: 6px 12px;
+}
+
+.btn-page.active {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+    font-weight: 600;
+}
+
+.pagination-info {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pagination-ellipsis {
+    padding: 0 4px;
+    color: var(--card-text);
+}
+
+.pagination-summary {
+    width: 100%;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--gray-6);
+    margin-top: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .pagination-summary {
+        color: var(--gray-3) !important;
+    }
+}
+
+[data-bs-theme="dark"] .pagination-summary,
+[data-dark-mode="true"] .pagination-summary,
+html.dark .pagination-summary,
+body.dark .pagination-summary {
+    color: var(--gray-3) !important;
+}
+
+.view-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.btn-view {
+    padding: 8px 20px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--card-text);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-view:hover {
+    background: var(--hover-bg);
+    border-color: var(--accent-color);
+}
+
+.btn-view.active {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+    font-weight: 600;
+}
+
+.releases-detailed {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.release-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    transition: box-shadow 0.2s;
+}
+
+.release-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.release-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--table-border);
+}
+
+.release-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--card-text);
+}
+
+.release-title a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+.release-title a:hover {
+    text-decoration: underline;
+}
+
+.release-date {
+    font-size: 0.875rem;
+    color: var(--gray-6);
+    font-weight: 500;
+}
+
+.assets-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.assets-table thead th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--card-text);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.assets-table tbody tr {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.assets-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.assets-table td {
+    padding: 10px 12px;
+    color: var(--card-text);
+}
+
+.asset-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.asset-link:hover {
+    text-decoration: underline;
+}
+
+.asset-downloads {
+    text-align: right;
+    font-weight: 500;
+    color: var(--card-text);
+}
+
+.assets-table tfoot {
+    border-top: 2px solid var(--border-color);
+}
+
+.total-row {
+    font-weight: 600;
+}
+
+.total-row td {
+    padding: 12px;
+    color: var(--card-text);
+}
+
+@media (prefers-color-scheme: dark) {
+    .release-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .release-date {
+        color: var(--gray-3) !important;
+    }
+}
+
+[data-bs-theme="dark"] .release-card:hover,
+[data-dark-mode="true"] .release-card:hover,
+html.dark .release-card:hover,
+body.dark .release-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .release-date,
+[data-dark-mode="true"] .release-date,
+html.dark .release-date,
+body.dark .release-date {
+    color: var(--gray-3) !important;
+}
+
+@media (max-width: 768px) {
+    .release-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .release-title {
+        font-size: 1.125rem;
+    }
+
+    .release-card {
+        padding: 15px;
+    }
+
+    .view-toggle {
+        flex-direction: column;
+    }
+
+    .btn-view {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
+<section class="section container-fluid mt-n3 pb-3">
+  <div class="row justify-content-center">
+    <div class="col-lg-12">
+
+      <div class="stats-header">
+        <div style="text-align: center; margin-bottom: 10px;">
+          <h3 style="margin: 0 0 5px 0; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg height="24" width="24" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle;">
+              <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
+            </svg>
+            GitHub Stats
+          </h3>
+          <h2 style="margin: 0 0 5px 0;">
+            <a href="https://github.com/trimble-oss/dba-dash" target="_blank" style="color: white; text-decoration: none;">
+              trimble-oss/dba-dash
+            </a>
+          </h2>
+        </div>
+
+        <div id="stats-overview" class="stats-grid">
+          <a href="https://github.com/trimble-oss/dba-dash/stargazers" target="_blank" class="stat-link">
+            <div class="stat-item">
+              <span class="stat-value" id="stars-count">-</span>
+              <span class="stat-label">Stars</span>
+            </div>
+          </a>
+          <a href="https://github.com/trimble-oss/dba-dash/forks" target="_blank" class="stat-link">
+            <div class="stat-item">
+              <span class="stat-value" id="forks-count">-</span>
+              <span class="stat-label">Forks</span>
+            </div>
+          </a>
+          <a href="https://github.com/trimble-oss/dba-dash/watchers" target="_blank" class="stat-link">
+            <div class="stat-item">
+              <span class="stat-value" id="watchers-count">-</span>
+              <span class="stat-label">Watchers</span>
+            </div>
+          </a>
+          <a href="https://github.com/trimble-oss/dba-dash/releases" target="_blank" class="stat-link">
+            <div class="stat-item">
+              <span class="stat-value" id="total-downloads">-</span>
+              <span class="stat-label">Total Downloads</span>
+            </div>
+          </a>
+          <a href="https://github.com/trimble-oss/dba-dash/issues" target="_blank" class="stat-link">
+            <div class="stat-item">
+              <span class="stat-value" id="open-issues">-</span>
+              <span class="stat-label">Open Issues</span>
+            </div>
+          </a>
+          <a href="https://github.com/trimble-oss/dba-dash/issues?q=is%3Aissue+is%3Aclosed" target="_blank" class="stat-link">
+            <div class="stat-item">
+              <span class="stat-value" id="closed-issues">-</span>
+              <span class="stat-label">Closed Issues</span>
+            </div>
+          </a>
+          <a href="https://github.com/trimble-oss/dba-dash/pulls" target="_blank" class="stat-link">
+            <div class="stat-item">
+              <span class="stat-value" id="open-prs">-</span>
+              <span class="stat-label">Open PRs</span>
+            </div>
+          </a>
+          <a href="https://github.com/trimble-oss/dba-dash/pulls?q=is%3Apr+is%3Aclosed" target="_blank" class="stat-link">
+            <div class="stat-item">
+              <span class="stat-value" id="closed-prs">-</span>
+              <span class="stat-label">Closed PRs</span>
+            </div>
+          </a>
+          <a href="https://github.com/trimble-oss/dba-dash/commits" target="_blank" class="stat-link">
+            <div class="stat-item">
+              <span class="stat-value" id="total-commits">-</span>
+              <span class="stat-label">Total Commits</span>
+            </div>
+          </a>
+          <a href="https://github.com/trimble-oss/dba-dash/discussions" target="_blank" class="stat-link">
+            <div class="stat-item">
+              <span class="stat-value" id="total-discussions">-</span>
+              <span class="stat-label">Total Discussions</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="chart-container" id="star-history-container">
+        <div class="chart-title">Stars Over Time</div>
+        <canvas id="starHistoryChart" height="80"></canvas>
+      </div>
+
+      <div class="chart-container">
+        <div class="chart-title">Cumulative Downloads</div>
+        <canvas id="downloadsChart" height="80"></canvas>
+      </div>
+
+      <div class="table-container">
+        <div class="chart-title">Downloads by Release</div>
+        <div id="release-stats">
+          <p class="text-center" style="padding: 20px;">Loading release statistics...</p>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <div class="chart-title">Contributors</div>
+        <div id="contributors-list">
+          <p class="text-center" style="padding: 20px;">Loading contributors...</p>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        <p>Loading statistics...</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{{ end }}

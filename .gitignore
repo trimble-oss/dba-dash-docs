@@ -7,3 +7,5 @@ hugo_stats.json
 
 # Local build artifacts
 /.hugo_build
+# Generated data files (created at build time)
+static/data/
