@@ -8,6 +8,7 @@
     "create": "hugo new",
     "dev": "hugo server --disableFastRender --noHTTPCache",
     "format": "prettier **/** -w -c",
+    "prebuild": "node scripts/fetch-github-stats.js",
     "build": "hugo mod clean && hugo mod tidy && hugo --minify --gc",
     "preview": "vite preview --outDir public"
   },
