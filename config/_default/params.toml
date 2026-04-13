@@ -7,7 +7,7 @@ images = ["cover.png"]
 mainSections = ["docs"]
 
 [social]
-  twitter = "wiseDATAman"
+  twitter = ""
 
 # Doks (@hyas/doks-core)
 [doks]
