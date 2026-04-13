@@ -61,14 +61,13 @@
     max-age=3600'''
     Access-Control-Allow-Origin = "*"
 
-# Stats page - needs inline script for Chart.js and data loading (must come after /* rule)
 [[headers]]
   for = "/stats/"
   [headers.values]
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
-    Content-Security-Policy = "default-src 'self' https://dbadash.com https://*.netlify.app; manifest-src 'self' https://dbadash.com https://*.netlify.app; connect-src 'self' https://dbadash.com https://*.netlify.app https://api.github.com/repos/trimble-oss/ https://*.google-analytics.com/ https://cdn.jsdelivr.net/npm/chart.js@4.4.0/; font-src 'self' https://dbadash.com https://*.netlify.app data:; img-src 'self' https://dbadash.com https://*.netlify.app https://avatars.githubusercontent.com data:; script-src 'self' https://dbadash.com https://*.netlify.app 'sha256-RYk4Cn/LASh9beTcxN1WIiOQnnuUN8llHXKILWmqOxM=' https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/ https://cdn.jsdelivr.net/npm/chart.js@4.4.0/ https://www.googletagmanager.com/gtag/js https://buttons.github.io/buttons.js; style-src 'self' https://dbadash.com https://*.netlify.app 'unsafe-inline' https://buttons.github.io/buttons.js; frame-src 'self' https://www.youtube.com/ https://www.youtube-nocookie.com/"
+    Content-Security-Policy = "default-src 'self' https://dbadash.com https://*.netlify.app; manifest-src 'self' https://dbadash.com https://*.netlify.app; connect-src 'self' https://dbadash.com https://*.netlify.app https://api.github.com/repos/trimble-oss/ https://*.google-analytics.com/ https://cdn.jsdelivr.net/npm/chart.js@4.4.0/; font-src 'self' https://dbadash.com https://*.netlify.app data:; img-src 'self' https://dbadash.com https://*.netlify.app https://avatars.githubusercontent.com data:; script-src 'self' https://dbadash.com https://*.netlify.app https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/ https://cdn.jsdelivr.net/npm/chart.js@4.4.0/ https://www.googletagmanager.com/gtag/js https://buttons.github.io/buttons.js; style-src 'self' https://dbadash.com https://*.netlify.app 'unsafe-inline' https://buttons.github.io/buttons.js; frame-src 'self' https://www.youtube.com/ https://www.youtube-nocookie.com/"
     X-Frame-Options = "SAMEORIGIN"
     Referrer-Policy = "strict-origin"
     Permissions-Policy = "geolocation=(self), microphone=(), camera=()"

@@ -132,10 +132,10 @@ function renderReleasesPage() {
 
     let tableHtml = '';
 
-    // View toggle buttons
+    // View toggle buttons (use data attributes + event delegation)
     tableHtml += '<div class="view-toggle">';
-    tableHtml += `<button class="btn-view ${viewMode === 'simple' ? 'active' : ''}" onclick="changeView('simple')">☰ Simple View</button>`;
-    tableHtml += `<button class="btn-view ${viewMode === 'detailed' ? 'active' : ''}" onclick="changeView('detailed')">📦 Asset Details</button>`;
+    tableHtml += `<button class="btn-view ${viewMode === 'simple' ? 'active' : ''}" data-view="simple">☰ Simple View</button>`;
+    tableHtml += `<button class="btn-view ${viewMode === 'detailed' ? 'active' : ''}" data-view="detailed">📦 Asset Details</button>`;
     tableHtml += '</div>';
 
     if (viewMode === 'simple') {
@@ -150,7 +150,7 @@ function renderReleasesPage() {
     // Page size selector
     tableHtml += '<div class="page-size-selector">';
     tableHtml += '<label for="pageSize">Show:</label>';
-    tableHtml += '<select id="pageSize" onchange="changePageSize(this.value)" class="page-size-select">';
+    tableHtml += '<select id="pageSize" class="page-size-select">';
     const pageSizes = [10, 20, 50, 100];
     pageSizes.forEach(size => {
         tableHtml += `<option value="${size}" ${size === itemsPerPage ? 'selected' : ''}>${size}</option>`;
@@ -160,7 +160,7 @@ function renderReleasesPage() {
     tableHtml += '</div>';
 
     if (totalPages > 1) {
-        tableHtml += `<button class="btn-pagination" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>← Previous</button>`;
+        tableHtml += `<button class="btn-pagination" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>← Previous</button>`;
         tableHtml += '<span class="pagination-info">';
 
         // Page numbers
@@ -173,27 +173,77 @@ function renderReleasesPage() {
         }
 
         if (startPage > 1) {
-            tableHtml += `<button class="btn-page" onclick="changePage(1)">1</button>`;
+            tableHtml += `<button class="btn-page" data-page="1">1</button>`;
             if (startPage > 2) tableHtml += '<span class="pagination-ellipsis">...</span>';
         }
 
         for (let i = startPage; i <= endPage; i++) {
-            tableHtml += `<button class="btn-page ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            tableHtml += `<button class="btn-page ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
         }
 
         if (endPage < totalPages) {
             if (endPage < totalPages - 1) tableHtml += '<span class="pagination-ellipsis">...</span>';
-            tableHtml += `<button class="btn-page" onclick="changePage(${totalPages})">${totalPages}</button>`;
+            tableHtml += `<button class="btn-page" data-page="${totalPages}">${totalPages}</button>`;
         }
 
         tableHtml += '</span>';
-        tableHtml += `<button class="btn-pagination" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>`;
+            tableHtml += `<button class="btn-pagination" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>`;
     }
 
     tableHtml += `<div class="pagination-summary">Showing ${startIndex + 1}-${Math.min(endIndex, releasesData.length)} of ${releasesData.length} releases</div>`;
     tableHtml += '</div>';
 
     document.getElementById('release-stats').innerHTML = tableHtml;
+
+    // Attach event listeners (delegation) after injecting HTML to avoid inline handlers
+    attachReleaseStatsHandlers();
+}
+
+function attachReleaseStatsHandlers() {
+    const container = document.getElementById('release-stats');
+    if (!container) return;
+
+    // Remove any existing delegated listener to avoid duplicates
+    container.removeEventListener('click', container._releaseStatsClickHandler);
+
+    const clickHandler = function(e) {
+        const btn = e.target.closest('button');
+        if (!btn || !container.contains(btn)) return;
+
+        // View toggle
+        if (btn.classList.contains('btn-view') && btn.dataset.view) {
+            changeView(btn.dataset.view);
+            return;
+        }
+
+        // Page buttons
+        if (btn.classList.contains('btn-page') && btn.dataset.page) {
+            const p = parseInt(btn.dataset.page, 10);
+            if (!isNaN(p)) changePage(p);
+            return;
+        }
+
+        // Pagination prev/next
+        if (btn.classList.contains('btn-pagination') && btn.dataset.page) {
+            const p = parseInt(btn.dataset.page, 10);
+            if (!isNaN(p)) changePage(p);
+            return;
+        }
+    };
+
+    container.addEventListener('click', clickHandler);
+    container._releaseStatsClickHandler = clickHandler;
+
+    // Page size select
+    const pageSizeSelect = container.querySelector('#pageSize');
+    if (pageSizeSelect) {
+        pageSizeSelect.removeEventListener('change', container._releaseStatsChangeHandler);
+        const changeHandler = function(e) {
+            changePageSize(e.target.value);
+        };
+        pageSizeSelect.addEventListener('change', changeHandler);
+        container._releaseStatsChangeHandler = changeHandler;
+    }
 }
 
 function changePage(page) {
