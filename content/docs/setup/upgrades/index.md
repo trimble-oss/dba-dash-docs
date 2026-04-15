@@ -35,7 +35,7 @@ toc: true
 4. A powershell script will run that will perform the upgrade.
 
 {{< callout context="note" icon="outline/info-circle" >}}It might take a few minutes to shutdown the DBA Dash service as it waits for collections to complete.  Starting the service could also take a few minutes as it upgrades the DBA Dash repository database and starts up the collections{{< /callout >}}
-{{< callout context="caution" icon="outline/alert-triangle" >}}If the application fails to start, please ensure you have .NET Framework 8 Desktop Runtime 8.0.0 or later installed.  See Prerequisites{{< /callout >}}
+{{< callout context="caution" icon="outline/alert-triangle" >}}If the application fails to start, please ensure you have .NET Framework 10 Desktop Runtime 10.0.0 or later installed.  See Prerequisites{{< /callout >}}
 
 ## Upgrading GUI clients
 
