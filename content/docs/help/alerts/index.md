@@ -93,6 +93,16 @@ A notification channel defines where to send the alert notification. To create a
   Schedules can also be applied to a specific tag.  So the 24x7 high priority schedule could be filtered for tag Role:Production.  Or if you have different teams responsible for different instances a tag could be used to filter instances applicable to the team associated with the notification channel.
   Note: It's OK to have overlapping schedules.  A channel will receive a single notification.  If multiple channels have overlapping schedules, each channel will be notified.
 
+  {{< callout context="note" >}}
+You can apply schedule filters to notification channels to control which alerts a channel receives based on:
+
+- Time of day
+- Day of week
+- Alert priority
+- Instance tag (for example: Prod, DEV)
+
+{{< /callout >}}
+
  [![Add Notification Channel](add-notification-channel.png)](add-notification-channel.png)
 
 Schedules have an associated re-trigger threshold which is the minimum delay required before sending an updated alert notification.  By default you will receive updates every 10 minutes and a maximum of 6 (configurable in Options\Repository Settings) notifications will be sent for each alert.  For Slack and Google chat alerts, updates are sent to the previous conversation thread.
@@ -100,6 +110,23 @@ Schedules have an associated re-trigger threshold which is the minimum delay req
 {{< callout context="caution">}}
 Sensitive information associated with the notification channel is stored in the repository database.  Data masking is used to limit access to sensitive information and users will receive a "Insufficient permission to access notification channel details" error if they try to edit a channel without appropriate [permissions](https://learn.microsoft.com/en-us/sql/relational-databases/security/dynamic-data-masking?view=sql-server-2017#permissions) to unmask the data.  Sensitive data is obfuscated even if you have permissions to unmask, preventing casual viewing of the data.
 {{< /callout >}}
+
+### Notification channel groups
+
+Notification channel groups let you target alert rules to specific sets of notification channels (email, Google Chat, Slack, PagerDuty, etc.). A *default* group is created automatically and additional groups can be created if required.
+
+#### How to create a notification channel group
+
+1. On the Alerts tab, click *Configure*.
+2. Click **Add Group**, enter a name, and click OK.
+3. Create or edit a notification channel and assign it to the group.
+
+![Notification Channel](notification-channel.png)
+
+4. When creating or editing an alert rule, select the group to control where notifications are sent.
+
+![Alert Rule](alert-rule.png)
+
 
 ## Desktop notifications
 
