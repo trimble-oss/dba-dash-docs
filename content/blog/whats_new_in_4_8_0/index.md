@@ -3,7 +3,7 @@ title: "What's new in 4.8?"
 description: "Highlights from the DBA Dash 4.8.0 release: deadlock reporting, alerting improvements, and other fixes."
 summary: "Deadlock reporting available on the Performance tab, new notification channel groups, improved alert filters, and other improvements."
 date: 2026-04-20T08:00:00+00:00
-lastmod: 2026-04-20T08:00:00+00:00
+lastmod: 2026-04-20T13:00:00+00:00
 draft: false
 weight: 50
 categories: [Releases]
@@ -68,11 +68,15 @@ You can apply schedule filters to notification channels to control which alert n
 
 ### Agent job exclusion filters
 
-Agent job alerts can now use exclusion filters for job name and category. You can specify multiple filters — enter each filter on a new line.
+Agent job alerts can now use exclusion filters for job name and category. You can specify multiple filters — enter each filter on a new line (use the down).
+
+[![Agent job exclusion filters](agent-job-exclude.png)](agent-job-exclude.png)
 
 ### Dedicated recipient for resolved notifications
 
 [This pull request](https://github.com/trimble-oss/dba-dash/pull/1844) by [goldenjacob](https://github.com/goldenjacob) adds the option to use a separate email address for resolution notifications. This can prevent resolved alerts creating unnecessary tickets in external systems.
+
+[![Agent job resolution to email](resolution-to-email.png)](resolution-to-email.png)
 
 ## Other improvements
 
