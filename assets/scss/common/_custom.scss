@@ -2,3 +2,13 @@
 .navbar-brand {
   color: #004f83;
 }
+
+// Light mode: table text matches heading/body color
+table {
+  --bs-table-color: #{$body-color};
+}
+
+// Dark mode: revert to inherited color (falls back to body color via cascade)
+[data-bs-theme="dark"] table {
+  --bs-table-color: inherit;
+}
