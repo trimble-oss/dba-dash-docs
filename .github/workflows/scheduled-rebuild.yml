@@ -2,8 +2,8 @@ name: Scheduled Rebuild
 
 on:
   schedule:
-    # Runs every 4 hours at the top of the hour
-    - cron: '0 */4 * * *'
+    # Runs every 5 hours at the top of the hour
+    - cron: '0 */5 * * *'
 
   # Allow manual triggering from GitHub UI
   workflow_dispatch:
