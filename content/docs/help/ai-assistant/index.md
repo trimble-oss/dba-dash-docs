@@ -277,6 +277,10 @@ If neither source is available the AI Assistant tab is hidden.
 
 ## Troubleshooting
 
+### Log files
+
+The AI service writes detailed logs to `DBADashAI-log-YYYYMMDD.txt` files in the `Logs` folder located in the same directory as the service. Check these files first when diagnosing any issue — they capture startup errors, provider configuration problems, and request-level details that are not surfaced in the GUI.
+
 ### AI Assistant tab is not shown
 
 - In local mode: verify the service is running — `Invoke-RestMethod http://localhost:5055/api/ai/health`
