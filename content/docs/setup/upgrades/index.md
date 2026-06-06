@@ -78,3 +78,19 @@ For a specific version:
 ```powershell
 ./UpgradeDBADash.ps1 -Tag 2.22.0
 ```
+
+## Automatic Upgrade
+
+Automatic updates can be configured by clicking the link in the service config tool and selecting a schedule.
+
+[![Configure automatic updates](configure-automatic-updates.png)](configure-automatic-updates.png)
+
+Upgrade checklist:
+- The service account must be able to start/stop the service and terminate GUI instances to avoid locked-file conflicts.
+- The service account must have write access to the application folder.
+- Keep regular backups of the repository database and service configuration before upgrading.
+- GUI clients are not auto-upgraded; users will be prompted to upgrade after the service updates.
+
+{{< callout context="caution" icon="outline/alert-triangle" >}}
+A failed update could leave you running without monitoring. Ensure backups and a rollback plan before enabling automatic updates.
+{{< /callout >}}
