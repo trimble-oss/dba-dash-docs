@@ -21,6 +21,13 @@ Two components work together:
 | **DBADash GUI** | Discovers the AI service, calls the API, and renders the response in the AI Assistant tab. |
 
 ---
+## Prerequisites
+
+* [.NET 10.0.9](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) or later is recommended. ASP.NET Core Runtime & .NET Desktop Runtime.
+
+Use `dotnet --list-runtimes` to check installed versions.
+
+---
 
 ## Quick Start (Azure Foundry)
 
@@ -302,3 +309,9 @@ Shared mode only. The GUI retrieves the API key from the database automatically.
 ### Port conflict
 
 Change `Registration:Port` in `appsettings.local.json` and restart. In local mode the GUI will probe `http://localhost:{port}` — update user settings in the GUI Options if using a non-default port.
+
+### AI Service won't start
+
+* Check that you have the correct .NET Runtime installed.  See [Prerequisites](#prerequisites)
+* Check [log files](#log-files)
+* Check for errors in Windows Event Viewer
