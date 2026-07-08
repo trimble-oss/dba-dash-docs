@@ -49,12 +49,16 @@ function shouldSkipFetch() {
 
 function fetchGitHub(path, headers = {}, returnHeaders = false) {
     return new Promise((resolve, reject) => {
+        // Include Authorization header when GITHUB_TOKEN is provided to avoid 401/rate limits
+        const authHeader = process.env.GITHUB_TOKEN ? { Authorization: `token ${process.env.GITHUB_TOKEN}` } : {};
+
         const options = {
             hostname: 'api.github.com',
             path: path,
             method: 'GET',
             headers: {
                 'User-Agent': 'DBA-Dash-Docs',
+                ...authHeader,
                 ...headers
             }
         };
@@ -366,8 +370,23 @@ async function main() {
             console.log('💡 Tip: This is likely a rate limit issue. The data will refresh on next build.');
             process.exit(0); // Exit successfully to allow build to continue
         } else {
-            console.error('⚠️  No previous data available. Build may fail.');
-            process.exit(1);
+            console.error('⚠️  No previous data available. Writing minimal stats and allowing build to continue.');
+
+            // Attempt to write a minimal placeholder stats file so the build can continue.
+            try {
+                const minimal = {
+                    generatedAt: new Date().toISOString(),
+                    repository: null,
+                    note: 'Partial data unavailable during this build. Provide GITHUB_TOKEN to enable full stats or retry later.',
+                    error: error.message
+                };
+                fs.writeFileSync(OUTPUT_FILE, JSON.stringify(minimal, null, 2));
+                console.log(`✅ Wrote minimal stats to ${OUTPUT_FILE}`);
+                process.exit(0);
+            } catch (writeErr) {
+                console.error('❌ Failed to write minimal stats file:', writeErr.message);
+                process.exit(0);
+            }
         }
     }
 }
