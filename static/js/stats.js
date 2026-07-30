@@ -96,9 +96,17 @@ function displayStats(data) {
     document.querySelector('.footer-note p').innerHTML =
         `Updated ${timeAgo} from the <a href="https://github.com/trimble-oss/dba-dash" target="_blank">GitHub repository</a>.`;
 
-    // Create charts
-    createStarHistoryChart(data.starHistory.labels, data.starHistory.data);
-    createDownloadsChart(data.downloadChart.labels, data.downloadChart.data);
+    // Create charts (guard star history because it may be removed)
+    if (data.starHistory && data.starHistory.labels && data.starHistory.data) {
+        createStarHistoryChart(data.starHistory.labels, data.starHistory.data);
+    } else {
+        // Hide star history canvas if present
+        const starCanvas = document.getElementById('starHistoryChart');
+        if (starCanvas) starCanvas.style.display = 'none';
+    }
+    if (data.downloadChart && data.downloadChart.labels && data.downloadChart.data) {
+        createDownloadsChart(data.downloadChart.labels, data.downloadChart.data);
+    }
 
     // Display releases table
     displayReleasesTable(data.releases);
