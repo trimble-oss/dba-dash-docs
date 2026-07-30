@@ -147,44 +147,6 @@ async function fetchAllPages(basePath, headers = {}, perPage = 100) {
     return allData;
 }
 
-function processStarHistory(stargazers) {
-    console.log(`Processing ${stargazers.length} stargazers...`);
-
-    const starsByMonth = new Map();
-
-    stargazers.forEach((star) => {
-        const date = new Date(star.starred_at);
-        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-
-        if (!starsByMonth.has(monthKey)) {
-            starsByMonth.set(monthKey, {
-                date: date,
-                count: 0
-            });
-        }
-        starsByMonth.get(monthKey).count++;
-    });
-
-    const sortedMonths = Array.from(starsByMonth.entries())
-        .sort((a, b) => a[0].localeCompare(b[0]));
-
-    const labels = [];
-    const data = [];
-    let cumulative = 0;
-
-    sortedMonths.forEach(([monthKey, monthData]) => {
-        cumulative += monthData.count;
-        // Format the date as "Mon YYYY" (e.g., "Jan 2022")
-        const formattedDate = monthData.date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short'
-        });
-        labels.push(formattedDate);
-        data.push(cumulative);
-    });
-
-    return { labels, data };
-}
 
 
 async function main() {
@@ -264,14 +226,8 @@ async function main() {
 
         console.log(`Processed ${releaseStats.length} releases with ${totalDownloads.toLocaleString()} total downloads`);
 
-        // Fetch star history
-        console.log('Fetching star history...');
-        const stargazers = await fetchAllPages(
-            `/repos/${REPO_OWNER}/${REPO_NAME}/stargazers`,
-            { 'Accept': 'application/vnd.github.v3.star+json' }
-        );
-
-        const starHistory = processStarHistory(stargazers);
+        // Star history removed: GitHub no longer allows unauthenticated access to starred_at
+        // (or token scopes changed). We no longer attempt to fetch per-user star timestamps.
 
         // Fetch contributors
         console.log('Fetching contributors...');
@@ -338,7 +294,7 @@ async function main() {
                 labels: downloadLabels,
                 data: downloadData
             },
-            starHistory: starHistory,
+            // starHistory removed due to GitHub API changes
             contributors: contributorStats,
             pullRequests: pullRequestStats,
             issues: issueStats
@@ -350,7 +306,7 @@ async function main() {
         console.log(`   - ${stats.repository.stars} stars`);
         console.log(`   - ${stats.totalDownloads.toLocaleString()} downloads`);
         console.log(`   - ${stats.releases.length} releases`);
-        console.log(`   - ${stats.starHistory.labels.length} months of star history`);
+        console.log('   - star history removed (GitHub API restrictions)');
         console.log(`   - ${stats.contributors.length} contributors`);
 
         // Clean up backup on success
