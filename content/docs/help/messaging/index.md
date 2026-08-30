@@ -60,6 +60,11 @@ To use **any** messaging functionality users need to have:
 Query Plan Forcing requires:
 * Allow Plan Forcing in config tool checked.  *Disabled by default*.
 * Membership of the *AllowPlanForcing* or *db_owner* roles in the repository database. (*Application Level constraint*)
+*Query plan forcing also allows users to flush individual plans from the cache on the Session Details dialog on the Running Queries tab*
+
+Kill sessions required:
+* Allow kill session in config tool checked.  *Disabled by default*
+* Membership of *AllowKillSession* or *db_owner* roles in the repository database.  (*Application Level constraint*)
 
 Community script execution requires:
 * Script listed in *Allowed Community Scripts* in the config tool (Or all scripts allowed).  *Disabled by default.*
@@ -77,6 +82,20 @@ e.g.
 {{< callout context="caution" icon="outline/alert-triangle" >}}
 Some of the role membership checks are *application level* constraints and could potentially be circumvented by users that have EXECUTE permission on the Messaging schema.
 {{< /callout >}}
+
+Ad-hoc Extended Events requires:
+* Allow Ad-hoc XE enabled in service configuration tool.  *Disabled by default*
+* Membership of the *AdhocXE* or *db_owner* roles in the repository database. (*Application Level constraint*)
+
+Start/Stop XE sessions requires:
+* Manage XE sessions configured.  This is a comma-separated list of XE sessions to allow/deny.  Prefix with "-" to deny.  Use * for all.  *Disabled by default*
+e.g. All except system: *,-system_health,-AlwaysOn_health,-telemetry_xevents
+* Membership of the *ManageXE* or *db_owner* roles in the repository database. (*Application Level constraint*)
+
+Watch XE sessions or View Data requires:
+* Watch XE sessions configured.  This is a comma-separated list of XE sessions to allow/deny.  Prefix with "-" to deny.  Use * for all.  *Disabled by default*
+e.g. All except system: *,-system_health,-AlwaysOn_health,-telemetry_xevents
+* Membership of the *WatchXE* or *db_owner* roles in the repository database. (*Application Level constraint*)
 
 The DBA Dash service account needs permissions to execute SQL agent jobs, which can be granted through the **SQLAgentOperatorRole** role.
 
