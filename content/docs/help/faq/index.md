@@ -259,7 +259,7 @@ This can also be done by clicking the *{Other Options}* link or you can append t
 
 ### How do I create alert notifications with DBA Dash?
 
-Alerts are now available in DBA Dash starting from 3.17.0.  [See here](docs/help/alerts/) for more info.
+Alerts are now available in DBA Dash starting from 3.17.0.  [See here](/docs/help/alerts/) for more info.
 
 ### How do I customize the tooltip length in the grid?
 
