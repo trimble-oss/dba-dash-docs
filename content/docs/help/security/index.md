@@ -118,13 +118,6 @@ PRINT @SQL
 EXEC sp_executesql @SQL
 ````
 
-If you want to allow slow query capture, grant the following permissions in the user databases.
-
-```sql
-GRANT CREATE ANY DATABASE EVENT SESSION TO DBADashService;
-GRANT ALTER ANY DATABASE EVENT SESSION TO DBADashService;
-```
-
 Additional permissions might be required for custom collections, custom checks, custom performance counters & community script execution.
 
 #### Azure DB
@@ -142,6 +135,13 @@ ADD MEMBER DBADashService
 -- Alow the user to connect to each database without an explicit login
 ALTER SERVER ROLE ##MS_DatabaseConnector##
 ADD MEMBER DBADashService
+```
+
+If you want to allow slow query capture, grant the following permissions in the user databases.
+
+```sql
+GRANT CREATE ANY DATABASE EVENT SESSION TO DBADashService;
+GRANT ALTER ANY DATABASE EVENT SESSION TO DBADashService;
 ```
 
 ### Repository Database Permissions
