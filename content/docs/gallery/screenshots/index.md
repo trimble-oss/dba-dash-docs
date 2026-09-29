@@ -2,7 +2,7 @@
 title: "Screenshots 📷"
 description: "DBA Dash screenshots"
 date: 2025-04-09T00:00:00+01:00
-lastmod: 2025-04-09T00:00:00+01:00
+lastmod: 2026-09-30T00:00:00+01:00
 draft: false
 weight: 10000
 toc: true
@@ -69,6 +69,31 @@ toc: true
 [![Query Store](query-store.png)](query-store.png)
 *Use query store to find your most expensive queries by CPU, Duration, Execution Count, Memory Grant or IO.  View query plans. Force/Unforce plans with logging.*
 
+### Query Plan Viewer
+
+[![Query Plan Viewer](query-plan-viewer.png)](query-plan-viewer.png)
+*Built-in execution plan viewer. Rank operators by cost, CPU, elapsed time, reads or estimate error. Badges highlight warnings, bad estimates, parallelism and missing indexes. Static insights for scalar UDFs, implicit conversions, excessive memory grants & more. Also available standalone in DBA Dash Visualizer and from SSMS with the DBA Dash extension.*
+
+[![Plan Compare](plan-compare-summary.png)](plan-compare-summary.png)
+*Compare two plans side by side. Key differences, run time, I/O, memory grant and estimates marked better or worse, plus operators, objects, waits, parameters, insights and a diff of the query text.*
+
+[![AI query plan analysis](ai-plan-analysis.png)](ai-plan-analysis.png)
+*Optional AI analysis of execution plans, with follow-up questions. Nothing is sent until you review the request and submit.*
+
+### Deadlocks
+
+[![Deadlock Charts](deadlock-charts.png)](deadlock-charts.png)
+*Track deadlocks over time. See where to focus your efforts by signature, application, database, login, host or procedure.*
+
+[![Deadlocks](deadlock-grid.png)](deadlock-grid.png)
+*Deadlocks grouped by signature, so a deadlock that happens two hundred times reads as one problem. Drill down to individual events and the processes involved.*
+
+[![Deadlock Viewer](deadlock-viewer.png)](deadlock-viewer.png)
+*Interactive deadlock viewer with ring and column layouts, rich tooltips and static analysis findings.*
+
+[![AI deadlock analysis](ai-deadlock-analysis.png)](ai-deadlock-analysis.png)
+*Optional AI analysis of deadlocks, cached per signature, with follow-up questions.*
+
 ### Configuration
 
 [![Configuration](configuration.png)](configuration.png)
@@ -118,5 +143,5 @@ toc: true
 
 ### Custom Reports
 
-[![Custom Reports](custom-reports.png)](schema-snapshots.png)
+[![Custom Reports](custom-reports.png)](custom-reports.png)
 *Your own custom reports which you can combine with custom collections*

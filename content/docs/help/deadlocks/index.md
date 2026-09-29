@@ -3,7 +3,7 @@ title: "Deadlocks"
 description: "Configure deadlock collection in DBA Dash and use the deadlock reports, signatures, viewer, findings and AI analysis."
 lead: "Native deadlock capture, reporting and analysis - from the extended events session on your monitored instance through to a deadlock viewer with static and AI analysis."
 date: 2026-09-16T00:00:00Z
-lastmod: 2026-09-16T00:00:00Z
+lastmod: 2026-09-29T00:00:00Z
 draft: false
 images: []
 weight: 999
@@ -224,6 +224,12 @@ The existing deadlock count on the Performance tab (derived from the `Locks\Numb
 
 The viewer visualises the deadlock and lets you inspect the relationships between its processes and resources. It opens from the **Graph** link in the reports, and from **Tools > Open Deadlock Graph | \*.xdl** for a graph saved from SSMS, the `system_health` session or the viewer itself.
 
+Each deadlock opens in its own tab, in the same window as the [query plan viewer](/docs/help/query-plan-viewer/). Drag and drop `.xdl` files onto the window to open them.
+
+{{< callout context="tip">}}
+The viewer is also available without DBA Dash in the standalone [DBA Dash Visualizer](/docs/help/dba-dash-visualizer/), and can be opened directly from SSMS with the [SSMS extension](/docs/help/ssms-extension/).
+{{< /callout >}}
+
 ### Layout
 
 Two layouts, chosen from the **Layout** menu and remembered for next time:
@@ -240,6 +246,7 @@ Two layouts, chosen from the **Layout** menu and remembered for next time:
 * The victim process is drawn in its own colour.
 * Statements are shown on the chart, with a link to load the full statement text in a code viewer.
 * Rich tooltips give the detail there isn't room for on the node itself.
+* Selecting a process shows its full details in a properties grid beside the graph, including the full execution stack.
 
 [![Tooltips](tooltips.png)](tooltips.png)
 
@@ -251,10 +258,10 @@ Toolbar: zoom in/out, **Fit**, **Open...** (another `.xdl`), **Copy Image**, **S
 
 | Tab | Contents |
 |---|---|
-| **Graph** | The visualisation |
+| **Graph** | The visualisation, with a properties grid for the selected object |
+| **Findings** | Static analysis of the graph. The caption carries the finding count |
 | **Processes** | The parsed process list - login, application, host, database, isolation level, statement, wait details. The **Plans** link opens the plans cached on the instance for that statement, with their execution stats |
 | **Resources** | The parsed resource list - object, index, lock mode, owners and waiters |
-| **Findings** | Static analysis of the graph. The caption carries the finding count |
 | **AI Analysis** | Optional AI-driven analysis |
 | **XML** | The original deadlock graph |
 
@@ -313,6 +320,12 @@ Every answer is kept, and looked up by pattern as well as by occurrence:
 Answers are never replaced. Two runs of one model over one graph rarely say the same thing, and asking again is often a search for a better answer rather than a correction of a wrong one. Analyses are only ever created by someone pressing the button, so the table stays small.
 
 The **Analysed** column on the Signatures report shows which patterns already have an answer.
+
+### Follow-up questions
+
+You can ask follow-up questions to continue the conversation. A conversation about another occurrence of the same signature can also be continued - that's the point of storing answers against the pattern.
+
+The initial analysis is stored in the repository database and shared with other users. Your follow-up questions and answers are private to you - see [AI conversations](/docs/help/ai-assistant/#ai-conversations).
 
 ## Data retention
 
