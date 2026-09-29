@@ -265,6 +265,25 @@ If neither source is available the AI Assistant tab is hidden.
 
 ---
 
+## Deadlock and query plan analysis
+
+The AI service is also used by the **AI Analysis** tab in the [deadlock viewer](/docs/help/deadlocks/#ai-analysis) and the [query plan viewer](/docs/help/query-plan-viewer/#ai-analysis). Nothing is sent until you press **Submit for analysis**, and the exact request is shown first so you can review it.
+
+### AI conversations
+
+Both viewers support follow-up questions. Where each part of the conversation is stored depends on who it belongs to:
+
+| Part | Stored | Visible to |
+|---|---|---|
+| **Initial analysis** | Repository database | Other DBA Dash users - so the same deadlock or query doesn't need to be analysed twice |
+| **Follow-up questions and answers** | Locally, in `%LOCALAPPDATA%\DBADash\AiConversations`, protected with Windows DPAPI | You only |
+
+Keeping follow-ups local means no one else can read them - including administrators of the repository database - without access to your Windows profile. The trade-off is that they don't roam between machines, and are lost if the machine is rebuilt.
+
+Select **Options > My AI conversations...** on the **AI Analysis** tab to **Export** or **Import** your conversations. An export is plain JSON unless you provide a passphrase to protect it. Importing merges with the conversations already on the machine.
+
+---
+
 ## API endpoints
 
 | Endpoint | Auth | Description |

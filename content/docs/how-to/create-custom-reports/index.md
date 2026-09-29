@@ -359,6 +359,14 @@ The Gradient button in the toolbar can be used to generate a set of rules that w
 
 ![Gradient Config](gradient.png)
 
+### Data Bars
+
+[![Data Bars](data-bar.png)](data-bar.png)
+
+Data bars draw a bar in each cell of a numeric column, sized by the value's share of the column's range. Right-click a column and select **Data Bar** to choose a style and color - solid, traffic light, gradient or positive/negative. **Options...** sets the colors, a fixed minimum and maximum, and warning and critical thresholds (as a percentage of the scale or as values).
+
+To save data bars with the report, use **Edit Report > Data Bar** for a column, or **Save Data Bars** on the grid's **Data Bar** menu to save every bar showing in the grid in one go (including removing saved bars that were taken off). **Save Layout** and **Reset Layout** don't affect data bars.
+
 ## Trigger Collections
 
 You can associate a collection with your custom report which allows you to trigger the collection to run on demand directly from the report.  The name of the available collections can be found on the *Collection Dates* tab.  A [custom collection](/content/docs/help/custom-collections/) will start *UserData.*
