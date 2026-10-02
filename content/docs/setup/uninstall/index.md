@@ -34,4 +34,4 @@ DROP DATABASE DBADashDB
 
 If slow query capture is enabled it's possible an extended event might get left behind on the monitored instances.  This will usually be **cleaned up automatically** each time the service shuts down but you might want to verify that it has been removed.  In SSMS, look for a session with a name starting **DBADash** and delete it.
 
-*The extended event isn't removed if the **Persist XE sessions** option is used, the service didn't have a clean shutdown or was unable to contact the monitored instance when it was shutdown.*
+*The extended event isn't removed if the **Persist XE sessions** option is used, the service didn't have a clean shutdown or was unable to contact the monitored instance when it was shutdown.  In EventFile capture mode with **Keep session running when service stops** enabled, the DBADash_SlowQueries session is deliberately left running.  Also delete its files (DBADash_SlowQueries\*.xel) from the instance's log directory.*

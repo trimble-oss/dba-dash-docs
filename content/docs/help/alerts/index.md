@@ -83,6 +83,7 @@ A notification channel defines where to send the alert notification. To create a
 * Click *Add Channel* on the alert configuration window.  Select from the menu options:
   * Webhook - For Google chat and generic webhooks.  Google chat supports threaded conversations.
   * Slack - Slack can also be configured as a webhook, but this option uses the API and supports threaded conversations.
+  * Teams - Post alerts to a Microsoft Teams channel using a Teams Workflow.  See [Microsoft Teams](#microsoft-teams).
   * Email
   * PagerDuty. *Select the service in PagerDuty.  Click Integrations.  Click to add an Events API V2 integration.  This provides the integration key required when setting up the notification channel in DBA Dash*
 * Configure the channel.
@@ -111,9 +112,79 @@ Schedules have an associated re-trigger threshold which is the minimum delay req
 Sensitive information associated with the notification channel is stored in the repository database.  Data masking is used to limit access to sensitive information and users will receive a "Insufficient permission to access notification channel details" error if they try to edit a channel without appropriate [permissions](https://learn.microsoft.com/en-us/sql/relational-databases/security/dynamic-data-masking?view=sql-server-2017#permissions) to unmask the data.  Sensitive data is obfuscated even if you have permissions to unmask, preventing casual viewing of the data.
 {{< /callout >}}
 
+### Microsoft Teams
+
+{{< callout context="tip">}}
+The Teams notification channel is available in DBA Dash starting from 4.21.0.  For older versions, use a *Webhook* channel with a custom message template (see [#1339](https://github.com/trimble-oss/dba-dash/issues/1339)).
+{{< /callout >}}
+
+Alerts are posted to a Teams channel as an Adaptive Card using a Teams *Workflow*.  To get the Workflow URL:
+
+1. In Teams, go to the channel you want to receive alerts.
+2. Click **...** (More options) next to the channel name and select **Workflows**.
+3. Select the **Send webhook alerts to a channel** template. This is the name Microsoft gives this workflow template in Teams - it's unrelated to the *Message Template* field described [below](#customizing-the-message), which is DBA Dash's own setting.
+4. Give the workflow a name, check the team and channel are correct, and click **Add workflow**.
+5. Copy the URL that is displayed.
+
+In DBA Dash, click *Add Channel* and select *Teams*.  Paste the URL into *Workflow Url* and give the channel a name.  Once saved, click the *Test* link for the channel to send a test notification.
+
+{{< callout context="note">}}
+The older *Incoming Webhook* connector (URLs containing *webhook.office.com*) is being retired by Microsoft.  Create a Workflow instead.
+{{< /callout >}}
+
+#### Troubleshooting
+
+With the unmodified **Send webhook alerts to a channel** workflow, Teams accepts the request before the workflow runs, so DBA Dash can report that a notification was sent even if it doesn't appear in Teams.  If this happens, open the **Workflows** app in Teams, select the workflow and check the run history for failed runs.  The details show why the message wasn't posted.
+
+The workflow runs as the user who created it.  If that user leaves the organization or their account is disabled, the workflow will stop working.  Consider creating the workflow with a service account.
+
+#### Customizing the message
+
+DBA Dash's own *Message Template* field (on the notification channel, separate from the Teams workflow template selected in step 3) is optional.  Leave it blank to use the default card.  To customize the message, provide JSON in this format.  The [Adaptive Cards Designer](https://adaptivecards.microsoft.com/designer) can help you design the card.  Select *Microsoft Teams* as the host app to preview how it will look.
+
+```json
+{
+  "type": "message",
+  "attachments": [
+    {
+      "contentType": "application/vnd.microsoft.card.adaptive",
+      "contentUrl": null,
+      "content": {
+        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+        "type": "AdaptiveCard",
+        "version": "1.4",
+        "body": [
+          { "type": "TextBlock", "text": "{Emoji} {Title}", "weight": "Bolder", "size": "Medium", "wrap": true },
+          { "type": "TextBlock", "text": "{Instance}", "isSubtle": true, "spacing": "None", "wrap": true },
+          { "type": "TextBlock", "text": "{Text}", "wrap": true }
+        ]
+      }
+    }
+  ]
+}
+```
+
+Available placeholders: {Title}, {Text}, {Instance}, {ConnectionID}, {InstanceAndConnectionID}, {AlertKey}, {Action}, {Icon}, {IconUrl}, {Emoji}, {Priority}, {PriorityBucket}, {TriggerDate}, {Now}, {CloudProvider}, {CloudResourceID}, {CloudRegion}, {CloudAccountID}.
+
+#### Threaded replies
+
+With the unmodified **Send webhook alerts to a channel** workflow, each notification for an alert (including when it's resolved) is posted as a new message.  To post updates as replies to the original message, edit the workflow so it returns the ID of the message it posts.  DBA Dash stores the ID and includes it as *replyToMessageId* in the body of later notifications for the alert.
+
+Edit the workflow so it does the following after the *When a Teams webhook request is received* trigger:
+
+1. Add a **Condition** that checks if *replyToMessageId* is empty.  e.g. `empty(triggerBody()?['replyToMessageId'])` is equal to `true`.
+2. **True** (new alert):
+   * **Post card in a chat or channel** - Post in *Channel* and select the team and channel.  For the *Adaptive Card*, use `triggerBody()?['attachments'][0]['content']`.
+   * **Response** - Status code `200`.  Add a header named `MessageId` with the *Message ID* output from the previous step.
+3. **False** (update for an existing alert):
+   * **Reply with an adaptive card in a channel** - Select the team and channel.  For the *Message ID*, use `triggerBody()?['replyToMessageId']`.  For the *Adaptive Card*, use `triggerBody()?['attachments'][0]['content']`.
+   * **Response** - Status code `200`.
+
+The *MessageId* header is preferred, but DBA Dash will also accept the message ID in the response body.  Either as the body on its own, or as JSON: `{"messageId": "..."}`.
+
 ### Notification channel groups
 
-Notification channel groups let you target alert rules to specific sets of notification channels (email, Google Chat, Slack, PagerDuty, etc.). A *default* group is created automatically and additional groups can be created if required.
+Notification channel groups let you target alert rules to specific sets of notification channels (email, Google Chat, Slack, Teams, PagerDuty, etc.). A *default* group is created automatically and additional groups can be created if required.
 
 #### How to create a notification channel group
 

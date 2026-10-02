@@ -39,11 +39,60 @@ Slow query capture is disabled by default as it will add a small amount of overh
 
 You can also edit the "Slow Query Threshold (ms)" column in the Existing Connections grid after adding an instance.  A value of -1 will disable slow query capture or specify a value of 1000 to capture queries that take longer than 1 second to run.  
 
+## Capture modes
+
+The capture mode is set on the "Slow Queries" tab of the service configuration tool, in the Existing Connections grid ("Slow Query Capture Mode"), or with `--SlowQueryCaptureMode` in DBADashConfig.
+
+| Mode | Session | How it's read | Available on |
+|------|---------|---------------|--------------|
+| **RingBuffer** (default) | DBADash_1 (and DBADash_2 with [dual session](#use-dual-session-advanced-option)) | The whole ring buffer is read, then the session is stopped and started to empty it | All instance types |
+| **EventFile** | DBADash_SlowQueries, created and managed by DBA Dash | From a saved position in the event file, so each collection reads only new events | SQL Server (not Azure SQL DB or Managed Instance) |
+| **ExistingSession** | A session you create and manage | event_file: from a saved position.  ring_buffer: read without being emptied | All instance types |
+
+RingBuffer is the default and works exactly as it always has.
+
+### EventFile
+
+EventFile mode is recommended for SQL Server instances.  It has the following advantages over RingBuffer:
+
+* The session is never stopped and started to flush it, so no events are lost while it's stopped.  You don't need the dual session option.
+* When a lot of slow queries run in a short time they go to disk instead of overflowing the ring buffer.
+* Each collection reads only new events instead of serializing the whole ring buffer.
+* If the session is kept running when the service stops (see below), slow queries that run while the service is down are still captured.  They are collected when the service starts again.
+
+The session writes to the instance's log directory, next to system_health.  By default it keeps 5 files of 20MB each.  You can change this with the "Slow Query Event File Size (MB)" and "Slow Query Event File Count" columns in the Existing Connections grid, or with `--SlowQueryEventFileMaxSizeMB` and `--SlowQueryEventFileMaxRolloverFiles`.  This only limits how much can be held while the service isn't collecting.  The repository database is the long term store.
+
+DBA Dash checks the session definition on the first collection after the service starts, after the slow query configuration changes, and whenever the session isn't running.  If the threshold, file size, memory or resource governor setting has changed, it recreates the session.  The files already written are kept and collection continues from where it left off.  Other collections only confirm the session is running, which keeps them cheap.
+
+It's possible to run a ring buffer and an event file capture of the same instance from two different DBA Dash services, for example to compare them.  Each service removes the other mode's sessions once when it starts, and the other service recreates its session on its next collection.
+
+The read position is saved to **SlowQueryCursors.json** in the service folder.  If the file is lost, the next collection reads the files from the beginning.  Events that are already in the repository are not inserted twice.
+
+On Azure SQL DB and Azure SQL Managed Instance, an event file needs blob storage, so EventFile mode uses the ring buffer instead.  A warning is logged when this happens.
+
+#### Keep session running when service stops
+
+By default, the DBADash_SlowQueries session is removed when the service stops, or stopped if [Persist XE Sessions](#persist-xe-sessions-advanced-option) is enabled.  This is the same as the ring buffer sessions.
+
+If you enable "Keep session running when service stops" (`--KeepSlowQueryXESessionRunning`), the session is left running when the service stops.  It also starts automatically when the instance starts (STARTUP_STATE=ON).  Slow queries that run while the service is down are captured and then collected when the service starts.  This setting is off by default because it leaves an extended event session running on the instance when DBA Dash isn't running.
+
+### ExistingSession
+
+Use ExistingSession to read slow queries from an extended events session you already manage.  Enter the session name on the Slow Queries tab, or use `--SlowQueryXESessionName`.  DBA Dash never creates, alters, stops or empties this session.
+
+* The session must be running and have an event_file or ring_buffer target.
+* rpc_completed, sql_batch_completed, sql_statement_completed and sp_statement_completed events are collected.  Other events in the session are ignored.
+* The slow query threshold is applied when the events are read, so the session can capture more than DBA Dash collects.  As with the DBA Dash sessions, events from DBA Dash's own reads (application name DBADashXE) and sp_readrequest are excluded.
+* A ring_buffer target isn't emptied, so every read returns the whole buffer.  DBA Dash only sends the events it hasn't seen before.  After the service restarts, events still in the buffer are read again but are not inserted twice.
+* You'll get the same columns in the GUI as the other modes if the session collects the actions DBA Dash uses: client_app_name, client_hostname, database_id, username, session_id and context_info.
+
 ### Persist XE Sessions (Advanced option)
 
 When the DBA Dash service is stopped the event sessions it creates on the source connections are removed as a cleanup operation.  This ensures that you benefit from any changes made to the event session in newer versions of DBA Dash.  It also removes the need for a manual cleanup of the event sessions if you decide to remove DBA Dash (Though it's possible the sessions won't be dropped if the shutdown isn't graceful or the instance couldn't be contacted).
 
 There is an option to "Persist XE Sessions" which will stop the event session instead of removing it.  This allows for a more advanced manual configuration of the event session.  For example, adding additional filters.  If you want to do this, enable the "Persist XE Sessions" option in the service configuration tool.  Save the configuration changes and restart the service.  You can now modify the event session manually as required.  The app is currently only designed to process rpc_completed and batch_completed events.
+
+In EventFile capture mode, DBA Dash checks the DBADash_SlowQueries session when the service starts, when the configuration changes, or when the session isn't running.  It recreates the session if the events, threshold or target don't match the configuration.  This can undo manual changes.  If you want to customize the session, use [ExistingSession](#existingsession) mode with a session of your own instead.
 
 ### Use dual session (Advanced option)
 
@@ -109,6 +158,8 @@ Note: If you are looking at a recent running queries snapshot, you might need to
 
 ## Why ring_buffer?
 
+*The ring_buffer is the default capture mode and the only mode DBA Dash manages on Azure SQL DB.  For SQL Server, [EventFile mode](#eventfile) avoids the stop/start flush described below.*
+
 Why does DBA Dash use the ring_buffer target instead of event_stream?  The primary reason is the event_stream target doesn't support Azure DB.  The ring_buffer target works across all instance types. The ring_buffer also fits a bit easier with the DBA Dash collection mechanism where a job fires at regular intervals and collects data. Using event_stream, a thread would be required to process the stream.  It would also need to batch the events up for writing to the destination (at least for folder/s3 bucket destinations).  The event_stream target might not work as well in cases where there isn't good network connectivity between the DBA Dash agent and the SQL instance.
 
 With the ring_buffer you have to collect the entire buffer or process the buffer to filter for new events.  DBA Dash flushes the buffer after collection by stop/starting the event session to avoid this.  Potentially this could lead to a small number of missed events which is why the [use dual session](#use-dual-session-advanced-option) option was added.  The event_stream target would have the advantage of only processing new events without the need to flush the buffer.  Also, the latency between the event capture and being available in the DBA Dash repository database could be reduced with the event_stream target.  The events could be written immediately to the repository database instead of waiting for the collection to run.  
@@ -123,6 +174,8 @@ Run on collection interval (Every 1min by default):
 
 * [Collection query](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLSlowQueries.sql)
 * [Collection query for Azure DB](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLSlowQueriesAzure.sql)
+* [Event file session (EventFile mode)](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLSlowQueriesEventFileSession.sql)
+* [Collector for all capture modes](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SlowQueries/SlowQueryCollector.cs)
 
 Run on Start/Stop of service if Persist XE Sessions is not enabled:
 

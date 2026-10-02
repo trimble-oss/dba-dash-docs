@@ -3,7 +3,7 @@ title: "AI Assistant"
 description: "Configure and use the DBA Dash AI Assistant to analyse repository data and answer natural-language questions about alerts, performance, waits, backups, blocking, slow queries, and more."
 lead: "The AI Assistant analyses your DBA Dash repository data and answers natural-language questions about your SQL Server environment."
 date: 2026-05-27T00:00:00Z
-lastmod: 2026-05-27T00:00:00Z
+lastmod: 2026-10-06T00:00:00Z
 draft: false
 images: []
 weight: 999
@@ -167,6 +167,35 @@ For Anthropic via **Azure Foundry**, set `BaseUrl` to the base Foundry URL (endi
 ```
 
 If `AI:Provider` is not set, the service auto-selects the first fully-configured provider in the order: AzureOpenAI → Anthropic.
+
+#### Ollama (local models)
+
+Runs against a local or self-hosted [Ollama](https://ollama.com/) server instead of a hosted LLM. Unlike AzureOpenAI and Anthropic, Ollama is never auto-selected - set `AI:Provider` explicitly.
+
+```json
+{
+  "AI": { "Provider": "Ollama" },
+  "Ollama": {
+    "BaseUrl": "http://localhost:11434",
+    "ApiKey": "",
+    "Model": "<model-name>",
+    "ContextLength": 32768,
+    "MaxTokens": "",
+    "TimeoutSeconds": 240
+  }
+}
+```
+
+| Key | Description |
+|---|---|
+| `BaseUrl` | URL of the Ollama server. |
+| `ApiKey` | Optional - only needed if the server requires a bearer token (e.g. behind a reverse proxy). |
+| `Model` | Default model to use, e.g. `llama3.1`. Must already be pulled on the server. |
+| `ContextLength` | Context window to request, in tokens. |
+| `MaxTokens` | Optional cap on response length. Leave blank to use Ollama's default. |
+| `TimeoutSeconds` | How long the service waits for a response before reporting a timeout. The GUI's own wait is a fixed 300 seconds, so keep this lower so the service times out first and can report the reason. |
+
+`GET /api/ai/models` lists the models currently pulled on the Ollama server, which populate the Model menu in the [plan](/docs/help/query-plan-viewer/#ai-analysis) and [deadlock](/docs/help/deadlocks/#ai-analysis) viewers.
 
 ### Registration
 

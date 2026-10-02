@@ -3,7 +3,7 @@ title: "Create Custom Reports"
 description: ""
 lead: ""
 date: 2023-10-24T15:52:02+01:00
-lastmod: 2023-10-24T15:52:02+01:00
+lastmod: 2026-10-06T00:00:00+01:00
 draft: false
 images: []
 menu:
@@ -226,9 +226,25 @@ VALUES
 
 ## Viewing your report
 
-Once the procedure is created it will be available the next time you start the application.  The report will be available in the **Reports** folder.  You will find this folder at root, instance and database level depending what context parameters you created for your report.  If your report has a **@InstanceIDs** parameter you should see it at root level and instance level.
+Once the procedure is created it will be available the next time you start the application.  The report will be available in the **Reports** folder.  You will find this folder at root, instance and database level depending what context parameters you created for your report.  If your report has a **@InstanceIDs** parameter you should see it at root level and instance level. A root level report no longer needs an `@InstanceIDs` or `@RootIDs` parameter to appear there - a stored procedure with no context parameters is now listed at root level too.
 
 The name of your report will be the name of the stored procedure.  Once you select your report a grid will be shown with the output of your stored procedure.  If your report contains multiple result sets, you will see a drop down on the right-hand side to select which table to display.
+
+## Visibility
+
+By default, a report with an `@InstanceIDs`, `@InstanceID` or `@DatabaseID` parameter is available for every instance/database at the matching level of the tree. Select **Visibility...** from the report's **Configure** menu (gear icon) to restrict which instances it applies to, based on any combination of:
+
+* Instance type - Regular instance, Managed Instance, Azure SQL DB
+* Tags
+* Specific instances to include or exclude
+
+Instance and database level reports are hidden in the tree for instances that don't match the rules. For a root level report, non-matching instances are simply left out of the `@InstanceIDs` table passed to your stored procedure.
+
+## Folders
+
+Select **Move to Folder...** from a report's **Configure** menu, or right-click a report in the tree, to organize your custom reports into nested folders under the **Reports** node. System reports can be moved into the same folders as your own custom reports.
+
+Folders are stored in the `dbo.CustomReportFolder` table in the repository database - a user needs `db_owner` or `db_ddladmin` to create or rename them.
 
 ## Customization
 
