@@ -3,7 +3,7 @@ title: "Query Plan Viewer"
 description: "Use the DBA Dash query plan viewer to explore execution plans, with operator ranking, insights and optional AI analysis."
 lead: "A built-in execution plan viewer - ranked operators, badges for the things worth spotting, static insights, plan comparison, and optional AI analysis."
 date: 2026-09-29T00:00:00Z
-lastmod: 2026-10-01T00:00:00Z
+lastmod: 2026-10-06T00:00:00Z
 draft: false
 images: []
 weight: 999
@@ -99,6 +99,7 @@ A plan with several statements gets a statement selector above the graph. Statem
 |---|---|
 | **Plan** | The graph, plus the selected operator's properties and insights |
 | **Insights** | Plan warnings from SQL Server and DBA Dash's own [insights](#insights), worst first, each linked back to its operator |
+| **Operators** | Every operator in the plan listed in a grid, with a link back to its place on the chart |
 | **Missing Indexes** | Missing index requests with a `CREATE INDEX` statement |
 | **Expressions** | Computed expressions and where they are worked out |
 | **Parameters** | Compiled and runtime values, scriptable as `DECLARE` statements |
@@ -109,7 +110,9 @@ A plan with several statements gets a statement selector above the graph. Statem
 
 Tabs are hidden when there is nothing to show.
 
-The operator properties include the memory grant for each operator (memory fractions and per-thread input/output/used memory), so it's clear which operators the grant went to.
+The operator properties include the memory grant for each operator (memory fractions and per-thread input/output/used memory), so it's clear which operators the grant went to. Estimated Available Memory Grant, Max Compile Memory and Estimated Pages Cached are formatted under Optimizer Hardware Dependent Properties the way SSMS shows them. Where SQL Server's memory grant feedback has resized the grant, the adjusted and originally estimated values are both shown, so a resized grant isn't mistaken for the optimizer's estimate.
+
+A statement's Query Hash and Query Plan Hash properties link to Query Store when the plan was opened from DBA Dash against an instance it can message. The standalone Visualizer has no instance to look them up on, so these stay as plain text there.
 
 ## Copy and save
 
@@ -185,6 +188,8 @@ Tab captions show the number of changes, e.g. **Operators (1 changed)**.
 [![AI plan analysis](ai-plan-analysis.png)](ai-plan-analysis.png)
 
 With the [AI Assistant](/docs/help/ai-assistant/) service configured, the **AI Analysis** tab can send the plan for detailed observations and recommendations.
+
+For providers that accept a model per request (Anthropic, Ollama), an **Options > Model** menu lists the configured default plus whatever models the service reports as available, so you can pick a different model for an analysis without changing the server-side configuration. The choice is shared with the [deadlock viewer](/docs/help/deadlocks/#ai-analysis) for the rest of the session.
 
 {{< callout context="caution">}}
 Nothing is sent until you press **Submit for analysis**, and the exact request is shown first. **Read it before pressing send** - plans can include parameter values and literals.

@@ -3,7 +3,7 @@ title: "Schedule"
 description: "DBA Dash default collection schedule and customization"
 lead: ""
 date: 2022-09-25T19:53:10+01:00
-lastmod: 2026-06-08T19:53:10+01:00
+lastmod: 2026-10-06T00:00:00+01:00
 draft: false
 images: []
 menu:
@@ -155,6 +155,10 @@ Add [your own](/docs/help/custom-checks) checks to DBA Dash.
 * Some reports are executed on your monitored instances and are not scheduled for collection. These reports will have an *Execute* button instead of a green refresh button. [Custom Tools](/docs/help/custom-tools/) are an example of this and the system also has certain reports like *Query Store* that are retrieved from monitored instances rather than the repository database. These also require the [Messaging](/docs/help/messaging/) feature to be enabled. The GUI retrieves data from monitored instances via the service.
 
 [![Execute report](execute.png)](execute.png)
+
+{{< callout context="note" icon="outline/info-circle" >}}
+*Slow Queries* can no longer be triggered on demand - it already runs every minute by default, and a triggered run could be imported out of order with the scheduled one. Triggering a collection that includes *Slow Queries* now skips it with a warning and runs the rest of the request.
+{{< /callout >}}
 
 ## Schedule Customization
 

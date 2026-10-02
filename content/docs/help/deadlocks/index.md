@@ -3,7 +3,7 @@ title: "Deadlocks"
 description: "Configure deadlock collection in DBA Dash and use the deadlock reports, signatures, viewer, findings and AI analysis."
 lead: "Native deadlock capture, reporting and analysis - from the extended events session on your monitored instance through to a deadlock viewer with static and AI analysis."
 date: 2026-09-16T00:00:00Z
-lastmod: 2026-09-29T00:00:00Z
+lastmod: 2026-10-06T00:00:00Z
 draft: false
 images: []
 weight: 999
@@ -308,6 +308,7 @@ Nothing is sent until you press **Submit for analysis**. The panel above the but
 
 * **Show request** - toggles the request preview back into view after an answer has arrived.
 * **Include schema** - adds the definitions of the objects the deadlock touched, taken from the repository's [schema snapshots](/docs/help/schema-snapshots) **as they were when the deadlock happened**. That point-in-time part is what makes it worth including: the procedure may have been changed twice since, and the definition that explains the deadlock is the one from before those changes. Best effort - snapshots are optional, the deadlock may predate the first one, and objects get dropped, so an empty result is an ordinary answer. Definitions are truncated to keep the payload a sensible size.
+* **Model** - for providers that accept a model per request (Anthropic, Ollama), lists the configured default plus whatever models the service reports as available. Hidden if the list can't be loaded, in which case the configured model is used. The choice is shared with the [query plan viewer](/docs/help/query-plan-viewer/#ai-analysis) for the rest of the session.
 
 ### Caching and history
 
