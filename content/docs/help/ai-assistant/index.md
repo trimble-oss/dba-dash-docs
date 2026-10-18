@@ -3,7 +3,7 @@ title: "AI Assistant"
 description: "Configure and use the DBA Dash AI Assistant to analyse repository data and answer natural-language questions about alerts, performance, waits, backups, blocking, slow queries, and more."
 lead: "The AI Assistant analyses your DBA Dash repository data and answers natural-language questions about your SQL Server environment."
 date: 2026-05-27T00:00:00Z
-lastmod: 2026-10-06T00:00:00Z
+lastmod: 2026-10-18T00:00:00Z
 draft: false
 images: []
 weight: 999
@@ -166,11 +166,95 @@ For Anthropic via **Azure Foundry**, set `BaseUrl` to the base Foundry URL (endi
 }
 ```
 
-If `AI:Provider` is not set, the service auto-selects the first fully-configured provider in the order: AzureOpenAI → Anthropic.
+#### Amazon Bedrock
+
+```json
+{
+  "AI": { "Provider": "Bedrock" },
+  "Bedrock": {
+    "Region": "us-east-1",
+    "Model": "us.anthropic.claude-sonnet-4-6",
+    "Profile": "",
+    "ApiKey": "",
+    "MaxTokens": ""
+  }
+}
+```
+
+Bedrock is only used when `AI:Provider` is `Bedrock`. The service calls the [Converse API](https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.html), so any chat model on Bedrock works (Anthropic Claude, Amazon Nova, Meta Llama, Mistral, and others).
+
+Bedrock can be called with AWS credentials or with a Bedrock API key:
+
+* **AWS credentials (recommended).** Leave `ApiKey` blank. The service takes credentials from `Profile` if it is set, or otherwise from the default AWS credential chain: an IAM role (EC2 instance profile, ECS task role, EKS web identity), the `AWS_*` environment variables, or the default profile of the account the service runs as. For each call it makes a short-term Bedrock API key from those credentials, valid for at most 12 hours or until the credentials expire. On premises, IAM Roles Anywhere through a profile's `credential_process` gives short-term credentials without a stored secret.
+* **API key.** Set `ApiKey` to an [Amazon Bedrock API key](https://docs.aws.amazon.com/bedrock/latest/userguide/api-keys.html). It takes priority over AWS credentials. AWS recommends API keys for exploration only, and short-term keys from the console expire within 12 hours, so a service needs a long-term key.
+
+The other settings:
+
+| Key | Description |
+|---|---|
+| `Region` | AWS region name, such as `eu-west-2`. Checked before it is used in the host name. |
+| `Model` | A model ID or inference profile ID. Most current models can only be called through an inference profile, the ID with a geographic prefix such as `us.` or `eu.`. Calling the base model ID returns a validation error. An application inference profile is given by its ARN. Use the bedrock-runtime model ID from the model card, not the bedrock-mantle one (`openai.gpt-oss-120b-1:0`, not `openai.gpt-oss-120b`). An inference profile ID only works in a region whose profile list includes it. |
+| `Profile` | Optional named AWS profile. Leave blank to use the default credential chain. |
+| `MaxTokens` | Optional cap on the answer length. Leave blank for the model's default. |
+
+The GUI's model picker lists the inference profiles and on-demand text models available in the region, with the ID to configure in brackets. Listing models needs `bedrock:ListInferenceProfiles` and `bedrock:ListFoundationModels`. Without those permissions the picker is hidden and the configured `Model` is used.
+
+To find model IDs outside the GUI, use the model card in the Bedrock console (the bedrock-runtime row of the Programmatic Access table) or the AWS CLI:
+
+```bash
+aws bedrock list-inference-profiles --region eu-west-2 --query "inferenceProfileSummaries[].inferenceProfileId"
+```
+
+```bash
+aws bedrock list-foundation-models --region eu-west-2 --by-output-modality TEXT --by-inference-type ON_DEMAND --query "modelSummaries[].modelId"
+```
+
+**AWS credentials and the Windows service.** The default credential chain is that of the account the service runs as. On EC2 the instance role just works. Elsewhere, either run the service as an account whose `%USERPROFILE%\.aws` holds the profile, or set the `AWS_SHARED_CREDENTIALS_FILE` and `AWS_CONFIG_FILE` environment variables for the service and name the profile in `Profile`. IAM Identity Center (SSO) profiles are not supported. They need an interactive sign-in.
+
+**IAM permissions.** For AWS credentials (an instance profile, task role or profile), grant the role:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "UseShortTermBedrockKeys",
+      "Effect": "Allow",
+      "Action": "bedrock:CallWithBearerToken",
+      "Resource": "*",
+      "Condition": { "StringEquals": { "bedrock:bearerTokenType": "SHORT_TERM" } }
+    },
+    {
+      "Sid": "InvokeModels",
+      "Effect": "Allow",
+      "Action": "bedrock:InvokeModel",
+      "Resource": [
+        "arn:aws:bedrock:*::foundation-model/*",
+        "arn:aws:bedrock:*:<account-id>:inference-profile/*",
+        "arn:aws:bedrock:*:<account-id>:application-inference-profile/*"
+      ]
+    },
+    {
+      "Sid": "ListModelsForThePicker",
+      "Effect": "Allow",
+      "Action": [ "bedrock:ListFoundationModels", "bedrock:ListInferenceProfiles" ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+* `bedrock:CallWithBearerToken` lets the role use the short-term key the service makes from its credentials. Without it every call is refused, even with `InvokeModel` allowed. Check that no service control policy denies it.
+* `bedrock:InvokeModel` is all the Converse API needs. The service does not stream. The foundation-model ARN has a region wildcard because a geo or global inference profile routes to other regions, and the permission is needed in each of them.
+* The List actions only fill the GUI's Model picker.
+* To allow specific models only, list each inference profile ARN together with its foundation-model ARN in every region the profile covers. See [Prerequisites for inference profiles](https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference-prereq.html). The `AmazonBedrockLimitedAccess` managed policy also works, but grants far more than the service needs.
+* Model access is separate from IAM. Some models need a one-off step in the Bedrock console (a use-case form for Anthropic, a subscription for Marketplace models). Do that as an admin rather than giving the role Marketplace permissions.
+
+With an API key instead, the IAM user the key belongs to needs the same `InvokeModel` and List permissions, and `bedrock:CallWithBearerToken` for `LONG_TERM` keys.
 
 #### Ollama (local models)
 
-Runs against a local or self-hosted [Ollama](https://ollama.com/) server instead of a hosted LLM. Unlike AzureOpenAI and Anthropic, Ollama is never auto-selected - set `AI:Provider` explicitly.
+Runs against a local or self-hosted [Ollama](https://ollama.com/) server instead of a hosted LLM. Like Bedrock, Ollama is never auto-selected. Set `AI:Provider` to `Ollama`.
 
 ```json
 {
@@ -195,7 +279,9 @@ Runs against a local or self-hosted [Ollama](https://ollama.com/) server instead
 | `MaxTokens` | Optional cap on response length. Leave blank to use Ollama's default. |
 | `TimeoutSeconds` | How long the service waits for a response before reporting a timeout. The GUI's own wait is a fixed 300 seconds, so keep this lower so the service times out first and can report the reason. |
 
-`GET /api/ai/models` lists the models currently pulled on the Ollama server, which populate the Model menu in the [plan](/docs/help/query-plan-viewer/#ai-analysis) and [deadlock](/docs/help/deadlocks/#ai-analysis) viewers.
+`GET /api/ai/models` lists the models the provider can use: for Bedrock, the models available in the region; for Ollama, the models pulled on the server. They populate the Model menu in the [plan](/docs/help/query-plan-viewer/#ai-analysis) and [deadlock](/docs/help/deadlocks/#ai-analysis) viewers.
+
+If `AI:Provider` is not set, the service auto-selects the first fully-configured provider in the order: AzureOpenAI → Anthropic. Bedrock and Ollama are only used when `AI:Provider` is set to `Bedrock` or `Ollama`.
 
 ### Registration
 
@@ -285,7 +371,7 @@ Configure the service by editing `appsettings.local.json` in the `DBADashAI` fol
 
 The GUI uses the following priority order to locate the AI service:
 
-1. **Local probe** — always checks `http://localhost:5055` (or the URL in user settings) first. If reachable, uses it with no authentication. The health endpoint returns a repository fingerprint; if the local service is pointed at a different database than the GUI is connected to, a warning is shown and the tab is disabled.
+1. **Local probe** — always checks `http://localhost:5055` first. If reachable, uses it with no authentication. The health endpoint returns a repository fingerprint. If the local service is pointed at a different database than the GUI is connected to, a warning is shown and the tab is disabled, unless the repository registers a different service, which is then used instead.
 2. **Repository database** — if no local service responds, reads `AI.ServiceConfig` for the shared service URL and API key registered by the central deployment.
 
 If neither source is available the AI Assistant tab is hidden.
@@ -318,10 +404,10 @@ Select **Options > My AI conversations...** on the **AI Analysis** tab to **Expo
 | Endpoint | Auth | Description |
 |---|---|---|
 | `GET /api/ai/health` | None | Service health + repository fingerprint |
-| `GET /api/ai/diagnostics` | Required | Configuration summary (keys redacted) |
+| `GET /api/ai/diagnostics` | Required | Configuration summary (keys redacted; for Bedrock, whether an API key or AWS credentials are used) |
 | `GET /api/ai/tools` | Required | Available tools and metadata |
 | `GET /api/ai/examples` | Required | Example questions grouped by category |
-| `GET /api/ai/models` | Required | Available LLM models |
+| `GET /api/ai/models` | Required | Available LLM models (for Bedrock, the models available in the region; for Ollama, the models installed on the server) |
 | `POST /api/ai/ask` | Required | Ask a question |
 | `POST /api/ai/proactive-digest` | Required | Proactive risk digest |
 | `POST /api/ai/feedback` | Required | Submit helpful/not-helpful feedback |
@@ -350,13 +436,25 @@ The local service's `ConnectionStrings:Repository` points to a different databas
 
 The LLM provider is not configured or unreachable. Check `AI:Provider` and the corresponding provider section. Use `GET /api/ai/diagnostics` (authenticated) to inspect the resolved configuration.
 
+### Bedrock errors
+
+| Message | Cause |
+|---|---|
+| `The provided model identifier is invalid` (400) | The model ID isn't one bedrock-runtime knows in this region. Common causes: a bedrock-mantle ID (no version suffix, for example `openai.gpt-oss-120b` instead of `openai.gpt-oss-120b-1:0`), or an inference profile prefix (`eu.`, `us.`, `global.`) that doesn't exist for the model. Pick the model from the GUI's Model picker to get an ID that works. |
+| `Invocation of model ID ... with on-demand throughput isn't supported` (400) | The model can only be called through an inference profile. Use its `us.`, `eu.` or `global.` ID. |
+| `You don't have access to the model` / 403 | The credentials or API key lack `bedrock:InvokeModel` for the model, or the model needs a marketplace subscription or use-case form in the Bedrock console. |
+| `Bedrock:ApiKey is not set and no AWS credentials were found` | No API key is set, and the service account has no AWS credentials (or `Profile` names a profile it can't find). See [AWS credentials and the Windows service](#amazon-bedrock). |
+| `Bedrock:Region must be an AWS region name` | `Region` is blank or mistyped. It must look like `eu-west-2`. |
+
+The service log records Bedrock's full response for every failed call, with the ErrorId shown in the GUI.
+
 ### 401 Unauthorized
 
 Shared mode only. The GUI retrieves the API key from the database automatically. If it fails, check that `AI.ServiceConfig` has a valid key and the GUI has read access to that table.
 
 ### Port conflict
 
-Change `Registration:Port` in `appsettings.local.json` and restart. In local mode the GUI will probe `http://localhost:{port}` — update user settings in the GUI Options if using a non-default port.
+Change the port on the **AI Service** tab of the service config tool (**Port**, under Registration), or set `Registration:Port` in `appsettings.local.json`, and restart the service. The GUI's local probe only checks `http://localhost:5055`, so a local-mode service on another port isn't found. To run on another port, for example a second AI service on the same machine, also set **Service URL** on the same tab (`Registration:ServiceUrl`, such as `http://localhost:5056`) so the GUI finds it through the repository. A service on the default port that belongs to a different repository is then ignored in favour of the registered one.
 
 ### AI Service won't start
 

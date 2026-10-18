@@ -3,7 +3,7 @@ title: "Availability Groups"
 description: ""
 lead: ""
 date: 2022-12-02T15:24:38Z
-lastmod: 2022-12-02T15:24:38Z
+lastmod: 2026-10-18T00:00:00Z
 draft: false
 images: []
 menu:
@@ -28,6 +28,16 @@ Backup status takes into account the backups performed on each of the replicas.
 DBA Dash reports the status of your availability groups on the Summary tab.  You can also see more detail about the health of your availability groups in the "Availability Groups" tab in the HA\DR folder in the tree.
 
 [![Availability Groups](availability_groups.png)](availability_groups.png)
+
+## Failover history
+
+The Availability Group tab records role changes. Each collection of availability replicas compares the local replica's role with the previous snapshot.
+
+Where the built-in `AlwaysOn_health` extended events session is running, DBA Dash also reads it every five minutes. The first run reads the files the instance already has, so the history is back-filled. Instances with no availability groups, or where that session is not running, are skipped and checked again hourly. A collection you trigger from the GUI always checks.
+
+Those events give an exact time, a failover type (manual, forced or automatic) and a reason drawn from any monitored replica of the group: a failover statement, a health check error, the replica stopping, the HADR manager going offline, a lease expiry or a HADR error. A snapshot estimate that an extended events row already covers is hidden. An instance restart is not counted as a role change.
+
+The tab has its own date range, defaulting to 30 days. The instance view lists the AlwaysOn health events. Events are kept for 365 days by default.
 
 ## Contained Availability Groups (SQL 2022)
 

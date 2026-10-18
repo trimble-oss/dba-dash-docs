@@ -3,7 +3,7 @@ title: "Query Plan Viewer"
 description: "Use the DBA Dash query plan viewer to explore execution plans, with operator ranking, insights and optional AI analysis."
 lead: "A built-in execution plan viewer - ranked operators, badges for the things worth spotting, static insights, plan comparison, and optional AI analysis."
 date: 2026-09-29T00:00:00Z
-lastmod: 2026-10-06T00:00:00Z
+lastmod: 2026-10-18T00:00:00Z
 draft: false
 images: []
 weight: 999
@@ -93,6 +93,8 @@ Collapsed operators are shown as stacked cards with a count of the hidden operat
 
 A plan with several statements gets a statement selector above the graph. Statements can be ranked by cost, elapsed time or estimate error, making it easy to find the statement that matters in a large batch or procedure. Use **Save As** to save the selected statement as a `.sqlplan` file of its own.
 
+Right-click a row in the statements grid to compare that statement with the one on screen, or to open it on a tab of its own. **Compare > With Another Statement in This Plan** lists every other statement.
+
 ## Tabs
 
 | Tab | Contents |
@@ -112,7 +114,9 @@ Tabs are hidden when there is nothing to show.
 
 The operator properties include the memory grant for each operator (memory fractions and per-thread input/output/used memory), so it's clear which operators the grant went to. Estimated Available Memory Grant, Max Compile Memory and Estimated Pages Cached are formatted under Optimizer Hardware Dependent Properties the way SSMS shows them. Where SQL Server's memory grant feedback has resized the grant, the adjusted and originally estimated values are both shown, so a resized grant isn't mistaken for the optimizer's estimate.
 
-A statement's Query Hash and Query Plan Hash properties link to Query Store when the plan was opened from DBA Dash against an instance it can message. The standalone Visualizer has no instance to look them up on, so these stay as plain text there.
+A statement's Query Hash and Query Plan Hash properties open the detail window when the plan was opened from DBA Dash: Query Stats, Running Queries and Query Store for that hash. The standalone Visualizer has no repository to look them up in, so these stay as plain text there.
+
+Insert, update and merge operators show their set predicate in the properties panel, the tooltip and search. A MERGE labels each predicate with its action. Seek predicates are shown for clustered index update and delete, including operators that hold the predicate directly.
 
 ## Copy and save
 
@@ -133,6 +137,8 @@ Similar to the [deadlock viewer's findings](/docs/help/deadlocks/#findings-stati
 * **Early abort** - e.g. optimization that stopped due to a memory limit.
 * **Warnings and missing indexes** - repeated warnings are grouped together.
 * **Top waits** - what the query waited on longest.
+* **Table variables** - a table variable has no statistics. The card says how many rows the optimizer believed it held (compiled while empty and costed for one row, or compiled with a known count), that a statement which modifies one always runs on a single thread, and that a temp table is the alternative when there are more than a few rows.
+* **Table-valued functions** - the work hidden inside a user-defined function, the return table with no statistics, and the fixed row guess (100 rows, or 1 with the legacy cardinality estimator), including whether interleaved execution applied. Built-in functions such as `STRING_SPLIT`, `OPENJSON` and the DMVs are named, with the one whose estimate was furthest out called out.
 
 The **Insights** tab lists these alongside the warnings SQL Server includes in the plan. The **Source** column shows whether each one came from **SQL Server** or **DBA Dash** - the DBA Dash insights won't appear in SSMS.
 
@@ -189,7 +195,7 @@ Tab captions show the number of changes, e.g. **Operators (1 changed)**.
 
 With the [AI Assistant](/docs/help/ai-assistant/) service configured, the **AI Analysis** tab can send the plan for detailed observations and recommendations.
 
-For providers that accept a model per request (Anthropic, Ollama), an **Options > Model** menu lists the configured default plus whatever models the service reports as available, so you can pick a different model for an analysis without changing the server-side configuration. The choice is shared with the [deadlock viewer](/docs/help/deadlocks/#ai-analysis) for the rest of the session.
+For providers that accept a model per request (Anthropic, Amazon Bedrock and Ollama), an **Options > Model** menu lists the configured default plus whatever models the service reports as available, so you can pick a different model for an analysis without changing the server-side configuration. The choice is shared with the [deadlock viewer](/docs/help/deadlocks/#ai-analysis) for the rest of the session.
 
 {{< callout context="caution">}}
 Nothing is sent until you press **Submit for analysis**, and the exact request is shown first. **Read it before pressing send** - plans can include parameter values and literals.

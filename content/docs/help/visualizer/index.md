@@ -3,7 +3,7 @@ title: "DBA Dash Visualizer"
 description: "Install and use DBA Dash Visualizer - a standalone app for viewing SQL Server execution plans, deadlock graphs and result grids without DBA Dash."
 lead: "Open execution plans, deadlock graphs and result grids in the DBA Dash viewers - no repository, service or SQL Server connection required."
 date: 2026-09-29T00:00:00Z
-lastmod: 2026-09-29T00:00:00Z
+lastmod: 2026-10-18T00:00:00Z
 draft: false
 images: []
 weight: 999
@@ -40,6 +40,10 @@ Download from the [latest release](https://github.com/trimble-oss/dba-dash/relea
 ### Setup program (recommended)
 
 Run `DBADash_Visualizer_Setup_<version>.exe`. It installs in a few seconds for the current user only, so no administrator rights are required. There are no prompts to click through. It adds DBA Dash Visualizer to the Start menu and **Installed apps**, installs the .NET Desktop Runtime if needed, and updates itself.
+
+### Install for everyone
+
+Run `DBADash_Visualizer_Setup_<version>.msi`. It asks whether to install for you or for everyone, under Program Files. A silent install is per user unless `ALLUSERS=1`. An update of an install for everyone asks for administrator permission.
 
 ### Zip
 
@@ -92,14 +96,14 @@ Logs are written to `%LOCALAPPDATA%\DBADash\Logs\DBADashVisualizer-<date>.log`.
 
 At most once a day, a few seconds after it starts, the Visualizer checks GitHub for a newer release.
 
-* **Setup program:** select **Install Update**. The update downloads in the background and installs when you close the Visualizer. Only what changed is downloaded where possible.
+* **Setup program or .msi:** select **Install Update**. The update downloads in the background and installs when you close the Visualizer. Only what changed is downloaded where possible. An install for everyone asks for administrator permission.
 * **Zip:** select **Download**, then extract the new zip over the old folder (close the Visualizer first).
 
 **Skip This Version** stops it mentioning that version again. Turn the check off in **About**, or check now with **Check for Updates** in the **Settings** menu.
 
 ## Uninstall
 
-* **Setup program:** uninstall **DBA Dash Visualizer** from **Installed apps**. This removes the app, its Start menu entry and any **Open with** entries.
+* **Setup program or .msi:** uninstall **DBA Dash Visualizer** from **Installed apps**. This removes the app, its Start menu entry and any **Open with** entries.
 * **Zip:** first run `DBADashVisualizer.exe --UnregisterFileAssociation` and `--RemoveStartMenuShortcut` if you used them, then delete the folder.
 
 Delete `%LOCALAPPDATA%\DBADash\Visualizer` to remove the settings.

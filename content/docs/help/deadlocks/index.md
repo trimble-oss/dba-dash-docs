@@ -3,7 +3,7 @@ title: "Deadlocks"
 description: "Configure deadlock collection in DBA Dash and use the deadlock reports, signatures, viewer, findings and AI analysis."
 lead: "Native deadlock capture, reporting and analysis - from the extended events session on your monitored instance through to a deadlock viewer with static and AI analysis."
 date: 2026-09-16T00:00:00Z
-lastmod: 2026-10-06T00:00:00Z
+lastmod: 2026-10-18T00:00:00Z
 draft: false
 images: []
 weight: 999
@@ -216,7 +216,9 @@ Triggering a collection requires the [messaging](/docs/help/messaging) feature t
 
 ### Performance tab
 
-The existing deadlock count on the Performance tab (derived from the `Locks\Number of Deadlocks/sec\_Total` performance counter) and the `sp_BlitzLock` drill-down remain available. With native collection enabled, `sp_BlitzLock` is no longer required.
+Where the Deadlocks collection is enabled, the deadlock markers on the Performance tab count the deadlocks DBA Dash stored. The counts are exact, they are filtered to the database when you are at database level, and each point opens the Deadlocks report for the window it counted. **View > Deadlock Counts** switches back to the `Locks\Number of Deadlocks/sec\_Total` performance counter when you want the longer history from before the collection was enabled. That counter is engine-wide. On Azure SQL Database it includes deadlocks that never touched the database you are looking at. The choice is saved with the performance view.
+
+The `sp_BlitzLock` drill-down remains available. With native collection enabled it is no longer required.
 
 ## Deadlock Viewer
 
@@ -308,7 +310,7 @@ Nothing is sent until you press **Submit for analysis**. The panel above the but
 
 * **Show request** - toggles the request preview back into view after an answer has arrived.
 * **Include schema** - adds the definitions of the objects the deadlock touched, taken from the repository's [schema snapshots](/docs/help/schema-snapshots) **as they were when the deadlock happened**. That point-in-time part is what makes it worth including: the procedure may have been changed twice since, and the definition that explains the deadlock is the one from before those changes. Best effort - snapshots are optional, the deadlock may predate the first one, and objects get dropped, so an empty result is an ordinary answer. Definitions are truncated to keep the payload a sensible size.
-* **Model** - for providers that accept a model per request (Anthropic, Ollama), lists the configured default plus whatever models the service reports as available. Hidden if the list can't be loaded, in which case the configured model is used. The choice is shared with the [query plan viewer](/docs/help/query-plan-viewer/#ai-analysis) for the rest of the session.
+* **Model** - for providers that accept a model per request (Anthropic, Amazon Bedrock and Ollama), lists the configured default plus whatever models the service reports as available. Hidden if the list can't be loaded, in which case the configured model is used. The choice is shared with the [query plan viewer](/docs/help/query-plan-viewer/#ai-analysis) for the rest of the session.
 
 ### Caching and history
 

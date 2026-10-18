@@ -3,7 +3,7 @@ title: "Deploy GUI"
 description: "How to deploy the DBA Dash GUI"
 lead: ""
 date: 2022-09-29T20:35:03+01:00
-lastmod: 2025-12-01T08:00:00+00:00
+lastmod: 2026-10-18T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -42,10 +42,24 @@ To run the GUI, users only need access to the repository database.  No access is
 
 ## Setup
 
+Download from the [latest release](https://github.com/trimble-oss/dba-dash/releases/latest). Install the version that matches your repository. An installed GUI stays on the version of the repository it connects to.
+
+### Setup program
+
+Run `DBADash_GUI_Setup_<version>.exe`. It installs for the current user, with no administrator rights, and adds the GUI to the Start menu. When it connects to a repository on a different major or minor version it offers to install that version, an update or a downgrade. **Upgrade** in the About box installs the repository's exact version, including a patch release.
+
+### Install for everyone
+
+Run `DBADash_GUI_Setup_<version>.msi`. It asks whether to install for you or for everyone, under Program Files. A silent install is per user unless `ALLUSERS=1`. An update of an install for everyone asks for administrator permission. The SSMS extension finds an all-users install.
+
+### Zip
+
 1. [Download](https://github.com/trimble-oss/dba-dash/releases) the GUI_Only package
 2. Extract it to a folder on your PC
 3. Run DBADash.exe
 4. Connect to the repository database.
+
+A copy extracted from the zip is upgraded by the upgrade script, as before.
 
 ![DBA Dash Connect](connect.png)
 
