@@ -34,6 +34,14 @@ toc: true
 [![Object Execution Compare](object-execution-compare.png)](object-execution-compare.png)
 *See how your stored procedure performance compares to yesterday or last week. Identify regressions that might require attention and easily quantify the impact of performance optimizations.*
 
+### Query Stats
+
+[![Query Stats charts](query-stats-charts.png)](query-stats-charts.png)
+*Statement-level CPU from the plan cache, including ad-hoc queries. Charts over time and by statement and database, with how much of the instance's CPU the collection kept.*
+
+[![Query Stats](query-stats-data.png)](query-stats-data.png)
+*The statements behind the charts: CPU, duration, reads and executions, with the batch text and the plan.*
+
 ### Running Queries
 
 [![Running Queries](running-queries.png)](running-queries.png)
@@ -58,6 +66,11 @@ toc: true
 
 [![Waits](waits.png)](waits.png)
 *See which waits are most relevant for your SQL instance and track them over time. Is the SQL instance IO bound?  Do we have blocking issues?  Are we running out of worker threads?  Are queries blocked waiting for memory grants?  Waits are one of the most important tools to help diagnose performance issues*
+
+### Latches and spinlocks
+
+[![Latches and Spinlocks](latches-spinlocks.png)](latches-spinlocks.png)
+*Latch wait time and spinlock spins when you are investigating contention. Off by default, and not something most instances need left on.*
 
 ### Metrics
 
@@ -107,7 +120,7 @@ toc: true
 ### HA/DR monitoring
 
 [![Availability Groups](availability-groups.png)](availability-groups.png)
-*Availability groups, Log Shipping, Mirroring & Backups*
+*Availability group replicas, role changes and the AlwaysOn health events behind a failover.*
 
 ### SQL Agent Jobs
 

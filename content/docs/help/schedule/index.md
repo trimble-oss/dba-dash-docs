@@ -3,7 +3,7 @@ title: "Schedule"
 description: "DBA Dash default collection schedule and customization"
 lead: ""
 date: 2022-09-25T19:53:10+01:00
-lastmod: 2026-10-06T00:00:00+01:00
+lastmod: 2026-10-18T00:00:00+01:00
 draft: false
 images: []
 menu:
@@ -56,6 +56,14 @@ Schedules can be customized at the service level and you can also override sched
 *Collects data from sys.elastic_pool_resource_stats*
 - [AzureDBResourceStats](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLAzureDBResourceStats.sql)
 *Collects data from sys.dm_db_resource_stats*
+
+### Every 5 min
+- [QueryStats](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLQueryStats.sql)
+*Statement-level CPU, duration, reads, writes, executions and memory grants from sys.dm_exec_query_stats. The schedule runs, but nothing is collected until Query Stats Top N is set for the connection. See the service config tool.*
+- [Deadlocks](/docs/help/deadlocks)
+*Deadlock graphs from an extended events session. Nothing is collected until a capture option is set for the connection.*
+- AGHealthEvents
+*Reads the built-in AlwaysOn_health extended events session. Instances with no availability groups, or where that session is not running, are skipped. See [Availability Groups](/docs/help/availability_groups/#failover-history).*
 
 ### Every Hour
 - [ServerProperties](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLServerProperties.sql)
@@ -144,6 +152,10 @@ Add [your own](/docs/help/custom-checks) checks to DBA Dash.
 *Table row count and disk space usage*
 - [FailedLogins](/docs/help/failed-logins)
 *Collects failed login information from the SQL Server error log*
+- [LatchStats](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLLatchStats.sql)
+*Latch wait time from sys.dm_os_latch_stats, for investigating latch contention. The suggested schedule once enabled is every minute. Shown on the Latches tab, including Azure SQL Database.*
+- [SpinlockStats](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLSpinlockStats.sql)
+*Spinlock collisions, spins, sleep time and backoffs from sys.dm_os_spinlock_stats. The suggested schedule once enabled is every minute. Shown on the Spinlocks tab with a SQL Server CPU line, including Azure SQL Database.*
 
 ## Triggering collections on demand
 
@@ -197,6 +209,24 @@ If you configure the schedule in the options tab it will apply to all the monito
 {{< callout context="note" icon="outline/info-circle" >}}
 If you have groups of instances that require different schedules, consider using separate instances of the DBA Dash service. You can run multiple instances of the service on the same computer by deploying to a different folder and editing the `ServiceName` to be unique in the JSON tab of the config tool before installing the service.
 {{< /callout >}}
+
+## Changing schedules from the GUI
+
+[![Edit schedules from the GUI](edit-schedule.png)](edit-schedule.png)
+
+Where the service allows it, schedules can also be changed from the GUI, and collections can be paused. Turn on **Allow Schedule Changes** in the service config tool (`AllowScheduleChanges`). The service tells the repository that it accepts changes, and the GUI only offers them where they will be accepted. The user needs the **AllowScheduleChanges** role, or db_owner. Changes are sent to the collecting service through [messaging](/docs/help/messaging/).
+
+**Configure Schedule** is on the instance context menu and on the Collection Dates toolbar. It opens the same schedule dialog as the config tool, for that instance or for the service that collects it. Unlike Collection Dates, it lists every collection, including ones that are disabled and have never run. A service-level schedule shows how many of the service's instances follow each collection's service schedule rather than their own.
+
+A schedule must fire at some point. A valid cron expression that never does, such as 30 February, is rejected.
+
+An instance change can be temporary, for example to switch a collection on while you investigate. It reverts by itself, or you can end it early. Temporary schedules survive a service restart.
+
+**Pause/Resume Collections**, on the instance context menu and on Collection Dates, pauses scheduled collections for the selected instances for up to 31 days and mutes their alerts. A collection you trigger by hand still runs. Paused instances are flagged in the tree, on the Summary tab and in Collection Dates. A pause survives a restart and ends by itself. Collection date alerts measure overdue time from the end of the pause, so collections don't alert the moment it ends.
+
+The service applies the change without a restart and reports the new schedule straight away. Schedule changes, temporary schedules and pauses are recorded in the **User Actions** report: who made the change, the instance, and the outcome.
+
+A collection that is switched off by its configuration rather than by its schedule, such as deadlocks with no extended events session, can't be turned on by changing the schedule.
 
 ## Collection Thresholds
 

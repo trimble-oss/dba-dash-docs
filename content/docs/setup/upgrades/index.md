@@ -2,7 +2,7 @@
 title: "Upgrades"
 description: "Upgrade DBA Dash to latest version"
 date: 2020-11-16T13:59:39+01:00
-lastmod: 2025-12-01T08:00:00+00:00
+lastmod: 2026-10-18T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -39,9 +39,13 @@ toc: true
 
 ## Upgrading GUI clients
 
+A GUI installed by the setup program or the `.msi` updates itself to the version of the repository it connects to. On connect it offers that version when the major and minor version differ, including a downgrade when the GUI is newer. **Upgrade** in the About box installs the repository's exact version, so a patch release can be picked up without waiting for that prompt, and it never goes past the repository version. An update of an install for everyone asks for administrator permission.
+
+A copy extracted from the zip still uses the upgrade script:
+
 1. The GUI will automatically prompt to upgrade on startup if the version is older than the repository database.
 
-{{< callout context="note" icon="outline/info-circle" >}}The client will only be prompted for upgrade if the x.y portion of the x.y.z version is different from the repository database.{{< /callout >}}
+{{< callout context="note" icon="outline/info-circle" >}}A zip copy is only prompted for upgrade if the x.y portion of the x.y.z version is different from the repository database.{{< /callout >}}
 
 1. Click Help, About to check the version of the client
 2. Click Upgrade to upgrade.

@@ -187,9 +187,28 @@ This does a number of tasks including creating the firewall exception (port 5985
 
 ## DBA Dash GUI
 
-To use the DBA Dash GUI, users only need access to the DBA Dash repository database.  No access is required to the monitored instances.  To grant the minimum permissions to run the DBA Dash GUI, add the user the the **App** role in the DBA Dash database. This grants the user SELECT and EXECUTE permissions to the database.  An **AppReadOnly** role can also be used to allow access to the GUI without the ability to acknowledge alerts.
+To use the DBA Dash GUI, users only need access to the DBA Dash repository database.  No access is required to the monitored instances.  To grant the minimum permissions to run the DBA Dash GUI, add the user to the **App** role in the DBA Dash database. This grants the user SELECT and EXECUTE permissions to the database.  An **AppReadOnly** role can also be used to allow access to the GUI without the ability to acknowledge alerts.
 
 The **ManageGlobalViews** role can be used to allow the user to save their customized metrics dashboards for all users. They will also have access to delete shared dashboards.  Users with db_owner will also have the same access.  Otherwise the user can still create their own dashboards.
+
+The **AllowScheduleChanges** role can change collection schedules and pause collections from the GUI, on a service that has **Allow Schedule Changes** turned on. db_owner can do the same. See [Changing schedules from the GUI](/docs/help/schedule/#changing-schedules-from-the-gui). The **User Actions** report is visible to this role.
+
+These roles are in addition to **App**. A member of **db_owner** can do what they allow without being added to the role.
+
+* **SecurityReports** shows **Server Role Members (sysadmin)** and **SQL Login Password Age**. Both stay hidden without the role.
+* **RunUserReports** grants EXECUTE on the UserReport schema, which is what makes a [custom report](/docs/how-to/create-custom-reports/#security) visible and runnable.
+* **AIUser** shows the [AI Assistant](/docs/help/ai-assistant/) tab and allows an analysis to be submitted: a plan, a deadlock or performance. The role can unmask the AI service API key, which is what a submit uses. Previewing a request, or copying the prompt, does not need it.
+
+Actions that run on a monitored instance also need the **Messaging** role, and the service has to allow the action. See [Messaging](/docs/help/messaging/#security).
+
+* **AllowPlanForcing** forces or unforces a Query Store plan, and flushes a plan from cache. The plan forcing log is visible to this role.
+* **AllowKillSession** kills a session. The kill session log is visible to this role.
+* **AllowJobExecution** starts an Agent job the service allows.
+* **CommunityScripts** runs the community tools the service allows.
+* **CustomTools** runs [custom tools](/docs/help/custom-tools/).
+* **AdhocXE**, **WatchXE** and **ManageXE** run an ad-hoc trace, watch a session, and start or stop one. See [Extended Events](/docs/help/extended-events/#repository-db-security).
+
+The **Reports** role is not used by the GUI. It grants SELECT on dbo and EXECUTE on the Report schema, for the report definitions that run outside the GUI.
 
 ## Messaging Security Considerations
 

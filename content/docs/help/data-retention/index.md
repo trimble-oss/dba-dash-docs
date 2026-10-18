@@ -3,7 +3,7 @@ title: "Data Retention"
 description: "Data Retention in DBA Dash"
 lead: ""
 date: 2022-10-11T11:07:25+01:00
-lastmod: 2022-10-11T11:07:25+01:00
+lastmod: 2026-10-18T00:00:00+01:00
 draft: false
 images: []
 menu:
@@ -27,6 +27,8 @@ DBA Dash manages data retention automatically based on the retention policy whic
 {{< callout context="note" icon="outline/info-circle" >}}
 The filter icon can be used to show the size of all tables including ones without retention policies.
 {{< /callout >}}
+
+Some tables follow another table's retention and have no setting of their own. The coverage tables the reports divide rates by follow the stats they belong with: Query Stats, Latches and Spinlocks, and their hourly rollups. Child rows shown with a parent do the same: deadlock processes and resources follow Deadlocks, and running-query cursors follow Running Queries. These rows are shown as plain text rather than a link, with the table they follow. A table that isn't managed for retention is shown the same way. Deadlock graphs stay independent, because they are kept for less time on purpose.
 
 ## Efficient data removal
 
