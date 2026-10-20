@@ -1,0 +1,125 @@
+{{ define "main" }}
+<div class="row justify-content-center">
+  <div class="col-lg-10 col-xl-8">
+    <article class="download-page">
+      <h1 class="text-center">Download</h1>
+      <p class="lead text-center">Latest version <span data-version-text>from GitHub</span>. Open source, MIT licensed. Every package below also includes the SSMS extension.</p>
+
+      <section id="service" class="download-group">
+        <h2>1. Set up monitoring</h2>
+        <p>Start here. This package has the collection service, the dacpac to deploy the repository database, the config tool and the GUI. Extract it and follow the <a href="/docs/setup/quick-start/">quick start</a>.</p>
+        <div class="card mb-3">
+          <div class="card-body download-option">
+            <div class="download-option-main">
+              {{ partial "inline-svg" (dict "src" "outline/file-zip" "class" "download-icon" "aria-hidden" "true") }}
+              <div>
+                <h3 class="h5">Service and GUI</h3>
+                <p>One zip for the machine that will collect data.</p>
+                <p class="download-file"><code>DBADash_<span data-version-text>version</span>.zip</code></p>
+              </div>
+            </div>
+            <a class="btn btn-primary" data-asset="DBADash_{version}.zip" href="https://github.com/trimble-oss/dba-dash/releases/latest">Download .zip</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="gui" class="download-group">
+        <h2>2. GUI only</h2>
+        <p>Add the monitoring client on another machine. Install the version that matches your repository. The installer keeps the GUI on the version of the repository it connects to. See <a href="/docs/setup/deploy-gui/">deploying the GUI</a>.</p>
+        <div class="card mb-3">
+          <div class="card-body download-option">
+            <div class="download-option-main">
+              {{ partial "inline-svg" (dict "src" "outline/device-desktop-down" "class" "download-icon" "aria-hidden" "true") }}
+              <div>
+                <h3 class="h5">Setup program</h3>
+                <p>Installs for the current user. No administrator rights, and it adds the GUI to the Start menu. When it connects to a repository on another version it offers to install that version.</p>
+                <p class="download-file"><code>DBADash_GUI_Setup_<span data-version-text>version</span>.exe</code></p>
+              </div>
+            </div>
+            <a class="btn btn-primary" data-asset="DBADash_GUI_Setup_{version}.exe" href="https://github.com/trimble-oss/dba-dash/releases/latest">Download .exe</a>
+          </div>
+        </div>
+        <div class="card mb-3">
+          <div class="card-body download-option">
+            <div class="download-option-main">
+              {{ partial "inline-svg" (dict "src" "outline/users" "class" "download-icon" "aria-hidden" "true") }}
+              <div>
+                <h3 class="h5">Install for everyone</h3>
+                <p>Asks whether to install for you or for everyone, under Program Files. An update of an install for everyone needs administrator permission. The SSMS extension finds an all-users install.</p>
+                <p class="download-file"><code>DBADash_GUI_Setup_<span data-version-text>version</span>.msi</code></p>
+              </div>
+            </div>
+            <a class="btn btn-outline-primary" data-asset="DBADash_GUI_Setup_{version}.msi" href="https://github.com/trimble-oss/dba-dash/releases/latest">Download .msi</a>
+          </div>
+        </div>
+        <div class="card mb-3">
+          <div class="card-body download-option">
+            <div class="download-option-main">
+              {{ partial "inline-svg" (dict "src" "outline/file-zip" "class" "download-icon" "aria-hidden" "true") }}
+              <div>
+                <h3 class="h5">Zip</h3>
+                <p>Extract it and run <code>DBADash.exe</code>. No installer. A copy from the zip is upgraded by the upgrade script, as before.</p>
+                <p class="download-file"><code>DBADash_GUI_Only_<span data-version-text>version</span>.zip</code></p>
+              </div>
+            </div>
+            <a class="btn btn-outline-primary" data-asset="DBADash_GUI_Only_{version}.zip" href="https://github.com/trimble-oss/dba-dash/releases/latest">Download .zip</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="visualizer" class="download-group">
+        <h2>DBA Dash Visualizer</h2>
+        <p>View execution plans and deadlock graphs only. No repository, service, or SQL Server connection. See the <a href="/docs/help/dba-dash-visualizer/">Visualizer documentation</a>.</p>
+        <div class="card mb-3">
+          <div class="card-body download-option">
+            <div class="download-option-main">
+              {{ partial "inline-svg" (dict "src" "outline/device-desktop-down" "class" "download-icon" "aria-hidden" "true") }}
+              <div>
+                <h3 class="h5">Setup program</h3>
+                <p>Installs in a few seconds for the current user. No administrator rights and no prompts. It adds Visualizer to the Start menu and Installed apps, installs the .NET Desktop Runtime if needed, and updates itself.</p>
+                <p class="download-file"><code>DBADash_Visualizer_Setup_<span data-version-text>version</span>.exe</code></p>
+              </div>
+            </div>
+            <a class="btn btn-primary" data-asset="DBADash_Visualizer_Setup_{version}.exe" href="https://github.com/trimble-oss/dba-dash/releases/latest">Download .exe</a>
+          </div>
+        </div>
+        <div class="card mb-3">
+          <div class="card-body download-option">
+            <div class="download-option-main">
+              {{ partial "inline-svg" (dict "src" "outline/users" "class" "download-icon" "aria-hidden" "true") }}
+              <div>
+                <h3 class="h5">Install for everyone</h3>
+                <p>Asks whether to install for you or for everyone, under Program Files. An update of an install for everyone needs administrator permission.</p>
+                <p class="download-file"><code>DBADash_Visualizer_Setup_<span data-version-text>version</span>.msi</code></p>
+              </div>
+            </div>
+            <a class="btn btn-outline-primary" data-asset="DBADash_Visualizer_Setup_{version}.msi" href="https://github.com/trimble-oss/dba-dash/releases/latest">Download .msi</a>
+          </div>
+        </div>
+        <div class="card mb-3">
+          <div class="card-body download-option">
+            <div class="download-option-main">
+              {{ partial "inline-svg" (dict "src" "outline/file-zip" "class" "download-icon" "aria-hidden" "true") }}
+              <div>
+                <h3 class="h5">Zip</h3>
+                <p>Extract it to a folder of your choice and run <code>DBADashVisualizer.exe</code>.</p>
+                <p class="download-file"><code>DBADash_Visualizer_<span data-version-text>version</span>.zip</code></p>
+              </div>
+            </div>
+            <a class="btn btn-outline-primary" data-asset="DBADash_Visualizer_{version}.zip" href="https://github.com/trimble-oss/dba-dash/releases/latest">Download .zip</a>
+          </div>
+        </div>
+      </section>
+
+      <p class="download-note">The setup programs install the <a href="https://dotnet.microsoft.com/download/dotnet/10.0">.NET 10 Desktop Runtime</a> if it is missing. The zip packages need that runtime installed already. Other files on the GitHub release, such as <code>.nupkg</code> packages, are used by the installers to update themselves.</p>
+
+      <section id="older-versions" class="download-group">
+        <h2>Older versions</h2>
+        <p>The buttons above download the latest release. Earlier versions, including the file list for each one, are on GitHub.</p>
+        <a class="btn btn-outline-primary" href="https://github.com/trimble-oss/dba-dash/releases">GitHub releases</a>
+      </section>
+    </article>
+  </div>
+</div>
+<script src="/js/downloads.js" defer></script>
+{{ end }}
