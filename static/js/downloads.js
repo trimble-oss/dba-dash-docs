@@ -10,6 +10,9 @@
     return;
   }
 
+  // Links only ever point at release assets, whatever the API or the cached stats return.
+  var releaseBase = "https://github.com/trimble-oss/dba-dash/releases/download/";
+
   function applyVersion(version, assetUrls) {
     if (!version) {
       return;
@@ -25,12 +28,10 @@
 
     assets.forEach(function (link) {
       var file = link.getAttribute("data-asset").replaceAll("{version}", version);
+      var cachedUrl = assetUrls && assetUrls[file];
       link.href =
-        (assetUrls && assetUrls[file]) ||
-        "https://github.com/trimble-oss/dba-dash/releases/download/" +
-          version +
-          "/" +
-          file;
+        (typeof cachedUrl === "string" && cachedUrl.indexOf(releaseBase) === 0 && cachedUrl) ||
+        releaseBase + encodeURIComponent(version) + "/" + encodeURIComponent(file);
     });
   }
 
