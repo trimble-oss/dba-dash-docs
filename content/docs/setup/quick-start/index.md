@@ -68,9 +68,9 @@ You can run the DBADashService.exe console app as your own user account without 
 
 1. Download the latest release from GitHub:
 
-<a id='full-download' class="btn btn-primary btn-lg px-4 mb-2" target="_blank" href="https://github.com/trimble-oss/dba-dash/releases" title="Download latest version of DBA Dash" role="button">Download</a>
+<a class="btn btn-primary btn-lg px-4 mb-2" href="/download/#service" title="Download the DBA Dash service and GUI" role="button">Download</a>
 
-*(Select the one labelled DBADash_{version}.zip)*
+*(The service and GUI package, DBADash_{version}.zip)*
 
 2. Extract the files to a folder of your choosing
 

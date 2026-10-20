@@ -124,6 +124,8 @@ The GUI is the front-end that you use to monitor your SQL instances.  It's a Win
 
 'DBADash_GUI_Only_{Version}.zip' only contains the GUI front-end for deployment to client machines.  The service and the service config tool are not included.
 
+The GUI and the standalone Visualizer also have setup programs (`.exe` for the current user, `.msi` to install for everyone). See the [download page](/download/) for which file to pick.
+
 ### Is there a Web UI?
 
 No. The front-end is a WinForms app.  This has some advantages, but the main limitation is that the data is less accessible than with a web front-end.

@@ -12,3 +12,180 @@ table {
 [data-bs-theme="dark"] table {
   --bs-table-color: inherit;
 }
+
+.home-shot {
+  width: 100%;
+  height: auto;
+  margin-bottom: 0.75rem;
+}
+
+.download-group {
+  margin-top: 2.5rem;
+  scroll-margin-top: 5rem;
+}
+
+.download-group > h2 {
+  margin-bottom: 0.5rem;
+}
+
+.download-option {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+// Icon beside the title at every width; only the button moves below on small screens.
+.download-option-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.download-icon {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  color: var(--bs-secondary-color);
+  stroke-width: 1.5;
+}
+
+.download-option .h5 {
+  // The theme's heading margin would push the title below the icon. The card padding is enough.
+  margin-top: 0;
+  margin-bottom: 0.35rem;
+}
+
+.download-option p:last-child,
+.download-file {
+  margin-bottom: 0;
+}
+
+.download-file {
+  font-size: 0.9rem;
+}
+
+.download-note {
+  margin-top: 2rem;
+}
+
+@media (min-width: 768px) {
+  .download-option {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .download-option .btn {
+    flex: 0 0 auto;
+  }
+}
+
+.home-screenshots {
+  margin-top: 1.5rem;
+  text-align: center;
+
+  p {
+    margin-bottom: 0.75rem;
+  }
+}
+
+.home-visualizer {
+  margin-top: 3rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--bs-border-color);
+}
+
+// GitHub star button. Styled locally because buttons.github.io injects a stylesheet, which the site CSP blocks.
+.github-star-wrap {
+  display: inline-flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 0.25rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+.github-star,
+.github-star-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 5px 10px;
+  text-decoration: none;
+  border: 1px solid #d1d9e0;
+  color: #25292e;
+}
+
+.github-star {
+  border-radius: 0.25em;
+  background-color: #ebf0f4;
+  background-image: linear-gradient(180deg, #f6f8fa, #ebf0f4 90%);
+
+  svg {
+    fill: currentColor;
+  }
+}
+
+.github-star-wrap:not(:has(.github-star-count[hidden])) .github-star {
+  border-radius: 0.25em 0 0 0.25em;
+}
+
+.github-star-count {
+  border-left: 0;
+  border-radius: 0 0.25em 0.25em 0;
+  background-color: #fff;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.github-star:hover,
+.github-star:focus,
+.github-star-count:hover,
+.github-star-count:focus {
+  text-decoration: none;
+  color: #25292e;
+}
+
+.github-star:hover,
+.github-star:focus {
+  background-color: #e5eaee;
+  background-image: linear-gradient(180deg, #eff2f5, #e5eaee 90%);
+}
+
+.github-star-count:hover,
+.github-star-count:focus {
+  color: #0969da;
+}
+
+[data-bs-theme="dark"] {
+  .github-star,
+  .github-star-count {
+    border-color: #3d444d;
+    color: #f0f6fc;
+  }
+
+  .github-star {
+    background-color: #1a2026;
+    background-image: linear-gradient(180deg, #212830, #1a2026 90%);
+  }
+
+  .github-star:hover,
+  .github-star:focus {
+    background-color: #1f242c;
+    background-image: linear-gradient(180deg, #262c36, #1f242c 90%);
+    color: #f0f6fc;
+  }
+
+  .github-star-count {
+    background-color: #0d1117;
+  }
+
+  .github-star-count:hover,
+  .github-star-count:focus {
+    color: #388bfd;
+  }
+}

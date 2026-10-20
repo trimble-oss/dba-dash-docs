@@ -53,6 +53,13 @@
   url = "/docs/setup/quick-start/"
 
 [[main]]
+  name = "Download"
+  weight = 35
+  identifier = "download"
+  url = "/download/"
+  parent = "get-started"
+
+[[main]]
   name = "👋 Quick Start"
   weight = 40
   identifier = "quick-start"
