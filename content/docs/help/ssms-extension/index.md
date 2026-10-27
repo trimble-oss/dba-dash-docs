@@ -1,9 +1,9 @@
 ---
 title: "SSMS Extension"
-description: "Open execution plans, deadlock graphs and results grids from SSMS in the DBA Dash viewers."
-lead: "Send execution plans, deadlock graphs and results grids from SSMS to DBA Dash Visualizer with a right-click."
+description: "Open execution plans, deadlock graphs, results grids and live plans from SSMS in the DBA Dash viewers."
+lead: "Send execution plans, deadlock graphs, results grids and live plans from SSMS to DBA Dash Visualizer with a right-click."
 date: 2026-09-29T00:00:00Z
-lastmod: 2026-10-01T00:00:00Z
+lastmod: 2026-10-27T00:00:00Z
 draft: false
 images: []
 weight: 999
@@ -20,6 +20,7 @@ The extension adds an **Open in DBA Dash Visualizer** option to SSMS for:
 * **Deadlock graphs** - a right-click menu the extension adds to deadlock graph tabs.
 * **XML** - a plain XML tab holding a plan or deadlock graph, such as the output from `sp_BlitzLock`.
 * **Results grids** - the results grid right-click menu.
+* **Live plans** - **Open Live Plan in DBA Dash Visualizer** on a results grid row that has a session id. See [Live plans](#live-plans).
 * **All results** - **Open All Results in DBA Dash Visualizer** is shown when the query window has more than one results grid.
 
 The option is also on the **Tools** menu, with **Ctrl+Alt+Shift+D** as a keyboard shortcut.
@@ -108,6 +109,18 @@ Run the script in SSMS to re-create the results you saw in the grid, then query 
 ### Saving and re-opening grids
 
 **Export File** saves the grid as JSON or XML (optionally compressed), which can be re-opened later in the Visualizer or in DBA Dash with **Tools > Open Grid or Data Set**. Results saved from SSMS with **Save Results As** XML can also be opened - by drag and drop, from Explorer, or with the **Open** button. **Tools > Open Grid or Data Set** in DBA Dash also opens DataSets written to the DBA Dash service's `Failed` folder, which can help with troubleshooting collection issues.
+
+## Live plans
+
+[![Live Plans in SSMS extension](live-plan-ssms.gif)](live-plan-ssms.gif)
+
+Right-click a row with a `session_id` or `spid` column, such as a result from `sp_BlitzWho`, `sp_WhoIsActive` or `sp_who2`, and choose **Open Live Plan in DBA Dash Visualizer**. The viewer follows that request as it runs. The plan XML is read once. Each refresh sends the operator counters, not another copy of the plan. See [Live query plans](/docs/help/running-queries/#live-query-plans).
+
+The row is the one under the pointer. A right-click in SSMS does not change the selection, so the extension uses the cell that was clicked, and the selected row when the menu is opened from the keyboard. The session id comes from that row. When the grid also has `start_time` or `request_start_time`, that value is sent too, so a session that has moved on to another request is left alone.
+
+The extension uses the query window's connection. Windows authentication and SQL authentication are supported. Microsoft Entra authentication is not supported yet. The connection is written to an `ssms_*.dbadashlive` temp file. The whole file is DPAPI-protected for the current Windows user. Any password is removed from the connection string and protected again inside the file, and the app holds it as a credential rather than as part of the connection string. The app accepts the file only from the extension's temp location, in the version it knows, and only when the file is less than 10 minutes old. It deletes the file as soon as it has been read. The extension deletes any of these files it wrote that are still there after 10 minutes.
+
+The viewer then connects itself and runs the same SQL the DBA Dash service uses for a live plan opened from the GUI.
 
 ## How it works
 

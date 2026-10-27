@@ -3,7 +3,7 @@ title: "Identity Columns"
 description: ""
 lead: ""
 date: 2022-09-25T20:14:24+01:00
-lastmod: 2022-09-25T20:14:24+01:00
+lastmod: 2026-10-27T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -66,3 +66,11 @@ The default warning threshold is configured at 50% and the critical threshold is
 *Starting with version [3.9](/content/blog/whats_new_in_3_9_0/), there is also threshold configuration for days remaining (Warning Threshold Days & Critical Threshold Days) in addition to % used.*
 
 Clicking the up arrow will allow you to set the threshold configuration at the database, instance then root level.  You can also click the gear menu icon to access the root and instance level configuration directly.  Note: The instance level menu option won't be available at root level.
+
+## Exclusions
+
+Tables you do not want monitored can be excluded by name. **Configure > Exclusions (Root)** applies to every instance. **Exclusions (Instance)** and **Exclusions (Database)** apply to the selected instance or database. The App role or an administrator can edit them.
+
+Enter one table per line, as the table name or `schema.table`, without brackets. `%` is a wildcard. `[` and `_` are matched literally, because they are valid in object names. Examples: `MyTable`, `dbo.MyTable`, `Staging.%`.
+
+An excluded table is reported with N/A status. **Excluded By** shows the pattern and the level that matched (root, instance or database), so a pattern that matches more than you intended is easy to see. Exclusions take priority over thresholds. The summary ignores excluded tables for max % used and estimated days remaining. An instance whose collected identity columns are all excluded shows OK. The AI identity tool ignores excluded tables. Removing an instance removes its instance-level exclusions.

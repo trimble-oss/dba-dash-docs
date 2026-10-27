@@ -3,7 +3,7 @@ title: "Schedule"
 description: "DBA Dash default collection schedule and customization"
 lead: ""
 date: 2022-09-25T19:53:10+01:00
-lastmod: 2026-10-18T00:00:00+01:00
+lastmod: 2026-10-28T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -59,7 +59,7 @@ Schedules can be customized at the service level and you can also override sched
 
 ### Every 5 min
 - [QueryStats](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLQueryStats.sql)
-*Statement-level CPU, duration, reads, writes, executions and memory grants from sys.dm_exec_query_stats. The schedule runs, but nothing is collected until Query Stats Top N is set for the connection. See the service config tool.*
+*Statement-level CPU, duration, reads, writes, executions and memory grants from sys.dm_exec_query_stats. The schedule runs, but nothing is collected until Query Stats Top N is set for the connection. See [Query Stats](/docs/help/query-stats/).*
 - [Deadlocks](/docs/help/deadlocks)
 *Deadlock graphs from an extended events session. Nothing is collected until a capture option is set for the connection.*
 - AGHealthEvents
@@ -156,6 +156,8 @@ Add [your own](/docs/help/custom-checks) checks to DBA Dash.
 *Latch wait time from sys.dm_os_latch_stats, for investigating latch contention. The suggested schedule once enabled is every minute. Shown on the Latches tab, including Azure SQL Database.*
 - [SpinlockStats](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLSpinlockStats.sql)
 *Spinlock collisions, spins, sleep time and backoffs from sys.dm_os_spinlock_stats. The suggested schedule once enabled is every minute. Shown on the Spinlocks tab with a SQL Server CPU line, including Azure SQL Database.*
+- [ServiceBroker](/docs/help/service-broker/)
+*Queues, the transmission queue, conversations and the Service Broker endpoint. The suggested schedule once enabled is every five minutes.*
 
 ## Triggering collections on demand
 
@@ -214,7 +216,7 @@ If you have groups of instances that require different schedules, consider using
 
 [![Edit schedules from the GUI](edit-schedule.png)](edit-schedule.png)
 
-Where the service allows it, schedules can also be changed from the GUI, and collections can be paused. Turn on **Allow Schedule Changes** in the service config tool (`AllowScheduleChanges`). The service tells the repository that it accepts changes, and the GUI only offers them where they will be accepted. The user needs the **AllowScheduleChanges** role, or db_owner. Changes are sent to the collecting service through [messaging](/docs/help/messaging/).
+Where the service allows it, schedules can also be changed from the GUI, and collections can be paused. Turn on **Allow Schedule Changes** (`AllowScheduleChanges`) or **Allow Connection Changes** (`AllowConnectionChanges`) in the service config tool. Either option tells the repository that the service accepts schedule changes, and the GUI only offers them where they will be accepted. The user needs the **Messaging** role and either **AllowScheduleChanges** or **ManageConnections**. db_owner can do the same without those roles. Changes are sent to the collecting service through [messaging](/docs/help/messaging/).
 
 **Configure Schedule** is on the instance context menu and on the Collection Dates toolbar. It opens the same schedule dialog as the config tool, for that instance or for the service that collects it. Unlike Collection Dates, it lists every collection, including ones that are disabled and have never run. A service-level schedule shows how many of the service's instances follow each collection's service schedule rather than their own.
 

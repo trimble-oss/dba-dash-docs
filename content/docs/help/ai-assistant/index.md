@@ -3,7 +3,7 @@ title: "AI Assistant"
 description: "Configure and use the DBA Dash AI Assistant to analyse repository data and answer natural-language questions about alerts, performance, waits, backups, blocking, slow queries, and more."
 lead: "The AI Assistant analyses your DBA Dash repository data and answers natural-language questions about your SQL Server environment."
 date: 2026-05-27T00:00:00Z
-lastmod: 2026-10-18T00:00:00Z
+lastmod: 2026-10-28T00:00:00Z
 draft: false
 images: []
 weight: 999
@@ -84,22 +84,24 @@ Run `DBADashAI` on the same machine as the GUI. It binds to `localhost` only and
 
 Deploy `DBADashAI` on a central server accessible to all GUI clients. Set `Registration:ServiceUrl` to the URL that clients will connect to. The service binds to all interfaces, registers that URL in the repository database, and enforces API key authentication.
 
+Shared mode listens on HTTPS. On the **AI Service** tab, **Use HTTPS** is next to the port. **Certificate** can stay on **Automatic (self-signed)**, or you can pick a certificate from the Local Computer Personal store. The service creates the self-signed certificate, keeps it in `%ProgramData%\DBADash\AI`, and registers its thumbprint with the service URL. GUI clients accept that certificate, or a certificate Windows already trusts for the host. A store certificate should match the host in the service URL, and the AI service account needs permission to use its private key. The self-signed certificate lasts two years and is renewed in the last 30 days, or when its name no longer matches the service URL.
+
 **`appsettings.local.json`:**
 
 ```json
 {
   "Registration": {
-    "ServiceUrl": "https://aiserver.corp.com",
+    "ServiceUrl": "https://aiserver.corp.com:5055",
     "Port": 5055
-  },
-  "Security": {
-    "Enabled": true,
-    "RequireHttps": true
   }
 }
 ```
 
-GUI clients discover the URL and API key automatically from the repository database — no client-side configuration needed.
+Leave `Security:CertificateThumbprint` empty for the self-signed certificate. Set it to a thumbprint from the Local Computer Personal store to use that certificate instead. `Security:EnableHttps` defaults to on for a shared service. Set it to `false` when a reverse proxy terminates TLS and the service should keep listening on HTTP. An `https://` service URL on a port other than `Registration:Port`, with `EnableHttps` left unset, is treated as that existing proxy setup.
+
+An existing Kestrel endpoint, listen URL, or `Kestrel:Certificates:Default` is left in place. When the certificate thumbprint can be read, it is registered so GUI clients can accept a certificate Windows does not trust.
+
+GUI clients discover the URL, the API key and the certificate thumbprint from the repository database. Each client keeps the thumbprint for that service's host and port. No client-side certificate installation is required.
 
 ---
 
@@ -196,6 +198,9 @@ The other settings:
 | `Model` | A model ID or inference profile ID. Most current models can only be called through an inference profile, the ID with a geographic prefix such as `us.` or `eu.`. Calling the base model ID returns a validation error. An application inference profile is given by its ARN. Use the bedrock-runtime model ID from the model card, not the bedrock-mantle one (`openai.gpt-oss-120b-1:0`, not `openai.gpt-oss-120b`). An inference profile ID only works in a region whose profile list includes it. |
 | `Profile` | Optional named AWS profile. Leave blank to use the default credential chain. |
 | `MaxTokens` | Optional cap on the answer length. Leave blank for the model's default. |
+| `Url` | Optional. The full Converse URL of a gateway or proxy in front of Bedrock. `{model}` in the URL is replaced with the model ID (URL-encoded, so an ARN stays one path segment). Must be an absolute `http` or `https` URL. |
+
+When `Url` is set and `ApiKey` is set, `Region` can be left blank. The service calls that URL and skips the model list, so the GUI model picker is hidden and the configured `Model` is used. Without an API key, `Region` is still required: the short-term key made from AWS credentials is signed with it, including when the call is sent to a gateway.
 
 The GUI's model picker lists the inference profiles and on-demand text models available in the region, with the ID to configure in brackets. Listing models needs `bedrock:ListInferenceProfiles` and `bedrock:ListFoundationModels`. Without those permissions the picker is hidden and the configured `Model` is used.
 
@@ -306,8 +311,8 @@ Only applies in shared/repository mode (`ServiceUrl` set). In local mode, auth i
 ```json
 {
   "Security": {
-    "Enabled": true,
-    "RequireHttps": false,
+    "EnableHttps": true,
+    "CertificateThumbprint": "",
     "KeyRotationDays": 30,
     "KeyGracePeriodHours": 24
   }
@@ -316,12 +321,14 @@ Only applies in shared/repository mode (`ServiceUrl` set). In local mode, auth i
 
 | Key | Description |
 |---|---|
-| `Enabled` | Enables authentication in shared/repository mode. API key authentication is the current authentication model. |
-| `RequireHttps` | Redirects HTTP requests to HTTPS. Strongly recommended in shared/repository mode. |
+| `EnableHttps` | Shared mode listens on HTTPS when this is true or unset, unless an `https://` service URL uses a different port from the listener (an existing reverse proxy). Set `false` to listen on HTTP. Local mode ignores this and stays on HTTP. |
+| `CertificateThumbprint` | Thumbprint of a certificate in the Local Computer Personal store. Empty creates a self-signed certificate and registers its thumbprint. A thumbprint that cannot be loaded stops the service. |
 | `KeyRotationDays` | Automatically rotates the shared API key after the specified number of days. Set `0` or less to disable rotation. |
 | `KeyGracePeriodHours` | Grace period for previous keys during rotation. |
 
-**⚠️ HTTPS in shared mode** — **Strongly recommended.** Without HTTPS, API keys are transmitted in plain text and can be intercepted on the network. Set `RequireHttps: true` and configure your binding via a reverse proxy (recommended) or Kestrel certificates. The health endpoint (`/api/ai/health`) is always unauthenticated for load-balancer probes.
+Authentication is always on in shared mode. The health endpoint (`/api/ai/health`) stays unauthenticated for load-balancer probes.
+
+With **Use HTTPS** turned off and no reverse proxy, the API key is sent without encryption.
 
 ### Logging
 
@@ -383,6 +390,8 @@ If neither source is available the AI Assistant tab is hidden.
 ## Deadlock and query plan analysis
 
 The AI service is also used by the **AI Analysis** tab in the [deadlock viewer](/docs/help/deadlocks/#ai-analysis) and the [query plan viewer](/docs/help/query-plan-viewer/#ai-analysis). Nothing is sent until you press **Submit for analysis**, and the exact request is shown first so you can review it.
+
+**Submit** and follow-up questions are available when the signed-in user can use the AI service key. That is the **AIUser** role, or db_owner, for a service whose key is stored in the repository. A local service that does not require a key can be used by anyone who can see the tab. A user without access to the key can still preview the request and copy the prompt. The status line says when submit is unavailable.
 
 ### AI conversations
 

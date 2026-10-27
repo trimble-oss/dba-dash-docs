@@ -3,7 +3,7 @@ title: "Alerts"
 description: "How to create alerts with DBA Dash"
 lead: ""
 date: 2025-01-16T08:00:00+00:00
-lastmod: 2025-02-26T00:00:24+01:00
+lastmod: 2026-10-28T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -39,12 +39,15 @@ An alert rule defines a condition that you want to be notified about. To create 
       * Memory Manager\Memory Grants Pending - queries queued waiting for a memory grant
     * CPU
     * Drive Space
+    * Azure DB Space. Used or allocated space against the database max size. The default measure is used space. The rule can use the critical % max size status, a percentage threshold, or both. When both are set, both have to be exceeded, the same as drive space.
+    * Elastic Pool Space. Used or allocated space against the pool storage limit. The default measure is allocated space. The rule can use the critical pool storage status, a percentage threshold, or both, and both have to be exceeded when both are set. Raised against the master database instance that collects the pool, one alert listing each pool over the threshold. Retired pools are left out.
     * Wait. e.g.
         * RESOURCE_SEMAPHORE - queries queued waiting for a memory grant
         * RESOURCE_SEMAPHORE_QUERY_COMPILE - queries queued waiting to compile
         * THREADPOOL - queries waiting for an available worker thread
         * LCK% - queries blocked
     * Agent Job.
+    * Service Broker. Queues, the transmission queue, conversations and the broker endpoint. Each check has its own level. Thresholds are set on the [Service Broker](/docs/help/service-broker/#thresholds) tab.
     * Offline - connection to the instance has failed.
     * Restart - instance has recently come back online following a restart.
 
