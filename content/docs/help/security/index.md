@@ -3,7 +3,7 @@ title: "Security"
 description: ""
 lead: ""
 date: 2022-09-25T20:30:12+01:00
-lastmod: 2022-09-25T20:30:12+01:00
+lastmod: 2026-10-28T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -25,7 +25,7 @@ Note: The [service account](#service-account) should have read/write access to t
 
 The application configuration is stored in a **ServiceConfig.json** file.  This file *can* contain sensitive data such as passwords and you also don't want unauthorized users to be able to manipulate this file.
 
-* Enable config file encryption.
+* Enable config file encryption when the file holds passwords or an AWS secret key, and when the file has to be copied to another machine. On Windows, with encryption off, those secrets are protected with a machine key. See [Config File](/docs/help/config-file/#secrets).
 * Use a strong password to encrypt the config.
 * Avoid storing sensitive information in the config file if possible.
 
@@ -191,7 +191,9 @@ To use the DBA Dash GUI, users only need access to the DBA Dash repository datab
 
 The **ManageGlobalViews** role can be used to allow the user to save their customized metrics dashboards for all users. They will also have access to delete shared dashboards.  Users with db_owner will also have the same access.  Otherwise the user can still create their own dashboards.
 
-The **AllowScheduleChanges** role can change collection schedules and pause collections from the GUI, on a service that has **Allow Schedule Changes** turned on. db_owner can do the same. See [Changing schedules from the GUI](/docs/help/schedule/#changing-schedules-from-the-gui). The **User Actions** report is visible to this role.
+The **AllowScheduleChanges** role can change collection schedules and pause collections from the GUI, on a service that has **Allow Schedule Changes** or **Allow Connection Changes** turned on. The user also needs the **Messaging** role. db_owner can do the same without either role. See [Changing schedules from the GUI](/docs/help/schedule/#changing-schedules-from-the-gui). The **User Actions** report is visible to this role.
+
+The **ManageConnections** role can add, remove and edit source connections from the GUI, on a service that has **Allow Connection Changes** turned on. The user also needs the **Messaging** role. That option also allows schedule changes, and this role can change schedules and pause collections. db_owner can do the same without either role. See [Source connections](/docs/help/messaging/#source-connections).
 
 These roles are in addition to **App**. A member of **db_owner** can do what they allow without being added to the role.
 

@@ -3,7 +3,7 @@ title: "Config File"
 description: ""
 lead: ""
 date: 2023-06-12T13:19:18+01:00
-lastmod: 2023-06-12T13:19:18+01:00
+lastmod: 2026-10-28T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -30,32 +30,23 @@ To ensure your config file is protected:
 * Limit access to the config file.
 * Review the [security](/docs/help/security) document and use the principal of least privilege.
 
-### Obfuscation
+### Secrets
 
-If config file encryption isn't used, sensitive information like connection string passwords and AWS Secret key are automatically obfuscated.  They are encrypted using Aes encryption which is considered secure, but the **key storage is NOT secure**.
+{{< callout context="caution" icon="outline/alert-triangle" >}}Secret protection is stronger from version 4.23 onwards. Earlier versions only obfuscated passwords, which is not secure. An upgrade to 4.23 or later is recommended if you are on an older version.{{< /callout >}}
 
-It's slightly better than plain text, but any user with access to the config and the application source code will be able to decrypt (anyone as it's open source).  If you have a need to store any sensitive information in the config file, you should use the [Encryption](#encryption) option.
+Connection string passwords and the AWS secret key are encrypted with AES-GCM when the config is saved. Each value has its own nonce, so the same password on two connections is stored as two different values. Only authentication methods that take a password are treated as secrets.
 
-Example:
-```
-  "SourceConnections": [
-    {
-    "ConnectionString": "Data Source=YourServer;Integrated Security=False;User ID=DBADash;Password=\"YourPassword\";Encrypt=True;Trust Server Certificate=True;Application Name=DBADash",
-    ...
-    }
-  ]
-```
-Obfuscated to:
-```json
-  "SourceConnections": [
-    {
-    "ConnectionString": "Data Source=YourServer;Integrated Security=False;User ID=DBADash;Password=\"¬=!Ek8T8zZ+XHR3oMQHPunpSQ==\";Encrypt=True;Trust Server Certificate=True;Application Name=DBADash",
-    ...
-    }
-  ]
-```
+On Windows, with [config encryption](#encryption) off, the key is a random machine key stored in the config (`MachineKey`) and protected with DPAPI for the local machine. Any process on that machine can decrypt the secrets. They cannot be decrypted on another machine. With config encryption on, the key is derived from the config password, so the secrets stay portable with that password and the machine key is removed.
 
-{{< callout context="caution" icon="outline/alert-triangle" >}} The password obfuscation is not secure.  Consider using the Encryption option to protect your config{{< /callout >}}
+On Linux and other platforms, DPAPI is not available. With config encryption off, secrets stay on the older obfuscation (`¬=!`). That passphrase is in the public source, so use config encryption wherever the file holds a password.
+
+Values written by older versions are still read: plaintext, `¬=!`, `dpapi:` and an older encrypted config. The service re-protects secrets on start when an upgrade is needed, and the config tool does the same when it saves. A value the service cannot decrypt is left in the file and logged. Those connections are not collected, so the service does not keep trying a blank password. The service will not start if the destination password cannot be decrypted.
+
+{{< callout context="caution" icon="outline/alert-triangle" >}}An older build of DBA Dash cannot read a config once its secrets have been re-protected. Keep the new build with the upgraded file.{{< /callout >}}
+
+[Full config encryption](#encryption) is the stronger protection. The whole file is encrypted, and once the temporary key is deleted it can't be read on the machine by anyone except the service account and the user that enabled encryption. Anyone else needs the password. This protection applies wherever the file is, so it's the better choice when the file has to leave the machine. The secrets stay portable too, because their key is derived from the password. The trade-off is that nothing can be recovered without the password.
+
+A password pasted into the config tool, the CLI or the GUI is rejected when it is already a protected value. A protected value from another machine would leave the connection unusable.
 
 ## Encryption
 
@@ -67,39 +58,55 @@ Use the Options tab in the service configuration tool to enable encryption. Or e
 
 {{< callout context="caution" icon="outline/alert-triangle" >}}Backups of your ServiceConfig.json file are automatically generated and kept for 7 days by default. After you enable encryption you might want to <a href ='#config-file-backup'>remove old config files</a>{{< /callout >}}
 
-Enabling config file encryption provides much stronger protection for your config and works by encrypting the whole config file with a password rather than encrypting just passwords and access keys. Passwords and access keys remain obfuscated as before in the decrypted version of the config.
+Enabling config file encryption encrypts the whole config file with a password. Current files use a version 2 envelope: PBKDF2-SHA256 with a random salt and 600,000 iterations, and AES-GCM. Secrets inside an encrypted config are protected with a key derived from the same password. The salt is kept while the password is unchanged, so saving the config does not rewrite the protected values on every save.
 
 When encryption is enabled, the password is stored for your user account in the AppData folder, protected using the [DPAPI](https://en.wikipedia.org/wiki/Data_Protection_API).  You don't need to supply the password each time you load the configuration tool.  To allow the service account access to the config, a file containing the password is initially written to the application folder (ServiceConfig.TempKey).  This is protected using the DPAPI with the machine key and will allow anyone that can login to decrypt the password.  Once the service starts, the file is removed and the password is stored in the AppData protected using the DPAPI user key.  From that point only your user account and the service account will have access to the config.  If anyone else needs to access the config file, the password will be required.
 
 The goals of this encryption solution were:
-* Config file should be [portable](#config-file-portability).
+* Config file should be [portable](#moving-the-config).
 * Provide enhanced protection to the whole config.
 * Config file must be decrypted by multiple users.  e.g. DBAs & the service account
 * Solution must not be tied to a specific cloud provider or external service.
 * It should be as seamless as possible.
 
-Example:
-```json
-{
-  "ServiceThreads": -1,
-  "LogInternalPerformanceCounters": false,
-  "SourceConnections": [
-    {
-    ...
-```
-Encrypted version:
+The saved file is a single protected value. Version 2 also stores the salt and the iteration count. Older encrypted files are a `ProtectedConfig` value on its own, and those are still read.
 
 ```json
 {
-  "ProtectedConfig": "3I78Hsq9feIajYOFZQ/FYh8zNxaNJAU+v3XCHXX2fhbNUr10ulAFIHMRziz3jM9Y2m1l7AX9m7J+usTlLW89fVugF1CbTvcSC4ahCo63z5qMnkOnUR0yenNVZfD9fY+90RhX2O8ntRafU+evLgDdawSpvaycN6XdDR5DVK1rA5/lRA245aSqRH0hA9ggmQBMCgcLuuTmSxHP2Od7x2AYKfUknO/Aag8OJ75gKVtVqr+txs0TK88tuuyLbRU/Ik3MeDWp5bWdkFMnxzudInltCht4pJo6FG5ibxcSuEyxTJ5mxbnRCMUxJ2fEX86AMuxTejzjLeaKLnNu18tfhD7tJwXbptzEdgl+CKzHvVt2cvRyKQKVZuJ6DTguAcv0DvDXNX+yrkfEM1Q1c+wQFlk8UylSFTyGBQ57SsmH8Ye9VNVZBFhc9R8UxQHseNs2DY4zH+hmzPoPlTtf62A0jVBBHL7c++BcYDejfps2/++lt95F5HITZ232Gru+BjQLdwPRARkOc7cuhaZ7bf/KlmXD7B5yGY6CPpba3MCyeDx7NE7F0J0YizOMBBfeqKC4S/wljx/mZzuOYAwD0KxBCWk1LQHaCnbokrlYycd/hvv5/BWM8J4OsNNE5wdOVbLk7i7s8IX/ICZsWa2izIFozqMxFmmsGf8oBQZc442MekF51flrRn5DV+vOmRXXygsvqiDKTp6pCr8eRU/qclwtl2FSbO2dKhzwIqQzl338f+n7/G3/RqAcxIvZ7w96Pb7MWjeX/h4vh0g3scLagrJ6OAANjDZdcK5/59m2O7Qqz1Ngso1F4xGpK6plpuzUmVXYfM8hFgaTss2v1T9Z/sP+i0N94tfnWQ3a6naWKtFO46QjArbzPPk5S484nSOaZmLJ1vfJGv/Nqfb165MhZx73txdVbQIO/oitzXR3HS+NUF6VJVOdulLdnVbLk91HLx8XjecWj86RPYSaxVOQz6tmTt/RROu7K9G0tLTT2qFn1Evo1Sh8iM+kP2pDGgLPvOs+kKLNjdyW3eo0jluaoGj5SbBg74NrPQ8LLS8rSUYEMcc4TA0iraeJGIOO4tuEtUsPHqZq2IbRtyvqr81wvHNkbHfjkiuN2pe1d4U3bl3kYY6Uc7ITK+Cou/JPYh6x1dHHLvRuf7hDtyygHUIr0gOygalkTf8SGpmBbt6YsLbGy3qvFciZHsW3aVM+fe9PlIwWQXFKcFNC/zVhZI7kUFagg5xRJ7b7TfdWpA/OpXwKWASdkpkw6nBdxjeD8QYADIfGg26N+PscKeCcDl32uH4ndJCl3zv6MKQsEfUPtWzd9GqdY/umsXawA/gGVaSvmYNQ2T8BfU6rdXqQGnDlGgQriet7ZTNCpxiknDgyU5zyNjhJxYs/R/0JEmKKu3g5zSK6MfPj"
+  "Version": 2,
+  "Salt": "<random salt>",
+  "Iterations": 600000,
+  "ProtectedConfig": "<AES-GCM ciphertext>"
 }
 ```
 
 {{< callout tip >}}The whole config file is encrypted and the decryption keys are protected. {{< /callout >}}
 
-## Config file portability
+## Moving the config
 
-If you need to move the DBA Dash service to another computer, you can simply copy the **ServiceConfig.json** file to your new install location.  If the config file is encrypted you will need to supply the password that you used to encrypt the config.  The new service account will also need access to decrypt the config.  In the service config tool, click the "Configure Encryption" button again and click update to create the temporary key for the service account.
+**Export Config** on the service config tool writes a copy for another machine, or a backup. The running config is left as it is. Choose one of:
+
+* Protect the secrets with an export password. On the new machine, supply that password when the file is opened.
+* Leave the secrets out. Each one is replaced and listed to be entered again when the file is used.
+
+The same actions are on the CLI. The export password can be passed as `--ExportPassword`, read from the `DBADASH_EXPORT_PASSWORD` environment variable, or read from standard input. A password supplied on the command line is stored in shell history.
+
+```powershell
+DBADashConfig -a Export --ExportPath C:\Temp\ServiceConfig.export.json
+DBADashConfig -a Export --ExportPath C:\Temp\ServiceConfig.export.json --NoSecrets
+```
+
+An unencrypted config copied as a file uses a machine key, so its secrets cannot be decrypted on the new computer. The config tool lists those passwords in one grid. You can test each connection, and apply one password to every connection that uses the same login. The CLI lists them and sets them by connection or by login. `--Password` may be omitted when `DBADASH_PASSWORD` is set, or when standard input is redirected.
+
+```powershell
+DBADashConfig -a ListUnreadableSecrets
+DBADashConfig -a SetPassword --ConnectionID "SQL1" 
+DBADashConfig -a SetPassword --UserName DBADash
+```
+
+`--ConnectionID` is the source connection's ConnectionID, or `server|database` for a destination. It has to match one connection. `--UserName` sets every SQL connection that logs in as that user, which is also how a shared password is rotated.
+
+If the config file is encrypted, copy `ServiceConfig.json` and supply the encryption password on the new machine. Secrets in an encrypted config are derived from that password, so they move with it. Click **Configure Encryption** and update to create the temporary key for the new service account. See [Move DBA Dash Service](/docs/setup/move-service/).
 
 ## Config file backup
 
@@ -111,4 +118,4 @@ Config backup files will be named similar to: `ServiceConfig.json.backup_2023061
 
 ## GUI config
 
-Starting with version 2.40.0, the **GUI** will initially use the connection defined in the ServiceConfig.json file if it's available.  The connection details will then be persisted on a per user basis in the AppData folder.  The connections are encrypted using the [DPAPI](https://en.wikipedia.org/wiki/Data_Protection_API) which provides better protection than the [obfuscation](#obfuscation) used in the ServiceConfig.json file.  It's still better to use Windows authentication where possible which avoids the need to persist any sensitive data.
+Starting with version 2.40.0, the **GUI** will initially use the connection defined in the ServiceConfig.json file if it's available.  The connection details will then be persisted on a per user basis in the AppData folder.  The connections are encrypted using the [DPAPI](https://en.wikipedia.org/wiki/Data_Protection_API).  Windows authentication avoids storing a password at all.

@@ -21,7 +21,7 @@ homepage: false
 
 Object Execution Stats tells you which procedure did the work. Query Stats tells you which statement inside it, and it also captures ad-hoc queries, which never appear in Object Execution Stats.
 
-A new collection reads statement-level CPU, duration, reads, writes, executions and the rest from the plan cache, and each instance and database gets a **Query Stats** tab for charts and a grid. It is off by default, because reading the plan cache costs whatever the cache costs.
+A new collection reads statement-level CPU, duration, reads, writes, executions and the rest from the plan cache, and each instance and database gets a **Query Stats** tab for charts and a grid. It is off by default, because reading the plan cache costs whatever the cache costs. See [Query Stats](/docs/help/query-stats/).
 
 {{< details "How Query Stats is collected" >}}
 

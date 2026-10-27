@@ -3,7 +3,7 @@ title: "Deadlocks"
 description: "Configure deadlock collection in DBA Dash and use the deadlock reports, signatures, viewer, findings and AI analysis."
 lead: "Native deadlock capture, reporting and analysis - from the extended events session on your monitored instance through to a deadlock viewer with static and AI analysis."
 date: 2026-09-16T00:00:00Z
-lastmod: 2026-10-18T00:00:00Z
+lastmod: 2026-10-27T00:00:00Z
 draft: false
 images: []
 weight: 999
@@ -303,7 +303,7 @@ With the [AI Assistant](/docs/help/ai-assistant) service configured, the **AI An
 {{< callout context="caution">}}
 Nothing is sent until you press **Submit for analysis**. The panel above the button is not a description of what will be sent - it *is* the payload, rendered by the same object that is serialised, so the two can't drift.
 
-**Read it before pressing send.** A deadlock graph carries the statements as they ran, and those routinely include parameter values.
+**Read it before pressing send.** A deadlock graph carries the statements as they ran, and those routinely include parameter values. **Submit** and follow-up questions need access to the AI service key (**AIUser**, or db_owner). Anyone who can open the deadlock can preview the request.
 {{< /callout >}}
 
 ### Options

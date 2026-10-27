@@ -3,7 +3,7 @@ title: "Setup Options"
 description: "Additional setup options not covered in the quick start"
 lead: "This pages covers some setup options not covered in the quick start guide."
 date: 2022-10-01T21:03:53+01:00
-lastmod: 2022-10-01T21:03:53+01:00
+lastmod: 2026-10-27T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -46,6 +46,8 @@ A secondary destination can be used to write to multiple repository databases.  
 Similar to the destination connection, your source connection can also be a folder or S3 bucket.  This allows the DBA Dash service that has connectivity to your repository database to import the data collected via the remote DBA Dash agent.  Set the source connection the same as the destination connection used by the remote agent and click Add/Update.
 
 ![Set source connection](source.png)
+
+Source connections can also be added, removed and edited from the DBA Dash GUI when **Allow Connection Changes** is turned on. See [Source connections](/docs/help/messaging/#source-connections). Adding a connection in the config tool reviews every connection in one grid before it is saved.
 
 ## Azure DB
 

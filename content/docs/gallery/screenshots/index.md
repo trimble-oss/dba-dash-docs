@@ -2,7 +2,7 @@
 title: "Screenshots 📷"
 description: "DBA Dash screenshots"
 date: 2025-04-09T00:00:00+01:00
-lastmod: 2026-09-30T00:00:00+01:00
+lastmod: 2026-10-28T00:00:00+01:00
 draft: false
 weight: 10000
 toc: true
@@ -37,7 +37,7 @@ toc: true
 ### Query Stats
 
 [![Query Stats charts](query-stats-charts.png)](query-stats-charts.png)
-*Statement-level CPU from the plan cache, including ad-hoc queries. Charts over time and by statement and database, with how much of the instance's CPU the collection kept.*
+*Statement-level CPU from the plan cache, including ad-hoc queries. Charts over time and by statement and database, with how much of the instance's CPU the collection kept. See [Query Stats](/docs/help/query-stats/).*
 
 [![Query Stats](query-stats-data.png)](query-stats-data.png)
 *The statements behind the charts: CPU, duration, reads and executions, with the batch text and the plan.*
@@ -128,10 +128,15 @@ toc: true
 *Track the performance of your SQL agent jobs over time, stored efficiently with long retention.*
 
 [![SQL Agent Job Timeline](sql-agent-job-timeline.png)](sql-agent-job-timeline.png)
-*SQL Agent job timeline view*
+*SQL Agent job timeline, including every instance under the Agent Jobs node.*
 
 [![SQL Agent Job DDL](job-ddl.png)](job-ddl.png)
 *Track DDL changes to your SQL agent jobs.  Compare jobs across SQL instances.*
+
+### Service Broker
+
+[![Service Broker](service-broker.png)](service-broker.png)
+*Queues, the transmission queue, conversations and the broker endpoint. See [Service Broker](/docs/help/service-broker/).*
 
 ### Storage
 

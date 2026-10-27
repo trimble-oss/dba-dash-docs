@@ -3,7 +3,7 @@ title: "Query Plan Viewer"
 description: "Use the DBA Dash query plan viewer to explore execution plans, with operator ranking, insights and optional AI analysis."
 lead: "A built-in execution plan viewer - ranked operators, badges for the things worth spotting, static insights, plan comparison, and optional AI analysis."
 date: 2026-09-29T00:00:00Z
-lastmod: 2026-10-18T00:00:00Z
+lastmod: 2026-10-27T00:00:00Z
 draft: false
 images: []
 weight: 999
@@ -23,12 +23,23 @@ The query plan viewer is available in DBA Dash starting from 4.19.0. It's also a
 * Drag and drop `.sqlplan` files onto the viewer window.
 * Pass files on the command line.
 * From SSMS, using the [SSMS extension](/docs/help/ssms-extension/).
+* **Live Plan** on a running request in DBA Dash, or **Open Live Plan in DBA Dash Visualizer** from an SSMS results grid. See [Live plans](#live-plans).
 
 Each plan opens in its own tab, so a fast run and a slow one can be compared side by side. Deadlock graphs open as tabs in the same window. **Ctrl+W** closes a tab.
 
 DBA Dash can optionally register itself as a handler for `.sqlplan` files from the viewer's **Settings** menu, in the same way as for `.xdl` files. This is opt-in and per user. When several files are opened at once from Explorer, they open as tabs in a single window.
 
 The plan can still be opened in another application registered for `.sqlplan` files, such as SSMS, using the **Open With** button.
+
+## Live plans
+
+A live plan follows a request that is still running, from DBA Dash or from an [SSMS results grid](/docs/help/ssms-extension/#live-plans). The plan XML is fetched once. **Refresh** (F5) and **Auto Refresh** on the Live bar poll the operator counters from `sys.dm_exec_query_profiles` and write them into that plan. The showplan is not fetched again, and it is not stored on each refresh. Zoom, pan, selection and the properties grid stay where you left them. Operators that are moving rows are highlighted, with a progress strip against the estimated row count. Auto refresh defaults to every 2 seconds. It pauses on a hidden tab and stops after 30 minutes, after three failures in a row, or when the query completes. The last capture stays on screen.
+
+A stored capture from the running queries collection opens on its own tab and stays still until you refresh. **Refresh** follows the query live when it is still running. See [Running Queries](/docs/help/running-queries/#live-query-plans).
+
+Wait totals are only present in the statistics XML from the first capture. A later refresh leaves them as they were, and a saved plan notes that.
+
+The **AI Analysis** tab keeps the capture it was opened with. A refresh does not restart that conversation.
 
 ## Reading the plan
 
@@ -198,7 +209,7 @@ With the [AI Assistant](/docs/help/ai-assistant/) service configured, the **AI A
 For providers that accept a model per request (Anthropic, Amazon Bedrock and Ollama), an **Options > Model** menu lists the configured default plus whatever models the service reports as available, so you can pick a different model for an analysis without changing the server-side configuration. The choice is shared with the [deadlock viewer](/docs/help/deadlocks/#ai-analysis) for the rest of the session.
 
 {{< callout context="caution">}}
-Nothing is sent until you press **Submit for analysis**, and the exact request is shown first. **Read it before pressing send** - plans can include parameter values and literals.
+Nothing is sent until you press **Submit for analysis**, and the exact request is shown first. **Read it before pressing send** - plans can include parameter values and literals. **Submit** and follow-up questions need access to the AI service key (**AIUser**, or db_owner). Anyone who can open the plan can preview the request and copy the prompt.
 {{< /callout >}}
 
 The analysis is scoped to the selected statement. Along with the plan XML, the request includes what the viewer already knows: insights, missing indexes, waits, parameters, and the operators ranked by their own cost.

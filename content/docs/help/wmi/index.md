@@ -3,7 +3,7 @@ title: "WMI"
 description: ""
 lead: ""
 date: 2022-10-30T13:59:46Z
-lastmod: 2022-10-30T13:59:46Z
+lastmod: 2026-10-27T00:00:00Z
 draft: false
 images: []
 menu:
@@ -31,7 +31,11 @@ The "Hardware" tab in DBA Dash shows the current power plan and highlights if it
 
 * Manufacturer/Model (Win32_ComputerSystem)
 
-This data is shown on the "Hardware" tab in DBA Dash. In AWS the model shows you the instance type used which is useful (e.g. r6id.xlarge, x2idn.16xlarge etc).  If WMI is disabled this data will be collected using [this query](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLServerExtraProperties.sql).  The SQL query uses xp_instance_regread and requires sysadmin permissions. This is collected as part of the server extra properties collection if WMI is enabled.  
+This data is shown on the "Hardware" tab in DBA Dash. In AWS the model shows you the instance type used which is useful (e.g. r6id.xlarge, x2idn.16xlarge etc).  If WMI is disabled this data will be collected using [this query](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLServerExtraProperties.sql).  The SQL query uses xp_instance_regread and requires sysadmin permissions. This is collected as part of the server extra properties collection if WMI is enabled.
+
+The Hardware tab also compares physical memory with the buffer pool limit for that edition and version of SQL Server. Memory above the limit is highlighted: a warning when the server has more RAM than the edition can use for the buffer pool, and information when the difference is in the range often left for the operating system. Express and Web use the limit for that version, and SQL Server 2016 with a service pack (and later) uses the higher limits those versions introduced. Azure SQL is not evaluated, because capacity there is the service tier.
+
+Max server memory is highlighted on the same tab. The default of 2,147,483,647 MB, and a value above physical memory, are warnings. On a server with 16 GB or more, a value of half the physical memory or less is information, unless it is already near the edition cap. A lower setting can be deliberate when several instances share the server.  
 
 * OS Caption (Win32_OperatingSystem)
 

@@ -3,7 +3,7 @@ title: "Running Queries"
 description: ""
 lead: ""
 date: 2022-09-25T20:00:55+01:00
-lastmod: 2022-09-25T20:00:55+01:00
+lastmod: 2026-10-27T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -46,3 +46,29 @@ Additionally thresholds are used for plan capture to reduce the overhead of coll
  1,000ms CPU, 10,000ms Duration, 6400 pages (50MB) memory grant, query count: 2
 
 Plans will be collected for queries that exceed **any** of the specified thresholds.  The thresholds can be configured in the ServiceConfig.json file.
+
+## Live query plans
+
+A request that is still running can be opened as a live plan, from Running Queries or from an [SSMS results grid](/docs/help/ssms-extension/#live-plans). **Live Plan** is on the session detail toolbar, and **Live Query Plan** is on the Running Queries context menu. The instance needs [messaging](/docs/help/messaging/#live-query-plans), and the user needs the **Messaging** role, the same as plan collection.
+
+The plan XML is read once, from `sys.dm_exec_query_statistics_xml`, and opened in the [query plan viewer](/docs/help/query-plan-viewer/#live-plans). It is not stored. Each refresh reads the operator counters from `sys.dm_exec_query_profiles` — a few small rows — and writes them into the plan already open. The showplan is not fetched again, and a full plan XML is not written on each refresh. **Refresh** (F5) and **Auto Refresh** are on the Live bar. Auto refresh can be off or every 2, 5, 10 or 30 seconds, and defaults to 2 seconds. It pauses while the tab is hidden and stops after 30 minutes, after three failures in a row, or when the query finishes. The last capture stays on screen.
+
+Zoom, pan and the properties grid stay put across a refresh. Operators that moved rows since the previous capture are highlighted. Statements such as `WAITFOR`, `BACKUP` and `DBCC` have no plan. Otherwise the instance needs lightweight query profiling, or the standard profiling that `sys.dm_exec_query_profiles` requires.
+
+The request is read before and after the plan or the counters. If the statement changed while the capture was taken, that refresh is skipped, so the plan stays attached to the request you opened.
+
+### Capturing long-running queries
+
+The running queries collection can store those operator counters for long-running queries, so the plan can be opened later. Only the counters are stored. The plan XML is the one already kept by plan collection, once per plan shape. The option is off by default. On the running queries options, **Capture long running queries** sets:
+
+| Setting | Default |
+|---|---|
+| CPU | 60,000 ms |
+| Duration | 300,000 ms (5 minutes) |
+| Max per collection | 10, highest CPU first |
+
+A cleared threshold is unused. The query also has to meet the plan collection threshold above. A blocked query does not count towards the duration threshold. Only the counters are stored, one row per request, statement and plan. Each collection that still sees the query running replaces them and keeps the previous capture, which is how the viewer tells which operators were moving. The plan itself comes from the plan collection.
+
+Where a capture exists, the plan link reads **View Live Capture**. Each capture opens on its own tab and does not refresh by itself. **Refresh** follows the query live if it is still running.
+
+Captures are kept for the same number of days as running queries. A retention of 0 or less is not purged, so the running queries and the captures are both kept.

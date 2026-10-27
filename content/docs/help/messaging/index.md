@@ -3,7 +3,7 @@ title: "Messaging"
 description: ""
 lead: ""
 date: 2024-06-24T14:11:24+01:00
-lastmod: 2024-06-24T14:11:24+01:00
+lastmod: 2026-10-28T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -98,6 +98,24 @@ e.g. All except system: *,-system_health,-AlwaysOn_health,-telemetry_xevents
 * Membership of the *WatchXE* or *db_owner* roles in the repository database. (*Application Level constraint*)
 
 The DBA Dash service account needs permissions to execute SQL agent jobs, which can be granted through the **SQLAgentOperatorRole** role.
+
+### Source connections
+
+Adding, removing and editing source connections from the GUI uses messaging. The service has to have **Allow Connection Changes** turned on. The user needs the **ManageConnections** role and the **Messaging** role. db_owner can do the same without either role.
+
+* **Add Connections...** on the root of the tree. The service connects as the service account, shows a review of what adding each connection means, then saves `ServiceConfig.json` and starts collecting. Custom collections cannot be added this way.
+* **Connection Options...** on an instance. Reads the connection's options from the service and saves changes to slow query capture, plan collection, live plan capture, deadlocks, query stats and the other options on those tabs.
+* **Remove Connection...** on an instance. Removes it from the service config. By default the DBA Dash extended events sessions on the instance are dropped and the instance is marked deleted in the repository.
+
+Connection strings are encrypted for the service before they are sent. The service creates an RSA key pair at startup and publishes the public key. The private key stays in the service process.
+
+A source saved without a ConnectionID (older configs) cannot be changed through these messages until it has one. Run `DBADashConfig -a PopulateConnectionID` and restart the service.
+
+**Allow Connection Changes** also allows schedule changes. See [Changing schedules from the GUI](/docs/help/schedule/#changing-schedules-from-the-gui).
+
+### Live query plans
+
+**Live Plan** on a running request uses messaging to read the plan from the instance. The **Messaging** role is required, the same as plan collection. The plan is not stored. See [Live query plans](/docs/help/running-queries/#live-query-plans).
 
 ## How it works
 

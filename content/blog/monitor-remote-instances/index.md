@@ -78,7 +78,7 @@ Here we will configure the DBA Dash service to collect data from monitored insta
 Credentials are configured on the Options tab if required:
 ![AWS Credential configuration](aws-cred.png)
 
-{{< callout caution>}}Although the secret key is encrypted in the configuration file, this should be considered obfuscation rather than encryption. {{< /callout >}}
+{{< callout caution>}}On Windows the secret key is encrypted with a machine key, so any process on that machine can decrypt it. Use [config encryption](/docs/help/config-file/#encryption), or an IAM role, when the key has to stay private.{{< /callout >}}
 {{< callout caution>}}Use a limited account that only grants access to the S3 bucket{{< /callout >}}
 
 * Set the destination connection:
