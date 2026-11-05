@@ -3,7 +3,7 @@ title: "AI Assistant"
 description: "Configure and use the DBA Dash AI Assistant to analyse repository data and answer natural-language questions about alerts, performance, waits, backups, blocking, slow queries, and more."
 lead: "The AI Assistant analyses your DBA Dash repository data and answers natural-language questions about your SQL Server environment."
 date: 2026-05-27T00:00:00Z
-lastmod: 2026-10-28T00:00:00Z
+lastmod: 2026-11-05T00:00:00Z
 draft: false
 images: []
 weight: 999
@@ -62,7 +62,7 @@ The service config tool creates/modifies the `appsettings.local.json` file which
 
 ### Local mode (default — recommended for getting started)
 
-Run `DBADashAI` on the same machine as the GUI. It binds to `localhost` only and requires no authentication — the loopback interface is the security boundary.
+Run `DBADashAI` on the same machine as the GUI. It binds to `localhost` only and requires no authentication — the loopback interface is the security boundary. Every endpoint answers only when the request host is a loopback name (`localhost`, `127.x.x.x`, `[::1]`, or none), so a page in a browser cannot reach it by another name for the same address.
 
 - No certificates required
 - No API key required
@@ -386,6 +386,20 @@ If neither source is available the AI Assistant tab is hidden.
 > **Role requirement** — Even when a service is reachable, the AI Assistant tab is only shown to users who are admins (**db_owner** or **sysadmin** on the repository database) or members of the **AIUser** role. If you can reach the service but the tab is still missing, verify that your repository login has one of these roles assigned.
 
 ---
+
+## Data sent to the model
+
+Masking is on by default. Plans and deadlock XML are masked before they are parsed, so the statement, the parameter list and the insights built from them are masked too. The same value keeps the same placeholder, so parameter sniffing still shows. Query text is masked as T-SQL: strings, and the values passed to procedures and `sp_executesql`. The statement inside `sp_executesql` or `EXEC (...)` stays readable. Tool results are masked by column name. Error and alert messages lose quoted values.
+
+The levels are parameter values and literals (the default), parameters, literals, full, and metadata only. Metadata only withholds statement text and replaces logins, hosts and application names with codes. Every masking menu remembers the last choice until the GUI restarts. `AI.DataDetail` in the service configuration is the minimum. A request can mask more, never less. A plan or deadlock request masked less than the setting is refused. The setting is metadata only until it has been read. Follow-up questions mask the tool results they send back, at the current setting.
+
+The same masking applies to the [MCP server](/docs/help/mcp/). An MCP client uses its own model. That is separate from the provider configured here.
+
+## Performance analysis
+
+**AI Analysis** on the Performance tab, and on Performance Summary, Latches and Spinlocks, analyses the instance over the selected range. The payload includes CPU, waits, IO and the other performance summaries, running queries and tempdb from the running-queries snapshots, and deadlocks (counts against the baseline, top signatures, and the top applications, databases and procedures).
+
+With **Lookups** ticked (the default), the model can ask for up to three lookups before it answers: root blockers in the worst blocking snapshots, queries waiting on a wait type, long-running queries and open transactions, and the processes and resources of one deadlock signature. Each lookup is limited to the instance and the analysis window. The dialog lists what was fetched above the answer. Follow-up questions keep those results.
 
 ## Deadlock and query plan analysis
 

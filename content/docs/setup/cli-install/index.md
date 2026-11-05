@@ -129,6 +129,16 @@ Change the service name if you want to have more than 1 instance of the DBA Dash
 DBADashConfig -a SetServiceName --ServiceName "MyDBADashService"
 ```
 
+## Community tools
+
+List, check and deploy the [community tools](/docs/help/community-tools/#deploying-from-dba-dash) pinned by this build. Deploy connects as you and needs `--AcceptDisclaimer`.
+
+```cmd
+DBADashConfig -a ListCommunityTools
+DBADashConfig -a CheckCommunityTools --ConnectionIDs *
+DBADashConfig -a DeployCommunityTools --Tools "sp_WhoIsActive,FirstResponderKit" --ConnectionIDs * --AcceptDisclaimer
+```
+
 ## Get Help
 
 ```cmd

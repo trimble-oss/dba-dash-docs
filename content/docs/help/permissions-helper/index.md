@@ -3,7 +3,7 @@ title: "Permissions Helper"
 description: ""
 summary: ""
 date: 2025-06-17T19:02:00+01:00
-lastmod: 2025-06-17T19:02:00+01:00
+lastmod: 2026-11-05T00:00:00+00:00
 draft: false
 weight: 999
 toc: true
@@ -36,6 +36,10 @@ The permissions helper is designed to work with Windows authentication.  It does
 ## Granting Access
 
 Clicking the *Permissions Helper* button on the destination or source tab will load all the connections.  You can delete any from the grid that you don't want to include.  You can also click the "Grant permissions to service account" link when adding a new instance to grant permissions just to that 1 instance.
+
+The GUI can open the same helper from **Add Connections**, and from the review dialog for connections that could not connect. It connects as the current Windows user. The service reports its account with the connection check, which is the login the helper provisions. A connection name of `.`, `localhost` or `(local)` is resolved to the computer the service runs on, so the grant is not applied to an instance on the computer running the GUI.
+
+Granting EXECUTE on `sp_Blitz` also grants EXECUTE on the other First Responder Kit procedures installed in that database. `sp_Blitz` runs them to check their versions. Procedures that are not installed are skipped.
 
 #### 1. Grant Access to the repository database
 

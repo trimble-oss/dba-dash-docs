@@ -3,7 +3,7 @@ title: "Community Tools"
 description: ""
 lead: ""
 date: 2024-11-03T08:40:00+00:00
-lastmod: 2024-11-03T08:40:00+00:00
+lastmod: 2026-11-05T00:00:00+00:00
 draft: false
 weight: 999
 toc: true
@@ -14,12 +14,62 @@ DBA Dash now supports various community scripts, including [Adam Machanic's](htt
 
 Community Tools are executed on your monitored instances using the [Messaging](/docs/help/messaging) feature.  The GUI communicates with the service via the repository database using service broker.  The service runs the scripts and sends the data back to the GUI.  The complexity is hidden behind the scenes - once the scripts are deployed and security configured, it just works.
 
-### Community Tools Setup
-* Deploy the community tools to your SQL instances & ensure the DBA Dash service account has permissions to execute.
+### Deploying from DBA Dash
 
-{{< callout context="tip" >}}
-The script below can be used to automate the deployment of community tools & permissions using [dbatools](https://dbatools.io/).
+From 4.24.0, DBA Dash can deploy and update these tools. Each build pins a release. The scripts are downloaded when you deploy them. They are not included in the installer.
+
+A pinned release is tested by deploying it and reading the version from the procedure definition. The procedure is not executed, so the test does not cover what the tool does when you run it. Before a pin moves to a newer upstream release, that same deploy and version check is run on SQL Server 2022, and parameter changes are reported. **Latest** skips the hash check and that deploy check.
+
+{{< callout context="caution" >}}
+Community tools are third-party scripts, under their own licenses. DBA Dash fetches and deploys them. Review each tool before using it.
 {{< /callout >}}
+
+| Family | Tools |
+|---|---|
+| [First Responder Kit](https://github.com/BrentOzarULTD/SQL-Server-First-Responder-Kit) | sp_Blitz, sp_BlitzFirst, sp_BlitzIndex, sp_BlitzCache, sp_BlitzWho, sp_BlitzLock, sp_BlitzBackups |
+| [DarlingData](https://github.com/erikdarlingdata/DarlingData) | sp_HealthParser, sp_HumanEvents, sp_HumanEventsBlockViewer, sp_IndexCleanup, sp_LogHunter, sp_PressureDetector, sp_QuickieStore |
+| [sp_WhoIsActive](https://whoisactive.com/) | sp_WhoIsActive |
+| [Kenneth Fisher's permission scripts](https://github.com/sqlstudent144/SQL-Server-Scripts) | sp_SrvPermissions, sp_DBPermissions |
+| [Ola Hallengren's Maintenance Solution](https://ola.hallengren.com/) | CommandExecute, DatabaseBackup, DatabaseIntegrityCheck, IndexOptimize |
+
+`DBADashConfig -a ListCommunityTools` lists the pinned version of each tool.
+
+In the service config tool, click **Community Tools** (beside Permissions Helper) or **Deploy Tools...** (beside Allowed Scripts).
+
+[![Community Tools version check](community-tools-check.png)](community-tools-check.png)
+
+1. Pick the tools and instances. Tools already in Allowed Scripts start ticked. Azure SQL Database is skipped unless **Include Azure SQL DB** is ticked.
+2. **Check Versions** shows what is installed and whether it matches the pin.
+3. Choose the source and database if you do not want the defaults.
+4. **Connect as** uses each connection's own credentials. Use it to enter one login for every selected instance.
+5. Tick the acknowledgement and click **Deploy**.
+
+[![Community Tools deployment](community-tools-deploy.png)](community-tools-deploy.png)
+
+Deployment connects as you, not as the service account. After a deploy you can add the tools to Allowed Scripts and open the Permissions Helper to grant EXECUTE. Save the service configuration to apply Allowed Scripts. The Permissions Helper also grants EXECUTE on the other First Responder Kit procedures installed beside `sp_Blitz`, because `sp_Blitz` runs them to check their versions.
+
+**Source** is **Pinned** (download the pinned release and check its SHA-256), **Latest** (the newest GitHub release, with no hash check and no deploy check), or **Folder** (scripts you have downloaded).
+
+Checking and deploying follow SQL Server's lookup for an `sp_` procedure: the database the connection lands in, then master. An update changes the copy that will run. A tool that is not installed goes in the connection's database. `--Database` checks or deploys one database instead. On Azure SQL Database there is no lookup in master.
+
+#### Maintenance Solution
+
+DBA Dash does not run these procedures. No Agent jobs are created. They are not selected by default and are not added to Allowed Scripts. They go in the connection's database, or the database you name. They need SQL Server 2017 or later and are skipped on Azure SQL Database.
+
+An existing procedure is replaced only when its definition is Ola Hallengren's. Anything else is **Conflict** and is left alone. A definition that does not match a known upstream release is **Modified** and is not updated. When parameters change, Agent job steps that call the procedure are checked first. The procedures in a database are updated together. A rollback script is written under `CommunityToolsRollback` before anything is replaced. **Override safety checks** (`--OverrideSafetyChecks`) replaces a Modified procedure or one whose update would break a job. An object that is not Ola's is never replaced.
+
+#### Command line
+
+```cmd
+DBADashConfig -a CheckCommunityTools --ConnectionIDs *
+DBADashConfig -a DeployCommunityTools --Tools "sp_WhoIsActive,FirstResponderKit" --ConnectionIDs "SQL1,SQL2" --AcceptDisclaimer
+```
+
+`--AcceptDisclaimer` is required to deploy. `--AddToAllowedScripts` adds the deployed tools to Allowed Scripts. `--SqlUser` connects with a SQL login. The password is prompted for, or read from `DBADASH_PASSWORD`. The command exits with code 1 if any deployment fails.
+
+### Community Tools Setup
+
+You can still deploy the tools yourself, and grant the service account EXECUTE, with [dbatools](https://dbatools.io/).
 
 ```pwsh
 ############# Setup ##############
