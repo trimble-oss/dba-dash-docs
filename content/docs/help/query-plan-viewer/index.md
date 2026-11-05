@@ -3,7 +3,7 @@ title: "Query Plan Viewer"
 description: "Use the DBA Dash query plan viewer to explore execution plans, with operator ranking, insights and optional AI analysis."
 lead: "A built-in execution plan viewer - ranked operators, badges for the things worth spotting, static insights, plan comparison, and optional AI analysis."
 date: 2026-09-29T00:00:00Z
-lastmod: 2026-10-27T00:00:00Z
+lastmod: 2026-11-05T00:00:00Z
 draft: false
 images: []
 weight: 999
@@ -119,7 +119,9 @@ Right-click a row in the statements grid to compare that statement with the one 
 | **Waits** | Wait stats from an actual plan, with a link to what each wait type means |
 | **Query** | The statement text and the `SET` options |
 | **AI Analysis** | Optional AI-driven analysis (DBA Dash only - not available in the Visualizer) |
-| **XML** | The raw plan XML |
+| **XML** | The raw plan XML. Ctrl+F finds in the XML. The editor's menu can copy the selection or the whole document |
+
+[![Find in plan XML](query-plan-search.png)](query-plan-search.png)
 
 Tabs are hidden when there is nothing to show.
 
@@ -128,6 +130,10 @@ The operator properties include the memory grant for each operator (memory fract
 A statement's Query Hash and Query Plan Hash properties open the detail window when the plan was opened from DBA Dash: Query Stats, Running Queries and Query Store for that hash. The standalone Visualizer has no repository to look them up in, so these stay as plain text there.
 
 Insert, update and merge operators show their set predicate in the properties panel, the tooltip and search. A MERGE labels each predicate with its action. Seek predicates are shown for clustered index update and delete, including operators that hold the predicate directly.
+
+**View Operator XML** on an operator's menu shows that operator's showplan XML. Operators below it are replaced with comments.
+
+[![Operator XML](query-plan-operator-xml.png)](query-plan-operator-xml.png)
 
 ## Copy and save
 
@@ -162,6 +168,10 @@ Use the **Compare** menu on the toolbar to compare the current statement with:
 * A plan opened from a file
 
 The comparison opens in its own tab. Use the **Before** and **After** drop-downs to switch either side to any statement of any open plan, or click **Swap**.
+
+[![Compare every statement of two plans](query-plan-compare.png)](query-plan-compare.png)
+
+Comparing two plans defaults to every statement when a plan has more than one. Times, reads, costs and counts are totalled. Memory grants and parallelism take the largest value. Operator cost shares are weighted by the statement cost. The **Plans** tab is hidden for a combined comparison, and the **Query** tab diffs the full text. Comparing two statements inside one plan is unchanged. A procedure that was one statement and is now several, or the other way around, can be compared as a whole.
 
 ### Summary
 
@@ -203,6 +213,10 @@ Tab captions show the number of changes, e.g. **Operators (1 changed)**.
 ## AI Analysis
 
 [![AI plan analysis](ai-plan-analysis.png)](ai-plan-analysis.png)
+
+The **Ask** menu beside **AI Analysis** can hand the statement to Claude Code, Cursor or another [MCP](/docs/help/mcp/) client.
+
+[![Ask an AI tool](mcp-analysis.png)](mcp-analysis.png)
 
 With the [AI Assistant](/docs/help/ai-assistant/) service configured, the **AI Analysis** tab can send the plan for detailed observations and recommendations.
 

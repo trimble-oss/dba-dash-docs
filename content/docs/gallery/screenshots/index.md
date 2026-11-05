@@ -2,7 +2,7 @@
 title: "Screenshots 📷"
 description: "DBA Dash screenshots"
 date: 2025-04-09T00:00:00+01:00
-lastmod: 2026-10-28T00:00:00+01:00
+lastmod: 2026-11-05T00:00:00+00:00
 draft: false
 weight: 10000
 toc: true
@@ -93,6 +93,15 @@ toc: true
 [![AI query plan analysis](ai-plan-analysis.png)](ai-plan-analysis.png)
 *Optional AI analysis of execution plans, with follow-up questions. Nothing is sent until you review the request and submit.*
 
+[![Ask Claude Code from a plan](mcp-analysis.png)](mcp-analysis.png)
+*Hand the open plan to Claude Code, Cursor, VS Code or another MCP client. See [MCP server](/docs/help/mcp/).*
+
+[![Claude Code analysing a plan](claude-code-analysis.png)](claude-code-analysis.png)
+*Claude Code reads the plan through DBA Dash's MCP server and answers in its own window.*
+
+[![Cursor asking about an instance](cursor-mcp.png)](cursor-mcp.png)
+*Ask from Cursor itself. It reads the repository through the MCP server registered in Connect AI Tools.*
+
 ### Deadlocks
 
 [![Deadlock Charts](deadlock-charts.png)](deadlock-charts.png)
@@ -130,6 +139,9 @@ toc: true
 [![SQL Agent Job Timeline](sql-agent-job-timeline.png)](sql-agent-job-timeline.png)
 *SQL Agent job timeline, including every instance under the Agent Jobs node.*
 
+[![Job timeline plan mode](timeline-plan.png)](timeline-plan.png)
+*Plan mode, on one instance, shows where jobs overlap and tries start times that keep them apart. Busy hours can be shaded, and suggestions can keep jobs out of them.*
+
 [![SQL Agent Job DDL](job-ddl.png)](job-ddl.png)
 *Track DDL changes to your SQL agent jobs.  Compare jobs across SQL instances.*
 
@@ -153,6 +165,9 @@ toc: true
 
 [![Community Tools - sp_Blitz](community-tools.png)](community-tools.png)
 *Run community tools - sp_Blitz, sp_BlitzBackups, sp_BlitzCache...and many more*
+
+[![Deploy community tools](community-tools-deploy.png)](community-tools-deploy.png)
+*Deploy and update the tools from the service config tool. See [Community Tools](/docs/help/community-tools/#deploying-from-dba-dash).*
 
 ### Schema Snapshots
 

@@ -200,6 +200,7 @@ These roles are in addition to **App**. A member of **db_owner** can do what the
 * **SecurityReports** shows **Server Role Members (sysadmin)** and **SQL Login Password Age**. Both stay hidden without the role.
 * **RunUserReports** grants EXECUTE on the UserReport schema, which is what makes a [custom report](/docs/how-to/create-custom-reports/#security) visible and runnable.
 * **AIUser** shows the [AI Assistant](/docs/help/ai-assistant/) tab and allows an analysis to be submitted: a plan, a deadlock or performance. The role can unmask the AI service API key, which is what a submit uses. Previewing a request, or copying the prompt, does not need it.
+* **McpUser** is for the [MCP server](/docs/help/mcp/), not the GUI. It can execute the procedures those tools call, including `dbo.QueryStats_Get`, and has SELECT on `dbo` because several performance chart procedures build dynamic SQL. It has no access to the AI service configuration, API keys or stored analyses. `db_owner` already has what the local server needs. The AI service's role is not a member of **McpUser**.
 
 Actions that run on a monitored instance also need the **Messaging** role, and the service has to allow the action. See [Messaging](/docs/help/messaging/#security).
 

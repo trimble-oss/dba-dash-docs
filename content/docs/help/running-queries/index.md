@@ -67,7 +67,7 @@ The running queries collection can store those operator counters for long-runnin
 | Duration | 300,000 ms (5 minutes) |
 | Max per collection | 10, highest CPU first |
 
-A cleared threshold is unused. The query also has to meet the plan collection threshold above. A blocked query does not count towards the duration threshold. Only the counters are stored, one row per request, statement and plan. Each collection that still sees the query running replaces them and keeps the previous capture, which is how the viewer tells which operators were moving. The plan itself comes from the plan collection.
+A cleared threshold is unused. The query also has to meet the plan collection threshold above. A blocked query does not count towards the duration threshold. The thresholds are on the request, which can span many statements. The current statement is bounded by the transaction start, and by DOP for CPU, and is skipped while it cannot meet the threshold. Only the counters are stored, one row per request, statement and plan. Each collection that still sees the query running replaces them and keeps the previous capture, which is how the viewer tells which operators were moving. The plan itself comes from the plan collection.
 
 Where a capture exists, the plan link reads **View Live Capture**. Each capture opens on its own tab and does not refresh by itself. **Refresh** follows the query live if it is still running.
 
