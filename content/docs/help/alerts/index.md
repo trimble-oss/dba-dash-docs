@@ -59,7 +59,7 @@ An alert rule defines a condition that you want to be notified about. To create 
 
 * Configure the rule
   * Apply To (Instance) - enter the name of the instance you want the alert to apply to OR leave blank to apply to all instances.
-  * Apply To (Tag) - Select a tag to apply the alert to a group of instances.
+  * Apply To (Tags) - Select one or more tags to apply the alert to a group of instances. Tags with different names must all match (AND), and values of the same tag are alternatives (OR). e.g. `(Role:Production OR Role:UAT) AND Region:APAC`. The picker shows the resulting expression and how many active instances match. For OR across different tag names, create more than one rule.
 
  [![Add Alert Rule](add-alert-rule.png)](add-alert-rule.png)
 
@@ -226,7 +226,7 @@ If you want to disable alerts for the next hour, click *Add Blackout* on the Ale
 * End Date - when the blackout period ends.  Defaults to the next hour.  For scheduled alerts, set to empty/null or a date in the distant future.
 * Alert Key - By default the blackout period will apply to all alerts. To filter for a specific alert, enter the alert key to filter on (LIKE syntax is supported.).  Alternatively, create the blackout using the *Add Blackout* link in the alert rules grid.
 * Apply To (Instance) - option to filter the blackout period to a specific instance
-* Apply To (Tag) - option to apply the blackout period to a specific tag.  e.g. Role:DEV
+* Apply To (Tags) - option to apply the blackout period to one or more tags.  e.g. Role:DEV.  Tags are combined the same way as for alert rules: different tag names must all match and values of the same tag are alternatives.  A blackout created from a rule's *Add Blackout* link copies the rule's tags.
 * Notes - option to add notes to describe the purpose of the blackout.
 * Time From/To - For scheduled alerts, enter a time when you want the blackout period to start & end.  e.g. 23:00.
 * TimeZone - The timezone used for Time From/To.

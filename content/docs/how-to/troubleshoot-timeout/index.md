@@ -24,7 +24,7 @@ DBA Dash makes it easy to troubleshoot query timeouts.  You can identify queries
 
 ## Prerequisites
 
-[Slow Query capture](/docs/help/slow-queries/) is disabled by default and should be enabled to allow troubleshooting of query timeouts.  Set the **Slow Query Threshold** to 1000 in the service config tool to capture queries that take longer than 1 second to run.  You can use a different threshold if you prefer but the threshold needs to be less than the application level query timeout.
+[Slow Query capture](/docs/help/slow-queries/) needs to be enabled to allow troubleshooting of query timeouts.  It's on by default for new connections, with a threshold of 10 seconds.  For timeout troubleshooting, set the **Slow Query Threshold** to 1000 in the service config tool to capture queries that take longer than 1 second to run.  You can use a different threshold if you prefer but the threshold needs to be less than the application level query timeout.
 
 [Running Queries](/docs/help/running-queries) will also be used to troubleshoot query timeouts, but this should already be enabled by default.  You might want to adjust the [schedule](/docs/help/schedule) to run more frequently though.  The default schedule is every 1min.  If you are dealing with 30 second timeouts, we might only capture a point in time snapshot of the queries execution 50% of the time which can make things harder to troubleshoot.  It can still be sufficient if you have a large number of timeouts.  The 1min schedule is also enough if you are dealing with longer query timeout durations like 5 or 10min where we will expect to see multiple point in time snapshots of a queries execution.  If you want to have more snapshots available, consider adjusting the threshold to 30 seconds.
 

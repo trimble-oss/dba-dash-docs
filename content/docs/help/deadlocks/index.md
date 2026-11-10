@@ -46,8 +46,8 @@ Deadlock capture is controlled by a single setting: **the name of the extended e
 
 | Option | Session name written to the config | Notes |
 |---|---|---|
-| **Disable Capture** | *(blank)* | The default. The collection doesn't run whatever its schedule says. |
-| **Dedicated System Managed Session** | `DBADash_Deadlocks` | **Recommended.** DBA Dash creates and starts the session itself and reads only it. |
+| **Disable Capture** | *(blank)* | The collection doesn't run whatever its schedule says.  Existing connections that don't set a session use this. |
+| **Dedicated System Managed Session** | `DBADash_Deadlocks` | **Recommended**, and the default for new connections. DBA Dash creates and starts the session itself and reads only it. |
 | **Use system health** | `system_health` | Nothing to deploy, read only, and it already contains recent deadlocks - but less efficient to read because unrelated events must be processed. Not available on Azure SQL Database. |
 | **Use existing session** | *your session name* | A session you already run. Read only - if it isn't running that is reported as an error rather than started. Ideally it should contain only the `sqlserver.xml_deadlock_report` event. |
 
@@ -60,8 +60,9 @@ What a dedicated session gives up is history - it starts empty. The **Backfill h
 ### New connections
 
 * In the **Service Configuration** tool, click the **Deadlocks** tab under the **Source** tab before adding the connection.
-* Select the capture option you want.
+* **Dedicated System Managed Session** is selected by default.  Select a different capture option if you want one.  To change what new connections start with, see [New connection defaults](/docs/setup/options/#new-connection-defaults).
 * Leave **Backfill history from system health** checked unless you don't want historical deadlocks.
+* **Skip on Azure SQL DB** is checked by default. Connections that turn out to be Azure SQL Database are added with deadlock capture disabled. Each Azure database is a separate connection with its own database scoped session, and the [Azure DB scan](/docs/setup/options/#azure-db) copies the master connection's settings to every database it finds. Uncheck it to capture deadlocks on Azure SQL DB too. It applies when connections are added (not when an existing connection is updated) and to **Apply deadlock configuration to all existing connections**.
 * Click **Add/Update**.
 
 ### Existing connections
@@ -69,7 +70,7 @@ What a dedicated session gives up is history - it starts empty. The **Backfill h
 There are two ways to configure instances you have already added:
 
 * Edit the **Deadlock XE Session** column in the existing connections grid. Set it to `DBADash_Deadlocks` (recommended), `system_health`, or your own session name. Clear it to disable capture. The **Backfill Deadlocks** column controls the backfill.
-* Or select the option you want on the **Deadlocks** tab and click **Apply deadlock configuration to all existing connections**.
+* Or select the option you want on the **Deadlocks** tab and click **Apply deadlock configuration to all existing connections**. With **Skip on Azure SQL DB** checked, Azure SQL Database connections are skipped and listed. Uncheck it to include them. Only connections whose server name is an Azure SQL endpoint (such as `*.database.windows.net`) are connected to, to check the platform.
 
 {{< callout context="note" icon="outline/info-circle" >}}
 Applying `system_health` to all connections skips Azure SQL Database instances - there is no `system_health` session there. Any instance whose platform can't be determined at the time is skipped and reported rather than being assigned a session that might not exist.

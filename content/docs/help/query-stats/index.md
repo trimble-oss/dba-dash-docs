@@ -19,13 +19,13 @@ Object Execution Stats tells you which procedure did the work. Query Stats tells
 
 The collection reads `sys.dm_exec_query_stats` and stores the change since the last read. The plan cache itself is not copied into the repository. Each instance and database has a **Query Stats** tab: charts and a grid of CPU, duration, reads, writes, executions and the rest.
 
-It is off by default. Reading the plan cache costs whatever the cache costs, and that cost scales with the size of the cache.
+It is on by default for new connections added in the service configuration tool or the GUI. Existing connections keep their setting. Reading the plan cache costs whatever the cache costs, and that cost scales with the size of the cache, so you might turn it off for instances with a very large plan cache. To change what new connections start with, see [New connection defaults](/docs/setup/options/#new-connection-defaults).
 
 ## Enabling
 
 In the service configuration tool, on the **Query Stats** tab when you add a connection:
 
-* **Collect query stats** turns the collection on. The default **Top N** is 50.
+* **Collect query stats** turns the collection on or off. It is checked by default. The default **Top N** is 50.
 * **Plans per collection** is how many plans one collection fetches for the shapes it stored. The default is 50. Set it to 0 to store no plans. Plans can still be fetched from the cache from the grid when messaging is enabled.
 * **Apply query stats configuration to all existing connections** copies those settings onto connections that are already in the config.
 
@@ -73,4 +73,4 @@ Raw rows are kept for 30 days and hourly rollups for 365. Both can be changed in
 
 Reports read whole hours from the hourly rollup and the partial hours at either end from the raw rows. A time filter with a UTC offset that is not a whole number of hours reads the raw rows, because an hourly row then straddles two local hours.
 
-Collection date alerts use a warning threshold of 15 minutes and a critical threshold of 30 minutes. Adjust them on the Collection Dates tab if you change the schedule. See [Collection thresholds](/docs/help/schedule/#collection-thresholds).
+Collection date thresholds are based on the collection's schedule by default, so they follow it if you change the schedule. See [Collection thresholds](/docs/help/schedule/#collection-thresholds).

@@ -17,9 +17,19 @@ DBA Dash logs errors in the *dbo.CollectionErrorLog* table in the repository dat
 
 The errors logged in the database can be viewed in the GUI on the *DBA Dash ErrorLog* tab under the *Checks* node of the tree.
 
-![DBA Dash ErrorLog](dbadash-errorlog.png)
+[![DBA Dash ErrorLog](errorlog.png)](errorlog.png)
 
-The *DBA Dash ErrorLog* tab tends to be the most convenient place to look for errors.  It contains only errors and warnings.  It can be searched and filtered for a specific instance.  It might not contain all errors - if there is a problem writing to the repository database for example.
+The *DBA Dash ErrorLog* tab tends to be the most convenient place to look for errors.  It contains only errors and warnings.  It opens on a row per instance (or per source with one instance selected), with counts split into *Errors / Warnings / Retries* and into where the error happened: *Collect / WMI / Import / Other*.  Click an instance, source or count to narrow the report, and *Back* to go up again.  It might not contain all errors - if there is a problem writing to the repository database for example.
+
+If 2 or more collections on an instance fail with WMI errors, a card above the results suggests fixing WMI access or setting *No WMI* for the instance.  See [WMI](/docs/help/wmi/).
+
+### Collection Health
+
+The *Collection Health* tab under the *Checks* node shows which collections are failing, and how often each collection succeeds.  The *Collection Health* column on the *Summary* tab uses the same status, and clicking it opens this tab.  Start here to find a collection that is failing, then follow its links to the errors.  See [Collection Health](/docs/help/collection-health/).
+
+### Collection Dates
+
+The *Collection Dates* tab under the *Checks* node shows when each collection last ran.  The *Snapshot Age* column on the *Summary* tab highlights collections that haven't run within the expected time.  This catches collections that have stopped running altogether - for example, if the service is stopped - which Collection Health can't report as failures.  See [Collection Thresholds](/docs/help/schedule/#collection-thresholds).
 
 ### Logs folder
 

@@ -149,12 +149,14 @@ At least one provider must be configured for the LLM summary to work. Without a 
   "Anthropic": {
     "BaseUrl": "https://api.anthropic.com",
     "ApiKey": "<key>",
-    "Model": "claude-3-5-sonnet-20241022",
+    "Model": "claude-sonnet-5-5",
     "Version": "2023-06-01",
-    "MaxTokens": 1024
+    "MaxTokens": 16000
   }
 }
 ```
+
+`MaxTokens` defaults to 16000 and is capped at 32000. Newer models think before they answer, and the thinking counts against `MaxTokens`. If the model stops before it answers, the analysis fails with a message to raise `Anthropic:MaxTokens`. DBA Dash doesn't set temperature or thinking, so each model uses its own defaults. Requests time out after 240 seconds.
 
 For Anthropic via **Azure Foundry**, set `BaseUrl` to the base Foundry URL (ending in `/anthropic/`):
 
@@ -470,6 +472,16 @@ The LLM provider is not configured or unreachable. Check `AI:Provider` and the c
 | `Bedrock:Region must be an AWS region name` | `Region` is blank or mistyped. It must look like `eu-west-2`. |
 
 The service log records Bedrock's full response for every failed call, with the ErrorId shown in the GUI.
+
+### Anthropic errors
+
+A 400, 404 or 422 from the provider includes the provider's own error message in the GUI.
+
+| Message | Cause |
+|---|---|
+| `temperature` is not supported (400) | DBA Dash 4.24 and earlier sent `temperature`, which newer models reject. Upgrade to 4.25 or later. |
+| The model stopped before it answered - raise `Anthropic:MaxTokens` | The model used all of `MaxTokens` thinking. Raise `Anthropic:MaxTokens` (default 16000, capped at 32000). |
+| The answer was cut short | The answer reached `MaxTokens`. Raise `Anthropic:MaxTokens`. |
 
 ### 401 Unauthorized
 
