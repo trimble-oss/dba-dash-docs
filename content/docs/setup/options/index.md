@@ -49,6 +49,27 @@ Similar to the destination connection, your source connection can also be a fold
 
 Source connections can also be added, removed and edited from the DBA Dash GUI when **Allow Connection Changes** is turned on. See [Source connections](/docs/help/messaging/#source-connections). Adding a connection in the config tool reviews every connection in one grid before it is saved.
 
+## New connection defaults
+
+The options tabs start with these collections turned on for new connections:
+
+| Option | Default for new connections |
+|---|---|
+| [Slow query capture](/docs/help/slow-queries/) | On, 10 second threshold, **EventFile** capture mode.  Azure SQL DB and Managed Instance connections are saved with RingBuffer |
+| [Running queries](/docs/help/running-queries/) | Session waits, task waits, TempDB allocations and cursors collected |
+| [Plans for running queries](/docs/help/running-queries/) | On, with the default thresholds |
+| [Live plan capture](/docs/help/running-queries/#capturing-long-running-queries) | On, for long running queries, with the default thresholds |
+| [Deadlocks](/docs/help/deadlocks/) | Dedicated system managed session (`DBADash_Deadlocks`), with backfill from system health.  Skipped for Azure SQL DB (**Skip on Azure SQL DB**) |
+| [Query stats](/docs/help/query-stats/) | On, Top N 50 and 50 plans per collection.  The cost of reading the plan cache depends on its size, so you might turn it off for instances with a very large plan cache. |
+
+You can change any option before you add the connection.  To use your own defaults, set the options you want and click **Save as my defaults** on the **Other** tab.  Click **Reset to app defaults** to remove your saved defaults.  Both links appear in the service configuration tool and in the GUI's **Add Connections** dialog.
+
+Your defaults are saved for your Windows account on that computer, in `%LocalAppData%\DBADash\NewConnectionDefaults.json`.  Custom collections aren't saved.
+
+{{< callout context="note" icon="outline/info-circle" >}}
+Defaults only apply to connections you add.  Existing connections keep their settings.  DBADashConfig command line options aren't affected.
+{{< /callout >}}
+
 ## Azure DB
 
 DBA Dash supports monitoring Azure DB.  Each database is treated like an individual SQL instance, but you only need to add a connection to the master database to the config.  By default the application will add collection schedules for each database when the service starts and also look for new databases created every hour.  You can disable these features if required.  The "Scan Now" button can be used to add the databases as connections in the config.  You might want to do this to have different collection configurations for each database.  You might also want to monitor specific databases.
@@ -61,11 +82,11 @@ Schedules can be customized if required.  You can configure schedules at the age
 
 ## Slow Query capture - Extended Events
 
-Slow query capture can be enabled to capture RPC/Batch completed events that take longer than a specified duration.  See [here](/docs/help/slow-queries/) for more information.
+Slow query capture is on by default for new connections.  It captures RPC/Batch completed events that take longer than a specified duration.  See [here](/docs/help/slow-queries/) for more information.
 
 ## Query plan capture
 
-Query plans can be captured for running queries.  See [here](/docs/help/running-queries/) for more information.
+Query plans are captured for running queries by default for new connections.  See [here](/docs/help/running-queries/) for more information.
 
 ## Schema snapshots
 
@@ -83,13 +104,13 @@ DBA Dash collects identity column information for any identity columns that have
 
 ## Log Internal Performance Counters
 
-If you enable internal performance counters, you will be able to track how long each collection took to run as well as some other internal metrics.  This information will be available on the Metrics tab along with the os performance counter metrics that get collected.
+If you enable internal performance counters, each collection run is kept, along with the CPU and logical reads it used on the monitored instance and in the repository.  This is shown on the [Collection Health](/docs/help/collection-health/#cost) tab.  Without it, Collection Health still shows success rates and durations from an hourly rollup.  The collection metrics are also available on the Metrics tab (click **Collection Metrics**), along with the OS performance counter metrics that get collected.
 
 [![Internal performance counters](internalcounters.png)](internalcounters.png)
 
-{{< callout context="caution" icon="outline/alert-triangle">}} Enabling internal performance counters will increase the size of the PerformanceCounters tables.{{< /callout >}}
+{{< callout context="caution" icon="outline/alert-triangle">}} Enabling internal performance counters keeps a row for every collection run in `dbo.CollectionRuns` (30 days by default), which increases the size of the repository database.{{< /callout >}}
 
-Internal performance counters track the time taken from the client side.  If you are interested in evaluating the monitoring impact of DBA Dash, you could create an extended event session to capture RPC and Batch Completed events for application name starting with "DBADash".
+To evaluate the monitoring impact of DBA Dash, use the CPU and logical reads on the [Collection Health](/docs/help/collection-health/#cost) tab.  For more detail, you could also create an extended event session to capture RPC and Batch Completed events for application name starting with "DBADash".
 
 ## Multiple agents running on the same host
 

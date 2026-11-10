@@ -26,7 +26,7 @@ Community tools are third-party scripts, under their own licenses. DBA Dash fetc
 
 | Family | Tools |
 |---|---|
-| [First Responder Kit](https://github.com/BrentOzarULTD/SQL-Server-First-Responder-Kit) | sp_Blitz, sp_BlitzFirst, sp_BlitzIndex, sp_BlitzCache, sp_BlitzWho, sp_BlitzLock, sp_BlitzBackups |
+| [First Responder Kit](https://github.com/BrentOzarULTD/SQL-Server-First-Responder-Kit) | sp_Blitz, sp_BlitzFirst, sp_BlitzIndex, sp_BlitzCache, sp_BlitzWho, sp_BlitzLock, sp_BlitzBackups, sp_ineachdb |
 | [DarlingData](https://github.com/erikdarlingdata/DarlingData) | sp_HealthParser, sp_HumanEvents, sp_HumanEventsBlockViewer, sp_IndexCleanup, sp_LogHunter, sp_PressureDetector, sp_QuickieStore |
 | [sp_WhoIsActive](https://whoisactive.com/) | sp_WhoIsActive |
 | [Kenneth Fisher's permission scripts](https://github.com/sqlstudent144/SQL-Server-Scripts) | sp_SrvPermissions, sp_DBPermissions |
@@ -38,7 +38,7 @@ In the service config tool, click **Community Tools** (beside Permissions Helper
 
 [![Community Tools version check](community-tools-check.png)](community-tools-check.png)
 
-1. Pick the tools and instances. Tools already in Allowed Scripts start ticked. Azure SQL Database is skipped unless **Include Azure SQL DB** is ticked.
+1. Pick the tools and instances. Tools already in Allowed Scripts start ticked. Ticking a tool also ticks the tools it needs - `sp_Blitz` calls `sp_ineachdb`, so it is deployed with it, including on Azure SQL Database. Azure SQL Database is skipped unless **Include Azure SQL DB** is ticked.
 2. **Check Versions** shows what is installed and whether it matches the pin.
 3. Choose the source and database if you do not want the defaults.
 4. **Connect as** uses each connection's own credentials. Use it to enter one login for every selected instance.

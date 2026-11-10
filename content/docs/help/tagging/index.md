@@ -27,6 +27,8 @@ The "Clear All" option will remove any tag filters you have applied.  The "Refre
 To group instances by tag, select the tag from the "Group" menu.
 ![Group by system tag](system-tags-group.png)
 
+Once grouped, **Then by** adds a further level within the group - e.g. Role, then Region.  Up to three levels are supported, and the menu has an option to remove the last level.  An instance with several values for a tag is listed under each value.  **Show Counts** counts distinct instances at every level.
+
 To remove the grouping, select `[None]`.  If you want the grouping to be persisted next time you load DBA Dash, click "Save".  
 
 ## Viewing tags

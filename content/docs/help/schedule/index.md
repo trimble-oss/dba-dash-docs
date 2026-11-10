@@ -232,10 +232,19 @@ A collection that is switched off by its configuration rather than by its schedu
 
 ## Collection Thresholds
 
-Collections have thresholds associated with them to alert you if a collection hasn't successfully run within an expected period of time. Issues are highlighted on the *Snapshot Age* column in the Summary tab. If you adjust thresholds or disable a collection, you will also need to adjust the associated collection threshold on the *Collection Dates* tab.
+Collections have thresholds associated with them to alert you if a collection hasn't successfully run within an expected period of time. Issues are highlighted on the *Snapshot Age* column in the Summary tab.
+
+By default, thresholds are based on each collection's schedule, so they follow any schedule changes you make:
+
+* Warning - twice the longest interval between runs, plus 3 minutes
+* Critical - 4 times the longest interval between runs, plus 6 minutes
+
+For example, a collection that runs every hour is a warning after 123 minutes and critical after 246 minutes. The multipliers and buffer minutes can be changed, or you can set fixed thresholds in minutes instead. A collection whose schedule is disabled isn't flagged as overdue.
 
 * Clicking the *Configure Root* link will allow you to set thresholds that apply to all instances.
 * Clicking the *Configure Instance* link will allow you to override thresholds for a specific instance.
+
+Collection Dates catches collections that have stopped running. To see collections that run but fail, use [Collection Health](/docs/help/collection-health/).
 
 [![Collection thresholds](collection-thresholds.png)](collection-thresholds.png)
 

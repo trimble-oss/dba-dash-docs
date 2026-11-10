@@ -13,11 +13,11 @@ menu:
 weight: 999
 toc: true
 ---
-Slow query capture uses an extended event session to capture queries (batch_completed and rpc_completed events) that take longer than a specified threshold to run.  Slow Query capture needs to be enabled in the service configuration tool when adding your source connection.
+Slow query capture uses an extended event session to capture queries (batch_completed and rpc_completed events) that take longer than a specified threshold to run.  Slow query capture is on by default for new connections added in the service configuration tool or the GUI.  See [New connection defaults](/docs/setup/options/#new-connection-defaults).
 
 ## Before Enabling
 
-Slow query capture is disabled by default as it will add a small amount of overhead.  Also, you might want to tweak the thresholds for your server.  If you enable slow query capture, the associated table in the repository database could grow quite large depending on the activity on your monitored instances, the thresholds used and the data retention settings. That said, the data collected is very useful and can help troubleshoot performance issues.  The collection uses extended events and the overhead of the collection should still be very small.  
+Slow query capture adds a small amount of overhead, and you might want to tweak the threshold for your server.  With slow query capture enabled, the associated table in the repository database could grow quite large depending on the activity on your monitored instances, the thresholds used and the data retention settings. That said, the data collected is very useful and can help troubleshoot performance issues.  The collection uses extended events and the overhead of the collection should still be very small.  
 
 > **Note**
 >  **Please ensure your SQL instance is patched to a recent CU**.  There have been some [issues](https://support.microsoft.com/en-us/topic/kb4051359-fix-sql-server-runs-out-of-memory-when-table-valued-parameters-are-captured-in-extended-events-sessions-in-sql-server-2016-even-if-collecting-statement-or-data-stream-isn-t-enabled-a3639efa-0618-82a8-f6b1-8cdcba29ce6d) with the OBJECTSTORE_LBSS memory clerk using a lot of space on older patch levels when using extended events.  If you are on a recent patch level it's unlikely that slow query capture will have any significant impact.  
@@ -28,9 +28,9 @@ Slow query capture is disabled by default as it will add a small amount of overh
 ## Configuring
 
 **New Connections:**
-* Add a new connection using the Service Configuration tool.  Before adding the connection, click the "Extended Events" tab.
-* Click the "Capture Slow Queries" checkbox to enable slow query capture which will use a threshold value of 1000ms by default. 
-* Edit the default threshold if required.
+* Add a new connection using the Service Configuration tool.  Before adding the connection, click the "Slow Queries" tab.
+* "Capture Slow Queries" is checked by default, with a threshold of 10000ms (10 seconds) and the EventFile capture mode.  Uncheck it to disable slow query capture.  The default threshold is higher than the 1000ms you might choose yourself because capture is on by default, and on busy instances the storage grows with every execution over the threshold.  [Query stats](/docs/help/query-stats/), also on by default, covers the statements below it.
+* Edit the threshold or capture mode if required.  To change what new connections start with, see [New connection defaults](/docs/setup/options/#new-connection-defaults).
 * Click Add/Update when you are ready to add the new connection
 
 ![Schedule](slow-queries-setup.png)
@@ -45,11 +45,11 @@ The capture mode is set on the "Slow Queries" tab of the service configuration t
 
 | Mode | Session | How it's read | Available on |
 |------|---------|---------------|--------------|
-| **RingBuffer** (default) | DBADash_1 (and DBADash_2 with [dual session](#use-dual-session-advanced-option)) | The whole ring buffer is read, then the session is stopped and started to empty it | All instance types |
-| **EventFile** | DBADash_SlowQueries, created and managed by DBA Dash | From a saved position in the event file, so each collection reads only new events | SQL Server (not Azure SQL DB or Managed Instance) |
+| **RingBuffer** | DBADash_1 (and DBADash_2 with [dual session](#use-dual-session-advanced-option)) | The whole ring buffer is read, then the session is stopped and started to empty it | All instance types |
+| **EventFile** (default for new connections) | DBADash_SlowQueries, created and managed by DBA Dash | From a saved position in the event file, so each collection reads only new events | SQL Server (not Azure SQL DB or Managed Instance) |
 | **ExistingSession** | A session you create and manage | event_file: from a saved position.  ring_buffer: read without being emptied | All instance types |
 
-RingBuffer is the default and works exactly as it always has.
+EventFile is the default for new connections.  Azure SQL DB and Managed Instance connections are saved with RingBuffer when they're added, as EventFile isn't available there.  A connection set to EventFile on those platforms uses RingBuffer anyway, with a warning in the log.  Existing connections keep their capture mode, and RingBuffer is still the default for a connection in ServiceConfig.json that doesn't set one, and for `--SlowQueryCaptureMode` in DBADashConfig.
 
 ### EventFile
 

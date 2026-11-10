@@ -22,6 +22,7 @@ The extension adds an **Open in DBA Dash Visualizer** option to SSMS for:
 * **Results grids** - the results grid right-click menu.
 * **Live plans** - **Open Live Plan in DBA Dash Visualizer** on a results grid row that has a session id. See [Live plans](#live-plans).
 * **All results** - **Open All Results in DBA Dash Visualizer** is shown when the query window has more than one results grid.
+* **Messages** - **Open Messages in DBA Dash Visualizer** on the Messages tab's right-click menu. See [STATISTICS IO and TIME](#statistics-io-and-time).
 
 The option is also on the **Tools** menu, with **Ctrl+Alt+Shift+D** as a keyboard shortcut.
 
@@ -59,6 +60,8 @@ Column data types are preserved when the grid is read from SSMS. Large result se
 
 **Open All Results in DBA Dash Visualizer** sends every result set from the query window in one go. They open on a single tab, named after the query window, with a table per result set. **Save All** saves them as a data set file (XML or JSON) that can be re-opened later, or as an Excel workbook with a sheet per result set.
 
+**Open in DBA Dash Visualizer** and **Open All Results** also send the query window's messages and the query text (SSMS 22). See [STATISTICS IO and TIME](#statistics-io-and-time).
+
 ### Data bars
 
 [![Data Bars](data-bar.png)](data-bar.png)
@@ -70,6 +73,8 @@ Right-click a numeric column or cell and select **Data Bar** to draw a bar in ea
 * **Options...** sets the colors, a fixed minimum and maximum, and warning and critical thresholds. Select **Thresholds are values, not % of scale** to compare the thresholds with the cell value - e.g. amber from 5ms and red from 50ms.
 * **Copy to All Numeric Columns** applies the same style to the other visible numeric columns. Each column keeps its own scale.
 * **Remove** and **Remove All Data Bars** take bars away.
+
+**Reset Data Bars** on the Data Bar menu puts back a table's own bars (such as the Statistics tab's) and forgets your changes.
 
 By default, a bar is scaled to the values showing, so it rescales when you filter, group or refresh. Data bars are remembered and re-applied to the next result set with the same column names and types.
 
@@ -109,6 +114,50 @@ Run the script in SSMS to re-create the results you saw in the grid, then query 
 ### Saving and re-opening grids
 
 **Export File** saves the grid as JSON or XML (optionally compressed), which can be re-opened later in the Visualizer or in DBA Dash with **Tools > Open Grid or Data Set**. Results saved from SSMS with **Save Results As** XML can also be opened - by drag and drop, from Explorer, or with the **Open** button. **Tools > Open Grid or Data Set** in DBA Dash also opens DataSets written to the DBA Dash service's `Failed` folder, which can help with troubleshooting collection issues.
+
+## STATISTICS IO and TIME
+
+[![Statistics Parser](statistics-parser.png)](statistics-parser.png)
+
+With SSMS 22, results opened in the Visualizer bring the query window's **Messages** tab and the query text with them. **Open Messages in DBA Dash Visualizer** on the Messages tab's right-click menu (or the **Tools** menu) sends the messages alone, for a query with no results.
+
+The document shows sub-tabs:
+
+* **Results** - the result sets.
+* **Messages** - the message text in the code editor, read only, with find (Ctrl+F, F3).
+* **Statistics** - shown when `SET STATISTICS IO` or `SET STATISTICS TIME` printed anything.
+
+The **Statistics** tab has a card with the query totals and a note on how far they can be trusted, table I/O by table (or by statement), and time, rows and reads per statement. The tables start with data bars. Counters are read by name, so counters added in new SQL Server versions become columns.
+
+{{< details "How the totals are worked out" >}}
+
+The query text is the text the window executed: its selection, or all of it, captured when the query starts. Editing the text afterwards doesn't change it. If the extension didn't see the query run, the editor's current text is sent and the card says it may have changed.
+
+A single statement - a procedure call with or without `EXEC`, `sp_executesql`, `EXEC('...')`, or a `SELECT`/`INSERT`/`UPDATE`/`DELETE`/`MERGE` - has its own execution time taken as the total. It already includes everything it ran, so nested times aren't added up twice. A query with several calls shows its times as a range, from the longest single time up to everything added up, with a warning. Modifications note that triggers may be counted twice.
+
+{{< /details >}}
+
+### Comparing runs
+
+Add `PRINT 'DBADash-Compare'` (or `PRINT 'DBADash-Compare: label'`) before each version of a query to split it into runs:
+
+```sql
+SET STATISTICS IO, TIME ON;
+PRINT 'DBADash-Compare: Before';
+EXEC dbo.MyProc @Id = 1;
+PRINT 'DBADash-Compare: After';
+EXEC dbo.MyProc_v2 @Id = 1;
+```
+
+The **Statistics** tab then shows a card comparing the first run with the last, a **Comparison** tab with the totals and per-table I/O side by side with the changes, and a tab with each run's own statistics. A run with STATISTICS TIME or IO off is left blank rather than counted as 0.
+
+[![Statistics Parser - Compare](statistics-parser-compare.png)](statistics-parser-compare.png)
+
+To compare across query windows, right-click a document tab that has statistics and choose **Compare Statistics With**.
+
+### Saving messages
+
+**Save Results and Messages...** (or **Save Messages...** when there are no results) on the Messages tab saves an XML data set that reopens on the same tabs, with the statistics read again. **Save All** on the Data Set view includes the messages too. JSON can't keep them marked as messages, so use XML.
 
 ## Live plans
 

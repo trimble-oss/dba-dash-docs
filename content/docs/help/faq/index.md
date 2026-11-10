@@ -312,6 +312,8 @@ If you are worried about the monitoring impact, start small.  Instead of adding 
 
 #### How to evaluate the overhead for your own environment
 
+From 4.25, the [Collection Health](/docs/help/collection-health/#cost) tab shows what each collection costs.  Turn on **Log Internal Performance Counters** in the service config tool, and it shows the duration, CPU and logical reads of each collection on your monitored instances, and the cost of importing it into the repository.  You can look at this per collection and per instance, and chart it over time.  This is a good place to find the collections that cost the most on your instances.
+
 DBA Dash is very transparent about what collections it runs and when.  With very few exceptions, you can find the queries for all the collections [here](https://github.com/trimble-oss/dba-dash/tree/main/DBADash/SQL).  You could run any of these manually to test against your own SQL instances.
 
 The DBA Dash service will report itself with the application name *DBADash* and the GUI will report as *DBADashGUI*.  You can use the template scripts below as a starting point if you want to capture activity from DBA Dash.
