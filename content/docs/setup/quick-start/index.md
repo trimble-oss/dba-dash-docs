@@ -81,7 +81,7 @@ Please secure access to this folder.  See [security document](/docs/help/securit
 3. Run DBADashServiceConfigTool.exe
 
 {{< callout context="caution" icon="outline/alert-triangle" >}}
-If the application fails to start, please ensure you have .NET Framework 8 Runtime (desktop apps) installed.  See Requirements
+If the application fails to start, please ensure you have .NET Framework 10 Runtime (desktop apps) installed.  See Requirements
 {{< /callout >}}
 
 4. Set a destination connection
