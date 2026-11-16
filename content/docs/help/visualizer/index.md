@@ -19,6 +19,7 @@ DBA Dash Visualizer is a small, standalone app containing the same viewers that 
 * **Execution plans** (`.sqlplan`) - see [Query Plan Viewer](/docs/help/query-plan-viewer/).
 * **Deadlock graphs** (`.xdl`) - see [Deadlock Viewer](/docs/help/deadlocks/#deadlock-viewer).
 * **Result grids and data sets** - e.g. results sent from SSMS with the [SSMS extension](/docs/help/ssms-extension/).
+* **JSON lines and Serilog logs** (`.jsonl`, `.ndjson`, `.clef`) - see [JSON lines and Serilog logs](#json-lines-and-serilog-logs).
 
 Several files open as tabs of one window, so they can be compared.
 
@@ -68,6 +69,18 @@ This silently runs the setup program, so it behaves the same way. `winget upgrad
   ```
 
 * Files opened from Explorer, several at once, all open in the one running copy.
+
+### JSON lines and Serilog logs
+
+{{< callout context="tip">}}
+Available starting from 4.26.1.
+{{< /callout >}}
+
+JSON files are classified by their content. A single array or DataSet-shaped object loads as a DBA Dash grid or data set export, as before. A sequence of JSON values (JSON lines) loads as generic records: a column per property, with types inferred from the values and nested values shown as JSON. A column becomes a date only when every value in it reads as one.
+
+Serilog compact (CLEF) records are recognised and laid out as a log: Timestamp, Level, Message, Exception, then the other properties. Messages are rendered from the message template when the rendered message isn't included.
+
+A record that isn't valid JSON, such as a half-written last line, doesn't stop the file opening. Its text is shown in an **(Unreadable)** column with the error on its row, and a warning above the grid says how many parts couldn't be read. Files are opened with shared read/write, so a log that's still being written can be viewed.
 
 ### Open from Explorer
 

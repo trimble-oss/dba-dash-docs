@@ -3,7 +3,7 @@ title: "Deadlocks"
 description: "Configure deadlock collection in DBA Dash and use the deadlock reports, signatures, viewer, findings and AI analysis."
 lead: "Native deadlock capture, reporting and analysis - from the extended events session on your monitored instance through to a deadlock viewer with static and AI analysis."
 date: 2026-09-16T00:00:00Z
-lastmod: 2026-10-27T00:00:00Z
+lastmod: 2026-11-16T00:00:00Z
 draft: false
 images: []
 weight: 999
@@ -218,6 +218,8 @@ Triggering a collection requires the [messaging](/docs/help/messaging) feature t
 ### Performance tab
 
 Where the Deadlocks collection is enabled, the deadlock markers on the Performance tab count the deadlocks DBA Dash stored. The counts are exact, they are filtered to the database when you are at database level, and each point opens the Deadlocks report for the window it counted. **View > Deadlock Counts** switches back to the `Locks\Number of Deadlocks/sec\_Total` performance counter when you want the longer history from before the collection was enabled. That counter is engine-wide. On Azure SQL Database it includes deadlocks that never touched the database you are looking at. The choice is saved with the performance view.
+
+From 4.26.0, **View > Lock Waits** (on by default) shades `LCK_*` wait time behind the blocking and deadlock markers on the same chart, with a dashed baseline line for the same hours in previous weeks. Wait stats are instance wide, so at database level the series is labelled **(Instance)**.
 
 The `sp_BlitzLock` drill-down remains available. With native collection enabled it is no longer required.
 

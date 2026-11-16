@@ -2,7 +2,7 @@
 title: "Screenshots 📷"
 description: "DBA Dash screenshots"
 date: 2025-04-09T00:00:00+01:00
-lastmod: 2026-11-05T00:00:00+00:00
+lastmod: 2026-11-20T00:00:00+00:00
 draft: false
 weight: 10000
 toc: true
@@ -13,6 +13,11 @@ toc: true
 *Check the health of all your SQL instances on a single dashboard. Backups, DBCC checks, Corruption, Agent Jobs, Log Shipping, AGs, database space, drive space, query store, database state, identity columns & custom checks.*
 
 *⚠️This is a lab environment.  Try to keep your production dashboard green.  Fix issues and customize thresholds to meet the needs of your environment*
+
+### Daily Report
+
+[![Daily health report email](daily-report.png)](daily-report.png)
+*A scheduled email with a health summary of your instances: checks and object issues, open alerts, and exception-based performance with the top queries and lead blockers behind each finding.  Send a full report or only what's changed.*
 
 ### Performance Summary
 
@@ -29,10 +34,10 @@ toc: true
 [![Object Execution Stats](object-execution-stats.png)](object-execution-stats.png)
 *Track the performance of your stored procedures over time. See which stored procedures are using the most CPU or IO, which are executed most frequently and which have the slowest execution times*
 
-### Object Execution Compare
+### Object Execution Baseline
 
-[![Object Execution Compare](object-execution-compare.png)](object-execution-compare.png)
-*See how your stored procedure performance compares to yesterday or last week. Identify regressions that might require attention and easily quantify the impact of performance optimizations.*
+[![Object Execution Baseline](object-execution-baseline.png)](object-execution-baseline.png)
+*See how your stored procedure performance compares to a baseline - yesterday, last week or the median of the last 4 weeks - drawn on the same chart. Identify regressions that might require attention and easily quantify the impact of performance optimizations.*
 
 ### Query Stats
 

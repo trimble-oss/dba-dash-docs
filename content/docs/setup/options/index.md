@@ -3,7 +3,7 @@ title: "Setup Options"
 description: "Additional setup options not covered in the quick start"
 lead: "This pages covers some setup options not covered in the quick start guide."
 date: 2022-10-01T21:03:53+01:00
-lastmod: 2026-10-27T00:00:00+00:00
+lastmod: 2026-11-16T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -28,6 +28,8 @@ You can also set it manually.  e.g.
 There are various methods you can use to configure access to S3 buckets.  You could add the permissions to an IAM role associated with the instance if it's a EC2 instance in AWS.  If you want to provide a AWS profile or Access/Secret key combination, that can be done in the Options tab.
 
 {{< callout context="caution" icon="outline/alert-triangle">}}Please avoid storing the credentials in the config if possible.  If it's not possible, ensure the config file is encrypted.{{< /callout >}}
+
+From 4.26.0, folder, S3 and failed-message-folder destinations can write gzip-compressed `.xml.gz` files instead of `.xml` (`CompressFiles` in ServiceConfig.json, off by default).  The failed message folder - used when the destination keeps rejecting an import - is capped at 1000 files; the oldest managed files are deleted to make room.
 
 ## Secondary Destinations
 
@@ -109,6 +111,8 @@ If you enable internal performance counters, each collection run is kept, along 
 [![Internal performance counters](internalcounters.png)](internalcounters.png)
 
 {{< callout context="caution" icon="outline/alert-triangle">}} Enabling internal performance counters keeps a row for every collection run in `dbo.CollectionRuns` (30 days by default), which increases the size of the repository database.{{< /callout >}}
+
+From 4.26.0, turning this on also makes the service sample its own resource usage - CPU, memory, GC, threads, handles, collection work queue and source connection counts - from the process itself, with no extra queries against your monitored instances. The **Service Stats** system report shows a summary and 12 over-time charts for each service, scoped to the services that collect or import the instances in context.
 
 To evaluate the monitoring impact of DBA Dash, use the CPU and logical reads on the [Collection Health](/docs/help/collection-health/#cost) tab.  For more detail, you could also create an extended event session to capture RPC and Batch Completed events for application name starting with "DBADash".
 
