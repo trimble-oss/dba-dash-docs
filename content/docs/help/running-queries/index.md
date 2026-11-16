@@ -15,6 +15,21 @@ toc: true
 ---
 [RunningQueries](https://github.com/trimble-oss/dba-dash/blob/main/DBADash/SQL/SQLRunningQueries.sql) captures queries that are currently executing.  This takes inspiration from the likes of [sp_whoisactive](http://whoisactive.com/) and [sp_BlitzWho](https://github.com/BrentOzarULTD/SQL-Server-First-Responder-Kit/blob/dev/sp_BlitzWho.sql) - both of which are great tools.  It captures queries that are currently executing as well as sleeping sessions with open transactions.  This point in time snapshot might not be representitive of your SQL Server load but it provides a piece of the puzzle that can help diagnose performance issues.  For example, the data captured is useful to diagnose blocking issues, tempdb contention and memory grant issues.
 
+## Running queries chart
+
+{{< callout context="tip">}}
+Available starting from 4.26.1.
+{{< /callout >}}
+
+When an instance is selected, the summary view shows a stacked bar chart above the list of running query snapshots: not blocked, blocked (red) and sleeping with an open transaction (grey).
+
+* When the range has more snapshots than fit, snapshots are grouped into time buckets.  Each bar is the average over its snapshots, with a diamond marking the busiest snapshot in the bucket so short spikes aren't averaged away.
+* Click a bucket to zoom the chart and the snapshot list into it, down to one bar per snapshot.  **Zoom Out** (or **Back**) returns to the previous range, and the zoom is kept when returning from a snapshot.
+* Click a snapshot's bar or a peak marker to load that snapshot.  Ctrl+click opens it in a new window.
+* An optional line is drawn against an axis on the right: sum memory grant (default), max memory grant, tempdb/blocked/critical wait time, longest running query, oldest transaction or tempdb current MB.  It uses the max per bar, as wait times repeat across snapshots and would be counted more than once if summed.
+
+Whether the chart is shown, and the line chosen, are saved as user settings.
+
 ## Enable Plan capture
 Query plan capture is on by default for new connections added in the service configuration tool or the GUI.  Existing connections keep their setting.  To change it, check or uncheck **Collect Plans for Running Queries** on the **Running Queries** tab in the DBA Dash Service Config tool.  To change what new connections start with, see [New connection defaults](/docs/setup/options/#new-connection-defaults).
 

@@ -3,7 +3,7 @@ title: "Alerts"
 description: "How to create alerts with DBA Dash"
 lead: ""
 date: 2025-01-16T08:00:00+00:00
-lastmod: 2026-10-28T00:00:00+00:00
+lastmod: 2026-11-16T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -87,7 +87,7 @@ A notification channel defines where to send the alert notification. To create a
   * Webhook - For Google chat and generic webhooks.  Google chat supports threaded conversations.
   * Slack - Slack can also be configured as a webhook, but this option uses the API and supports threaded conversations.
   * Teams - Post alerts to a Microsoft Teams channel using a Teams Workflow.  See [Microsoft Teams](#microsoft-teams).
-  * Email
+  * Email - Select an [email server](#email-servers) and enter the recipients.
   * PagerDuty. *Select the service in PagerDuty.  Click Integrations.  Click to add an Events API V2 integration.  This provides the integration key required when setting up the notification channel in DBA Dash*
 * Configure the channel.
   * Alert Message Consolidation Threshold - *The number of notifications that will trigger a single consolidated alert notification to reduce noise.  Default 5.*
@@ -114,6 +114,16 @@ Schedules have an associated re-trigger threshold which is the minimum delay req
 {{< callout context="caution">}}
 Sensitive information associated with the notification channel is stored in the repository database.  Data masking is used to limit access to sensitive information and users will receive a "Insufficient permission to access notification channel details" error if they try to edit a channel without appropriate [permissions](https://learn.microsoft.com/en-us/sql/relational-databases/security/dynamic-data-masking?view=sql-server-2017#permissions) to unmask the data.  Sensitive data is obfuscated even if you have permissions to unmask, preventing casual viewing of the data.
 {{< /callout >}}
+
+### Email Servers
+
+{{< callout context="tip">}}
+Email servers are available in DBA Dash starting from 4.26.0.  In earlier versions, each email channel holds its own SMTP settings.
+{{< /callout >}}
+
+SMTP settings - host, port, credentials and from address - are stored once as an email server, and selected by email notification channels and [daily reports](#daily-reports).  Manage them from the **Email Servers** toolbar icon on the Alerts page, or select **New server...** from the server dropdown when configuring an email channel.  A server can't be deleted while a channel or report uses it.
+
+When upgrading to 4.26.0, each existing email channel gets a server with its current settings.
 
 ### Microsoft Teams
 
@@ -241,6 +251,10 @@ By default, the service config tool is already configured to process alerts.  If
 * Alert startup delay - when the service starts you might want to introduce an additional delay, allowing collections time to run before generating alerts.
 
 [![Alert Service Config](alert-service-config.png)](alert-service-config.png)
+
+## Daily Reports
+
+Daily reports email a health summary of your instances on a schedule, sent through an [email server](#email-servers).  They're sent by the DBA Dash service with **Process Alerts** enabled.  See [Daily Reports](/docs/help/daily-reports/).
 
 ## Handling new alerts
 
